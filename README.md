@@ -21,5 +21,5 @@ Este proyecto es un sistema web diseñado para mejorar la gestión operativa del
 - **PostgreSQL**: Es el sistema de gestión de bases de datos relacional que se utilizará para almacenar y organizar la información del restaurante. Permite realizar consultas complejas y manejar transacciones con alto rendimiento, asegurando la integridad y consistencia de los datos, como reservas, pedidos, menús y promociones.
 
 ## Diagrama de la Base de Datos
-![Diagrama de la Base de Datos](base de datos.jpeg)
+![Diagrama de la Base de Datos](basededatos.jpeg)
 
