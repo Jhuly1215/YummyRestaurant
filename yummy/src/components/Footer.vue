@@ -22,6 +22,10 @@
               <img src="https://img.icons8.com/ios-filled/50/ffffff/instagram-new.png" alt="Instagram" class="social-icon">
               Instagram
             </a>
+            <a href="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3825.068280228346!2d-68.1145714889087!3d-16.522650184158717!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x915f20ee187a3103%3A0x2f2bb2b7df32a24d!2sUniversidad%20Cat%C3%B3lica%20Boliviana%20%22San%20Pablo%22!5e0!3m2!1ses!2sbo!4v1729875829431!5m2!1ses!2sbo" target="_blank" rel="noopener noreferrer">
+              <img src="https://img.icons8.com/ios-filled/50/ffffff/marker.png" alt="GoogleMaps" class="social-icon"> 
+              Ubicación
+            </a>
           </div>
         </div>
         </div>
