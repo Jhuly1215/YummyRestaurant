@@ -1,0 +1,418 @@
+
+.carousel-item {
+    height: 60vh; 
+    background-position: center;
+    background-size: cover;
+    background-attachment: fixed; 
+  }
+
+  
+  .carousel-caption {
+    bottom: 20px;
+    font-family: 'Crimson Text', sans-serif;
+  }
+
+ 
+  .content {
+    padding: 50px 20px;
+    text-align: center;
+    background-color: white;
+  }
+  body {
+    font-family: "Oxygen", sans-serif;
+    color: #050505;
+    background-image: url('https://b2090723.smushcdn.com/2090723/wp-content/uploads/2019/03/DSC_0614.jpg?lossy=0&strip=0&webp=1');
+    background-size: cover; 
+    background-position: center; 
+    background-repeat: no-repeat; 
+}
+
+  
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+  }
+  
+  .main {
+    max-width: 1200px;
+    margin: 0 auto;
+    margin-top: 75px;
+    margin-bottom: 100px;
+  }
+  
+  .cards {
+    display: flex;
+    flex-wrap: wrap;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  
+  .cards_item {
+    display: flex;
+    padding: 1rem;
+    transition: transform 0.3s ease-in-out;
+}
+
+.cards_item:hover {
+    transform: scale(1.05); 
+    box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.2); 
+}
+  
+  .card_image {
+    position: relative;
+    max-height: 250px;
+  }
+  
+  .card_image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  
+  
+  
+  .note {
+    position: absolute;
+    top: 8px;
+    left: 8px;
+    padding: 4px 8px;
+    border-radius: 0.25rem;
+    background-color: #c89b3f;
+    font-size: 14px;
+    font-weight: 700;
+  }
+  
+  @media (min-width: 40rem) {
+    .cards_item {
+      width: 50%;
+    }
+  }
+  
+  @media (min-width: 56rem) {
+    .cards_item {
+      width: 33.3333%;
+    }
+  }
+  
+  .card {
+    background-color: white;
+    border-radius: 0.25rem;
+    box-shadow: 0 20px 40px -14px rgba(0, 0, 0, 0.25);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+  
+  .card_content {
+    position: relative;
+    padding: 16px 12px 32px 24px;
+    margin: 16px 8px 8px 0;
+    max-height: 290px;
+    overflow-y: scroll;
+  }
+  
+  .card_content::-webkit-scrollbar {
+    width: 8px;
+  }
+  
+  .card_content::-webkit-scrollbar-track {
+    box-shadow: 0;
+    border-radius: 0;
+  }
+  
+  .card_content::-webkit-scrollbar-thumb {
+    background: #c89b3f;
+    border-radius: 15px;
+  }
+  
+  .card_title {
+    position: relative;
+    margin: 0 0 24px;
+    padding-bottom: 10px;
+    text-align: center;
+    font-size: 20px;
+    font-weight: 700;
+  }
+  
+  .card_title::after {
+    position: absolute;
+    display: block;
+    width: 50px;
+    height: 2px;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: #c89b3f;
+    content: "";
+  }
+  
+  hr {
+    margin: 24px auto;
+    width: 50px;
+    border-top: 2px solid #c89b3f;
+  }
+  
+  .card_text p {
+    margin: 0 0 24px;
+    font-size: 14px;
+    line-height: 1.5;
+  }
+  
+  .card_text p:last-child {
+    margin: 0;
+  }
+  .title-fade {
+    position: absolute;
+    top: 30%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    width: 100%;
+    color: white;
+    opacity: 0; 
+    animation: fadeIn 3s ease-in-out forwards;
+    z-index: 10; 
+  }
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+
+  .title-fade h1{
+    font-family: "EB Garamond";
+    font-size: 7rem;
+    text-shadow: 3px 3px 5px rgba(0, 0, 0, 0.7);
+  }
+
+ 
+  #perfumeCarousel {
+    position: relative;
+  }
+
+  .info_button {
+    background-color: #c89b3f; 
+    color: black;
+    border: none; 
+    border-radius: 5px; 
+    padding: 10px 20px; 
+    font-size: 16px; 
+    cursor: pointer; 
+    margin-top: 10px; 
+    transition: background-color 0.3s ease; 
+  }
+
+  .info_button:hover {
+    background-color: #a87a4e; 
+  }
+
+ 
+
+.navbar {
+  display: flex;
+  background-color: #a87a4e;
+  justify-content: space-between;
+  align-items: center;
+}
+.navbar.navbar-scrolled {
+  background-color: rgba(255, 255, 255, 0.8); 
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); 
+}
+
+
+.navbar-collapse {
+  display: flex;
+  justify-content: flex-end;
+  width: 100%;
+}
+
+
+.navbar-brand {
+  font-family: "EB Garamond", serif;
+  font-size: 2rem;
+  margin-left: 25px;
+  color: #333;
+}
+
+.navbar-nav .nav-link {
+  color: #333;
+  padding: 15px;
+}
+
+.navbar-nav .nav-link:hover {
+  color: #c89b3f;
+}
+
+
+.footer {
+  background-color: #c89b3f; 
+  color: #fff; 
+  padding: 40px 0; 
+  margin-top: 25px;
+}
+
+.footer h5 {
+  color: #fff; 
+  margin-bottom: 20px;
+}
+
+.footer p {
+  color: #fff; 
+}
+
+.footer a {
+  color: #fff; 
+  text-decoration: none; 
+}
+
+.footer a:hover {
+  text-decoration: underline;
+}
+
+.footer .text-center {
+  border-top: 1px solid #fff; 
+  padding-top: 20px;
+}
+
+.bg-image-vertical {
+  position: relative;
+  overflow: hidden;
+  background-repeat: no-repeat;
+  background-position: right center;
+  background-size: auto 100%;
+  }
+  
+  @media (min-width: 1025px) {
+  .h-custom-2 {
+  height: 100%;
+  }
+  }
+  .btn-success {
+    background-color: #c89b3f;
+    border-color: #c89b3f; 
+    color: black;
+  }
+
+  .btn-success:hover {
+    background-color: #b78b30; 
+    border-color: #b78b30; 
+  }
+  .btn-add-product {
+    background-color: #c89b3f;
+    color: rgb(15, 13, 13);
+    margin-top: 50px;
+    margin-right: 90%;
+  }   
+  .btn-add-product:hover {
+    background-color: #8c6f25;
+  }
+
+  .about-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-top: 20px;
+}
+
+.about-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-top: 20px;
+  padding: 20px;
+}
+
+.map-container {
+  flex: 1;
+  margin-left: 50pxpx; 
+}
+
+.hours-container {
+  flex: 1;
+}
+
+.hours-container .card {
+  background-color: #fff;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  border: 1px solid #c89b3f;
+  transition: transform 0.3s;
+}
+
+.hours-container .card:hover {
+  transform: scale(1.05); 
+}
+
+.hours-container h2 {
+  font-family: "Oxygen", sans-serif;
+  color: #c89b3f;
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.hours-container ul {
+  list-style-type: none;
+  padding: 0;
+  text-align: center;
+}
+
+.hours-container li {
+  font-size: 18px;
+  margin-bottom: 10px;
+  color: #333;
+}
+
+.hours-container li::before {
+  content: "•";
+  color: #c89b3f;
+  font-weight: bold;
+  display: inline-block; 
+  width: 1em;
+  margin-left: -1em;
+}
+
+
+.profile-card-5 {
+  margin-top: 20px;
+}
+
+.profile-card-5 .btn {
+  border-radius: 2px;
+  text-transform: uppercase;
+  font-size: 12px;
+  padding: 7px 20px;
+}
+
+.profile-card-5 .card-img-block {
+  width: 91%;
+  margin: 0 auto;
+  position: relative;
+  top: -20px;
+}
+
+.profile-card-5 .card-img-block img {
+  border-radius: 5px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.63);
+}
+
+.profile-card-5 h5 {
+  color: #c89b3f;
+  font-weight: 600;
+}
+
+.profile-card-5 p {
+  font-size: 14px;
+  font-weight: 300;
+}
+
+.profile-card-5 .btn-primary {
+  background-color: #c89b3f;
+  border-color: #c89b3f;
+}
