@@ -2,6 +2,7 @@
   <nav class="nav-container">
       <div class="navIzquierda">
         <img src="@/assets/images/logoprincipal.jpeg" alt="Imagen del logo" class="logo" style="width: 120px;">
+        <h1>Tu lugar para compartir y disfrutar</h1>
       </div>
     </nav>
 </template>
@@ -28,6 +29,14 @@ html, body {
   margin: 0;
   padding: 0;
 }
+.navIzquierda h1{
+    color: aliceblue;
+    font-size: 2vh;
+    display: block;
+    text-align: center;
+    padding-right: 5%;
+    padding-left: 5%;
+}
 
 /* Estilos del contenedor del navbar */
 .nav-container {
@@ -43,8 +52,9 @@ html, body {
 /* Ajustes para la imagen del logo */
 .logo {
   width: 120px; /* Ajuste de tamaño del logo */
-  margin-left: 2%;
+  margin-left: 0%;
   margin-right: 0;
+  text-align: center;
 }
 
 /* Añadir margen superior al contenido debajo del navbar */
