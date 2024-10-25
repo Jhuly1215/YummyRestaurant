@@ -11,10 +11,21 @@
             <p>Teléfono: +123 456 789</p>
             <p>Email: info@Yummy.com</p>
           </div>
+          <div class="col-md-4">
+          <h5>Nuestras redes sociales</h5>
+          <div class="social-links">
+            <a href="https://www.facebook.com/Yummy" target="_blank" rel="noopener noreferrer">
+              <img src="https://img.icons8.com/ios-filled/50/ffffff/facebook--v1.png" alt="Facebook" class="social-icon">
+              Facebook
+            </a>
+            <a href="https://www.instagram.com/Yummy" target="_blank" rel="noopener noreferrer">
+              <img src="https://img.icons8.com/ios-filled/50/ffffff/instagram-new.png" alt="Instagram" class="social-icon">
+              Instagram
+            </a>
+          </div>
         </div>
-        <div class="text-center py-3">
-          <p>&copy; 2024 Yummy. Todos los derechos reservados.</p>
         </div>
+        
       </div>
     </footer>
   </template>
