@@ -45,7 +45,6 @@
       background-color: #A16F23; 
       color: #fff; 
       padding: 40px 0; 
-      margin-top: 25px;
     }
 
     .footer h5 {

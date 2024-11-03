@@ -1,25 +1,33 @@
 <template>
-  <HomePage/>
+  <NavbarComponent />
+  <router-view />
+  <FooterComponent />
 </template>
 
 <script>
-import HomePage from './ventanas/home.vue'
+import NavbarComponent from '@/components/Navbar.vue';
+import FooterComponent from '@/components/Footer.vue';
 
 export default {
   name: 'App',
   components: {
-    HomePage,
-  }
-}
+    NavbarComponent,
+    FooterComponent,
+  },
+};
 </script>
 
 <style>
+body, #app {
+  margin: 0;
+  padding: 0;
+}
 #app {
   font-family: Avenir, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
   color: #2c3e50;
-  margin-top: 60px;
+  
 }
 </style>
