@@ -3,7 +3,7 @@
 </template>
 
 <script>
-import Login from './ventanas/reservas.vue'
+import Login from './ventanas/mapaInteractivo.vue'
 
 
 export default {
