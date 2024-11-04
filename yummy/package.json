@@ -3,11 +3,14 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "serve": "vue-cli-service serve",
+    "dev": "concurrently \"npm run server\" \"npm run client\"",
+    "client": "vue-cli-service serve",
+    "server": "npm run serve --prefix ../server",
     "build": "vue-cli-service build",
     "lint": "vue-cli-service lint"
   },
   "dependencies": {
+<<<<<<< HEAD
     "axios": "^1.7.7",
     "bootstrap": "^5.3.3",
     "core-js": "^3.8.3",
@@ -16,15 +19,27 @@
     "pinia": "^2.2.6",
     "vue": "^3.2.13",
     "vue-router": "^4.4.5"
+=======
+    "@chenfengyuan/vue-carousel": "^2.0.0",
+    "@fortawesome/fontawesome-free": "^6.6.0",
+    "axios": "^1.7.7",
+    "bootstrap": "^5.3.3",
+    "core-js": "^3.8.3",
+    "vue": "^3.2.13",
+    "vue-carousel-3d": "^0.2.0"
+>>>>>>> 1a53c5b7310993566963a62188f35dcafa1b799a
   },
   "devDependencies": {
     "@babel/core": "^7.12.16",
     "@babel/eslint-parser": "^7.12.16",
-    "@vue/cli-plugin-babel": "~5.0.0",
-    "@vue/cli-plugin-eslint": "~5.0.0",
-    "@vue/cli-service": "~5.0.0",
+    "@vue/cli-plugin-babel": "^5.0.8",
+    "@vue/cli-plugin-eslint": "^5.0.8",
+    "@vue/cli-service": "^5.0.8",
+    "concurrently": "^9.0.1",
     "eslint": "^7.32.0",
-    "eslint-plugin-vue": "^8.0.3"
+    "eslint-plugin-vue": "^8.0.3",
+    "sass": "^1.80.6",
+    "sass-loader": "^16.0.3"
   },
   "eslintConfig": {
     "root": true,
@@ -38,7 +53,9 @@
     "parserOptions": {
       "parser": "@babel/eslint-parser"
     },
-    "rules": {}
+    "rules": {
+      
+    }
   },
   "browserslist": [
     "> 1%",

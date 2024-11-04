@@ -28,10 +28,7 @@
   </script>
   
   <style scoped>
-  body, #app {
-    margin: 0;
-    padding: 0;
-  }
+  
   
   .login-container {
     display: flex;

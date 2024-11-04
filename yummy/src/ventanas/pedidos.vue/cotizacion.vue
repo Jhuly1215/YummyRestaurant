@@ -1,11 +1,10 @@
-<!-- src/components/ModalPedido.vue -->
+
 <template>
     <div class="modal-overlay">
       <div class="modal-content">
         <span class="close-button" @click="$emit('onClose')">&times;</span>
         <h2 class="titulo">Tu Pedido</h2>
-  
-        <!-- Tabla de pedidos -->
+
         <div class="pedido-items">
           <div class="pedido-item-header">
             <span>Plato</span>
