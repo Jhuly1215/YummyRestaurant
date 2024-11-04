@@ -88,8 +88,6 @@ export default {
   height: 60vh;
   object-fit: cover;
   transition: transform 0.5s ease-in-out;
-<<<<<<< HEAD
-=======
 }
 
 .carousel-caption {
@@ -113,7 +111,6 @@ export default {
 
 .carousel-indicators .active {
   background-color: #a87a4e; /* Color activo */
->>>>>>> 76d4c48732c9328ce15601409e727412914d26da
 }
 
 .carousel-caption {

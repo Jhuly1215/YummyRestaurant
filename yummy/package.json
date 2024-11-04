@@ -16,11 +16,7 @@
     "bootstrap": "^5.3.3",
     "core-js": "^3.8.3",
     "vue": "^3.2.13",
-<<<<<<< HEAD
     "vue-carousel-3d": "^0.2.0"
-=======
-    "vue-router": "^4.4.5"
->>>>>>> 76d4c48732c9328ce15601409e727412914d26da
   },
   "devDependencies": {
     "@babel/core": "^7.12.16",

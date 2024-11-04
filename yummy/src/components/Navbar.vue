@@ -61,9 +61,4 @@ html, body {
 .content {
   margin-top: 50px; /* Ajusta según la altura del navbar */
 }
-<<<<<<< HEAD
 </style>
-=======
-</style>
-
->>>>>>> 76d4c48732c9328ce15601409e727412914d26da
