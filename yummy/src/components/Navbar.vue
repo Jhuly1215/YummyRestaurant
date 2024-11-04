@@ -62,4 +62,3 @@ html, body {
   margin-top: 50px; /* Ajusta según la altura del navbar */
 }
 </style>
-
