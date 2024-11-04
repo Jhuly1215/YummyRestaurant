@@ -1,14 +1,17 @@
+
 <template>
-  <HomePage/>
+  <OfertasPage />
 </template>
 
 <script>
-import HomePage from './ventanas/home.vue'
+//import HomePage from './ventanas/home.vue'
+import OfertasPage from './ventanas/ofertasPage.vue';
 
 export default {
   name: 'App',
   components: {
-    HomePage,
+    OfertasPage,
+    //HomePage,
   }
 }
 </script>
