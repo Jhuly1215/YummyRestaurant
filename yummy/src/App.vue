@@ -1,19 +1,16 @@
 <template>
-  <!--<HomePage/>-->
-  <MenuPedido/>
+  <OfertasPage />
 </template>
 
 <script>
 //import HomePage from './ventanas/home.vue'
-//import MenuCliente from './ventanas/MenuCliente.vue';
-import MenuPedido from './ventanas/MenuPedido.vue';
+import OfertasPage from './ventanas/ofertasPage.vue';
 
 export default {
   name: 'App',
   components: {
+    OfertasPage,
     //HomePage,
-    //MenuCliente,
-    MenuPedido
   }
 }
 </script>

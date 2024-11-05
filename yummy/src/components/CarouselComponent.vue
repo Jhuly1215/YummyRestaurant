@@ -112,4 +112,27 @@ export default {
 .carousel-indicators .active {
   background-color: #a87a4e; /* Color activo */
 }
+
+.carousel-caption {
+  background: rgba(0, 0, 0, 0.5); /* Fondo semi-transparente */
+  padding: 10px;
+  border-radius: 8px;
+}
+
+.carousel-item.active img {
+  transform: scale(1.02); /* Efecto de zoom suave */
+}
+
+.carousel-control-prev-icon,
+.carousel-control-next-icon {
+  filter: invert(1); /* Cambia los íconos de flecha a color claro */
+}
+
+.carousel-indicators button {
+  background-color: #c89b3f; /* Color personalizado para los indicadores */
+}
+
+.carousel-indicators .active {
+  background-color: #a87a4e; /* Color activo */
+}
 </style>
