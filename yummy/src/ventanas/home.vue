@@ -52,7 +52,7 @@
           />
         </ul>
       </div>
-  
+      
       <!-- Importar y usar Footer -->
       <FooterComponent />
     </div>

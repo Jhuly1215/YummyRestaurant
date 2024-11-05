@@ -1,35 +1,52 @@
 <template>
-<div class="menu-card">
-    <img src="" alt="plato" class="imagen">
+  <div class="menu-card">
+    <img :src="imagen" alt="plato" class="imagen">
     <div class="info">
-    <h2>Nombre plato</h2>
-    <p>Descripción plato</p>
-    <router-link to="#">
-        <button class="btn">Agregar</button>
-    </router-link>
+      <h2>{{ nombre }}</h2>
+      <p>{{ descripcion }}</p>
+      <p>{{ precio }}</p>
+
     </div>
-</div>
+  </div>
 </template>
 
 <script>
-
+export default {
+  name: 'CardMenu',
+  props: {
+    imagen: {
+      type: String,
+      required: true
+    },
+    nombre: {
+      type: String,
+      required: true
+    },
+    descripcion: {
+      type: String,
+      required: true
+    },
+    precio: {
+      type: String,
+      required: true
+    }
+  }
+}
 </script>
 
 <style scoped>
-
 .menu-card {
   display: flex;
   flex-direction: row;
   width: 45%;
   max-width: 600px;
   padding: 20px;
-  border-radius: 15px; /* Bordes redondeados */
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Sombra */
+  border-radius: 15px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
   transition: transform 0.3s ease-in-out;
   background-color: #fff;
   align-items: center;
   gap: 20px;
-  
 }
 
 .menu-card:hover {
@@ -49,16 +66,6 @@
   align-items: center;
   text-align: center;
   flex-grow: 1;
-}
-
-.carreras-container h2 {
-  font-size: 1.8rem;
-  margin-bottom: 10px;
-}
-
-.carreras-container p {
-  font-size: 1rem;
-  margin-bottom: 20px;
 }
 
 .btn {
