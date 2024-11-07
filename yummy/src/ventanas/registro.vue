@@ -1,42 +1,188 @@
 <template>
+  <div class="login-container">
+    <div class="login-card">
+      <h2 class="title">Bienvenido</h2>
+      <form @submit.prevent="handleRegister">
+        <label for="nombre">Nombre:</label>
+        <input type="text" id="nombre" v-model="nombre" required placeholder="Ingresa tu nombre" />
 
-      <div class="login-container">
-        <div class="login-card">
-          <h2 class="title">Bienvenido</h2>
-          <form @submit.prevent="handleSubmit">
-            <label for="nombre">Nombre:</label>
-            <input type="text" id="nombre" v-model="nombre" required placeholder="Ingresa tu nombre"/>
+        <label for="apellidos">Apellidos:</label>
+        <input type="text" id="apellidos" v-model="apellidos" required placeholder="Ingresa tus apellidos" />
 
-            <label for="apellidos">Apellidos:</label>
-            <input type="text" id="apellidos" v-model="apellidos" required placeholder="Ingresa tus apellidos"/>
+        <label for="email">Correo electrónico:</label>
+        <input type="email" id="email" v-model="email" required placeholder="Ingresa tu correo" />
 
-            <label for="email">Correo electrónico:</label>
-            <input type="email" id="email" v-model="email" required placeholder="Ingresa tu correo" />
+        <label for="password">Contraseña:</label>
+        <div class="password-container">
+          <input
+            :type="showPassword ? 'text' : 'password'"
+            id="password"
+            v-model="password"
+            required
+            placeholder="Ingresa tu contraseña"
+          />
+          <span @click="togglePasswordVisibility" class="toggle-password">
+            <i :class="showPassword ? 'fas fa-eye-slash' : 'fas fa-eye'"></i>
+          </span>
+        </div>
 
-            <label for="password">Contrasena:</label>
-            <input type="password" id="password" v-model="password" required placeholder="Ingresa tu contraseña"/>
-            <label for="password">Contraseña:</label>
-            <input type="password" id="password" v-model="password" required placeholder="Ingresa tu contraseña"/>
-    
-            <p class="signup-text"> ¿Ya tienes una cuenta? <router-link to="/iniciarsesion">Inicia sesión aquí</router-link></p>
-    
-            <button type="submit" class="login-button">Listo</button>
-          </form>
+        <p class="signup-text">¿Ya tienes una cuenta? <router-link to="/iniciarsesion">Inicia sesión aquí</router-link></p>
+
+        <button type="submit" class="login-button">Listo</button>
+      </form>
+
+      <!-- Modal para ingresar el código de verificación -->
+      <div v-if="showVerificationModal" class="modal">
+        <div class="modal-content">
+          <h3>Verifica tu correo</h3>
+          <p>Ingresa el código que enviamos a {{ email }}.</p>
+          <input type="text" v-model="verificationCode" placeholder="Código de verificación" />
+          <button @click="verifyCode" class="login-button">Verificar</button>
+          <button @click="closeModal" class="cancel-button">Cancelar</button>
         </div>
       </div>
-    </template>
-    
-    <script>
 
-    export default {
-      name: "LogIn",
-      
+      <!-- Modal de error -->
+      <div v-if="showErrorModal" class="modal">
+        <div class="modal-content">
+          <h3>Error en el registro</h3>
+          <p>{{ errorMessage }}</p>
+          <button @click="closeModal" class="cancel-button">Intentar de nuevo</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
+
+<script>
+import axios from 'axios';
+
+export default {
+  name: 'RegistroUsuario',
+  data() {
+    return {
+      nombre: '',
+      apellidos: '',
+      email: '',
+      password: '',
+      verificationCode: '',
+      showVerificationModal: false,
+      showErrorModal: false,
+      errorMessage: '',
+      showPassword: false, 
     };
-    </script>
-    
-    <style scoped>
-    
-    .login-container {
+  },
+  methods: {
+    togglePasswordVisibility() {
+      this.showPassword = !this.showPassword;
+    },
+    async handleRegister() {
+      try {
+        // Paso 1: Verificar si el correo existe y enviar código de verificación
+        const response = await axios.post('/api/usuario/enviar-codigo', { email: this.email });
+        
+        if (response.data.success) {
+          this.showVerificationModal = true;
+        } else {
+          this.showError('El correo no existe o ocurrió un problema');
+        }
+      } catch (error) {
+        this.showError('No se pudo verificar el correo');
+      }
+    },
+    async verifyCode() {
+      try {
+        // Asegúrate de que ambos valores, email y code, estén definidos antes de enviar la solicitud
+        const response = await axios.post('/api/usuario/verificar-codigo', {
+          email: this.email,
+          code: this.verificationCode,
+        });
+
+        if (response.data.success) {
+          await this.registerUser(); // Registro exitoso
+        } else {
+          this.showError('El código de verificación es incorrecto');
+        }
+      } catch (error) {
+        this.showError('No se pudo verificar el código');
+      }
+    },
+
+    async registerUser() {
+      try {
+        // Paso 3: Realizar el registro del usuario
+        await axios.post('/api/usuario/registrar', {
+          nombre: this.nombre,
+          apellidos: this.apellidos,
+          email: this.email,
+          password: this.password,
+        });
+        this.closeModal();
+        alert('Usuario registrado exitosamente');
+      } catch (error) {
+        this.showError('No se pudo completar el registro');
+      }
+    },
+    showError(message) {
+      this.errorMessage = message;
+      this.showErrorModal = true;
+    },
+    closeModal() {
+      this.showVerificationModal = false;
+      this.showErrorModal = false;
+    },
+  },
+};
+</script>
+
+<style scoped>
+/* Estilos del modal */
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal-content {
+  background: white;
+  padding: 2rem;
+  border-radius: 4px;
+  width: 300px;
+  text-align: center;
+}
+
+.cancel-button {
+  background-color: #ccc;
+  color: #333;
+  padding: 0.75rem;
+  margin-top: 1rem;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.cancel-button:hover {
+  background-color: #aaa;
+}
+.password-container {
+  position: relative;
+}
+
+.toggle-password {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  cursor: pointer;
+  color: #666;
+}
+.login-container {
       display: flex;
       align-items: center;
       justify-content: center;
@@ -107,5 +253,4 @@
     .login-button:hover {
       background-color: #A16F23; /* Color marrón más oscuro */
     }
-    </style>
-    
+</style>

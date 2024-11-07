@@ -7,7 +7,18 @@
           <input type="email" id="email" v-model="email" required placeholder="Ingresa tu correo" />
   
           <label for="password">Contraseña:</label>
-          <input type="password" id="password" v-model="password" required placeholder="Ingresa tu contraseña"/>
+        <div class="password-container">
+          <input
+            :type="showPassword ? 'text' : 'password'"
+            id="password"
+            v-model="password"
+            required
+            placeholder="Ingresa tu contraseña"
+          />
+          <span @click="togglePasswordVisibility" class="toggle-password">
+            <i :class="showPassword ? 'fas fa-eye-slash' : 'fas fa-eye'"></i>
+          </span>
+        </div>
   
           <p class="signup-text"> ¿No tienes una cuenta? <router-link to="/registro">Regístrate aquí</router-link></p>
 
@@ -23,7 +34,17 @@
 
   export default {
     name: "LogIn",
-    
+    data() {
+      return {
+        showPassword: false, 
+      };
+      
+    },
+  methods: {
+      togglePasswordVisibility(){
+        this.showPassword = !this.showPassword;
+      }
+    }
   };
   </script>
   
@@ -101,5 +122,18 @@
   .login-button:hover {
     background-color: #A16F23; /* Color marrón más oscuro */
   }
+
+  .password-container {
+  position: relative;
+}
+
+.toggle-password {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  cursor: pointer;
+  color: #666;
+}
   </style>
   

@@ -39,19 +39,7 @@
   };
   </script>
   
-  <style scoped>
-      .footer {
-      background-color: #A16F23; 
-      color: #fff; 
-      padding: 40px 0; 
-    }
-  </style>
-
-<script>
-export default {
-  name: "FooterComponent",
-};
-</script>
+  
 
 <style scoped>
     .footer {

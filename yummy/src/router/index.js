@@ -1,6 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router';
 import Home from '@/ventanas/home.vue';
-import Registro from '@/ventanas/registro.vue';
+import RegistroUsuario from '@/ventanas/registro.vue';
 import LogIn from '@/ventanas/login.vue';
 import Reservas from '@/ventanas/reservas/Reservas.vue';
 
@@ -19,8 +19,8 @@ const router = createRouter({
     },
     {
       path: '/registro',
-      name: 'Registro',
-      component: Registro,
+      name: 'RegistroUsuario',
+      component: RegistroUsuario,
     },
     {
         path: '/reservas',
