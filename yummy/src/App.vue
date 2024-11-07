@@ -1,26 +1,32 @@
 <template>
-  <Login/>
+  <NavbarComponent />
+  <router-view />
+  <FooterComponent />
 </template>
 
 <script>
-import Login from './ventanas/mapaInteractivo.vue'
-
+import NavbarComponent from '@/components/Navbar.vue';
+import FooterComponent from '@/components/Footer.vue';
 
 export default {
   name: 'App',
   components: {
-    Login,
-  }
-}
+    NavbarComponent,
+    FooterComponent,
+  },
+};
 </script>
 
 <style>
+body, #app {
+  margin: 0;
+  padding: 0;
+}
 #app {
   font-family: Avenir, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
   color: #2c3e50;
-  margin-top: 60px;
 }
 </style>
