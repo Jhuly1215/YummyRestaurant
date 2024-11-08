@@ -11,6 +11,7 @@ app.use(express.json());
 
 const ofertasRoutes = require('./src/api/ofertas/oferta.routes');
 const usuarioRoutes = require('./src/api/usuario/usuario.routes');
+const authRoutes = require('./src/api/autenticacion/authRoutes');
 
 
 
@@ -19,6 +20,7 @@ const usuarioRoutes = require('./src/api/usuario/usuario.routes');
 
 app.use('/api/ofertas', ofertasRoutes);
 app.use('/api/usuario', usuarioRoutes);
+app.use('/api/auth', authRoutes);
 
 sequelize.sync()
   .then(() => console.log("Base de datos conectada"))
