@@ -1,5 +1,6 @@
 <template>
   <OfertasPage />
+  <ABMProductos />
 </template>
 
 <script>
