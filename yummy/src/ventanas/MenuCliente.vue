@@ -70,32 +70,14 @@ export default {
 };
 </script>
 
-
 <style scoped>
 .main {
 max-width: 1200px;
 margin: 0 auto;
-margin-top: 75px;
+margin-top: 20px;
 margin-bottom: 100px;
 }
-.content {
-padding: 50px 20px;
-text-align: center;
-background-color: white;
-}
 
-.title-fade {
-position: absolute;
-top: 30%;
-left: 50%;
-transform: translate(-50%, -50%);
-text-align: center;
-width: 100%;
-color: white;
-opacity: 0; 
-animation: fadeIn 3s ease-in-out forwards;
-z-index: 10; 
-}
 .cards {
 display: flex;
 flex-wrap: wrap;
