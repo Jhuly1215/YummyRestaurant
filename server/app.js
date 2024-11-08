@@ -2,6 +2,7 @@
 const express = require('express');
 const sequelize = require('./src/config/db');
 const ofertasRoutes = require('./src/api/ofertas/oferta.routes');
+const platillosRoutes = require('./src/api/platillos/platillo.routes');
 const cors = require('cors');
 
 const app = express();
@@ -9,6 +10,7 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 app.use('/api/ofertas', ofertasRoutes);
+app.use('/api', platillosRoutes); //AYUDA, no se porque no funciona como: app.use('/api/platillos', platillosRoutes);
 
 sequelize.sync()
   .then(() => console.log("Base de datos conectada"))

@@ -2,14 +2,14 @@
   <div>
     <h2>Platillos</h2>
     <div class="table-container">
-      <table class="platillos-table">
+      <table class="table">
         <thead>
           <tr>
             <th>Id</th>
             <th>Nombre</th>
-            <th>Descripcion</th>
+            <th>Descripción</th>
             <th>Precio</th>
-            <th>Id Categoria</th>
+            <th>Categoría</th>
           </tr>
         </thead>
         <tbody>
@@ -17,7 +17,7 @@
             <td>{{ platillo.idplato }}</td>
             <td>{{ platillo.nombre }}</td>
             <td>{{ platillo.descripcion }}</td>
-            <td>${{ platillo.precio }}</td>
+            <td>{{ platillo.precio }} Bs.</td>
             <td>{{ platillo.idcategoria }}</td>
             <td>
               <button class="action-button edit-button"><i class="fas fa-edit"></i></button>
@@ -27,8 +27,7 @@
         </tbody>
       </table>
     </div>
-    <h2>Agregar Platillo</h2>
-    
+    <button class="button-new">Nuevo platillo</button>
   </div>
 </template>
 
@@ -68,33 +67,33 @@ export default {
 </script>
 
 <style scoped>
+h2 {
+  color: #322209;
+}
 .table-container {
   overflow-x: auto;
-  margin-bottom: 20px;
 }
 
-.platillos-table {
+.table {
   width: 100%;
-  min-width: 1000px;
   border-collapse: collapse;
 }
 
-.platillos-table th, .platillos-table td {
-  border: 1px solid #ccc;
+.table th, .table td {
+  border: 0;
   padding: 10px;
-  text-align: left;
 }
 
-.platillos-table th {
-  background-color: #f2f2f2;
-  color: #333;
+.table th {
+  background-color: #FFFDA4;
+  color: #322209;
 }
 
 .action-button {
   background: none;
   border: none;
   cursor: pointer;
-  margin: 0 5px;
+  margin: 5px;
 }
 
 .edit-button {
@@ -104,4 +103,14 @@ export default {
 .delete-button {
   color: #f44336;
 }
+
+.button-new {
+  background-color: #FE9900;
+  color: #FFFEDC;
+  border: 0;
+  padding: 10px 20px;
+  border-radius: 50px;
+
+}
+
 </style>
