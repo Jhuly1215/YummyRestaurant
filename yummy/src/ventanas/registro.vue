@@ -100,6 +100,8 @@ export default {
 
         if (response.data.success) {
           await this.registerUser(); // Registro exitoso
+          // Redirige al Home si el login es exitoso
+          this.$router.push('/iniciarsesion'); // Redirige a la ruta 'Home' que definiste
         } else {
           this.showError('El código de verificación es incorrecto');
         }
