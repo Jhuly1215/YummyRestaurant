@@ -56,6 +56,7 @@
 
 <script>
 import axios from 'axios';
+import Swal from 'sweetalert2'; // Para usar SweetAlert2
 
 export default {
   name: 'RegistroUsuario',
@@ -76,7 +77,24 @@ export default {
     togglePasswordVisibility() {
       this.showPassword = !this.showPassword;
     },
+
+    // Función para verificar si la contraseña cumple con los requisitos
+    validatePassword(password) {
+      // Validación con regex: al menos una mayúscula, un número y un carácter especial
+      const passwordPattern = /^(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*(),.?":{}|<>]).+$/;
+      return passwordPattern.test(password);
+    },
+
     async handleRegister() {
+      if (!this.validatePassword(this.password)) {
+        Swal.fire({
+          icon: 'error',
+          title: 'Contraseña inválida',
+          text: 'La contraseña debe contener al menos una mayúscula, un número y un carácter especial.',
+        });
+        return; // Detenemos el registro si la contraseña no es válida
+      }
+
       try {
         // Paso 1: Verificar si el correo existe y enviar código de verificación
         const response = await axios.post('/api/usuario/enviar-codigo', { email: this.email });
@@ -90,6 +108,7 @@ export default {
         this.showError('No se pudo verificar el correo');
       }
     },
+
     async verifyCode() {
       try {
         // Asegúrate de que ambos valores, email y code, estén definidos antes de enviar la solicitud
@@ -120,15 +139,21 @@ export default {
           password: this.password,
         });
         this.closeModal();
-        alert('Usuario registrado exitosamente');
+        Swal.fire({
+          icon: 'success',
+          title: 'Registro exitoso',
+          text: 'Usuario registrado correctamente.',
+        });
       } catch (error) {
         this.showError('No se pudo completar el registro');
       }
     },
+
     showError(message) {
       this.errorMessage = message;
       this.showErrorModal = true;
     },
+
     closeModal() {
       this.showVerificationModal = false;
       this.showErrorModal = false;
@@ -136,6 +161,7 @@ export default {
   },
 };
 </script>
+
 
 <style scoped>
 /* Estilos del modal */

@@ -113,6 +113,62 @@ exports.actualizarUsuario = async (req, res) => {
     res.status(500).json({ error: 'Error al actualizar el usuario' });
   }
 };
+// Obtener un usuario por su correo
+exports.obtenerUsuarioPorCorreo = async (req, res) => {
+  const { correo } = req.params;  // Obtener el correo de los parámetros de la URL
+
+  try {
+    const usuario = await sequelize.query(
+      `SELECT idusuario FROM usuario WHERE correo = :correo`,
+      {
+        replacements: { correo },
+        type: sequelize.QueryTypes.SELECT,  // Usamos SELECT para obtener datos
+      }
+    );
+
+    if (usuario.length > 0) {  // Verifica si se encontró al menos un usuario
+      res.json(usuario[0]);  // Devolver el primer usuario encontrado
+    } else {
+      res.status(404).json({ error: 'Usuario no encontrado' });
+    }
+  } catch (error) {
+    console.error("Error al obtener el usuario por correo:", error);
+    res.status(500).json({ error: 'Error al obtener el usuario por correo' });
+  }
+};
+
+// Actualizar solo la contraseña
+exports.actualizarContrasena = async (req, res) => {
+  const { id } = req.params; // Obtiene el id del usuario desde los parámetros de la URL
+  const { newPassword } = req.body; // Obtiene la nueva contraseña desde el cuerpo de la solicitud
+
+  console.log("ID recibido:", id);
+
+  console.log("Nueva contraseña:", newPassword);
+  try {
+    // Asegúrate de hashear la nueva contraseña antes de almacenarla
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+    // Ejecuta la consulta para actualizar solo el campo de la contraseña
+    const [actualizado] = await sequelize.query(
+      `UPDATE usuario SET password = :password WHERE idUsuario = :id`,
+      {
+        replacements: { id, password: hashedPassword },
+        type: sequelize.QueryTypes.UPDATE,
+      }
+    );
+
+    if (actualizado) {
+      res.json({ message: 'Contraseña actualizada exitosamente' });
+    } else {
+      res.status(404).json({ error: 'Usuario no encontrado' });
+    }
+  } catch (error) {
+    console.error("Error al actualizar la contraseña:", error);
+    res.status(500).json({ error: 'Error al actualizar la contraseña' });
+  }
+};
+
 
 // Eliminar un usuario
 exports.eliminarUsuario = async (req, res) => {

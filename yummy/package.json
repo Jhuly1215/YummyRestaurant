@@ -13,10 +13,11 @@
     "axios": "^1.7.7",
     "bootstrap": "^5.3.3",
     "core-js": "^3.8.3",
-    "d3": "^7.9.0",
     "cors": "^2.8.5",
+    "d3": "^7.9.0",
     "express": "^4.21.1",
     "pinia": "^2.2.6",
+    "sweetalert2": "^11.14.5",
     "vue": "^3.2.13",
     "vue-router": "^4.4.5"
   },
@@ -45,11 +46,9 @@
       "parser": "@babel/eslint-parser"
     },
     "rules": {
-  "no-unused-vars": "off",
-  "no-console": "off"
- 
-}
-
+      "no-unused-vars": "off",
+      "no-console": "off"
+    }
   },
   "browserslist": [
     "> 1%",
