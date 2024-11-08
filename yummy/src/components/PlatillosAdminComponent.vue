@@ -10,6 +10,7 @@
             <th>Descripción</th>
             <th>Precio</th>
             <th>Categoría</th>
+            <th>Acciones</th>
           </tr>
         </thead>
         <tbody>
@@ -19,7 +20,7 @@
             <td>{{ platillo.descripcion }}</td>
             <td>{{ platillo.precio }} Bs.</td>
             <td>{{ platillo.idcategoria }}</td>
-            <td>
+            <td class="botones">
               <button class="action-button edit-button"><i class="fas fa-edit"></i></button>
               <button class="action-button delete-button"><i class="fas fa-trash"></i></button>
             </td>
@@ -80,7 +81,7 @@ h2 {
 }
 
 .table th, .table td {
-  border: 0;
+  border: 1;
   padding: 10px;
 }
 
