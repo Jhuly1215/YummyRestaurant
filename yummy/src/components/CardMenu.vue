@@ -73,7 +73,7 @@ export default {
   height: 100%;
   backface-visibility: hidden;
   border-radius: 15px;
-  box-shadow: 0 10px 14px #322209;
+  box-shadow: 0 10px 10px #7c5b27;
   display: flex;
   align-items: center;
   justify-content: center;
