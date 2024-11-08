@@ -1,87 +1,71 @@
 <template>
-    <div>
-      <NavbarComponent />
-      <div class="main">
-        <div class="cards">
-          <!-- Varias tarjetas CardMenu -->
-          <CardMenu
-            :imagen="'https://cdn0.bodas.com.mx/article-vendor/0940/3_2/960/jpg/-mg-0925_5_140940-1552761878.jpeg'"
-            nombre="Nombre del plato 1"
-            descripcion="Descripción del plato 1"
-            precio="###"
-          />
-          <CardMenu
-            :imagen="'https://cdn0.bodas.com.mx/article-vendor/0940/3_2/960/jpg/-mg-0925_5_140940-1552761878.jpeg'"
-            nombre="Nombre del plato 2"
-            descripcion="Descripción del plato 2"
-            precio="###"
-          />
-          <CardMenu
-            :imagen="'https://cdn0.bodas.com.mx/article-vendor/0940/3_2/960/jpg/-mg-0925_5_140940-1552761878.jpeg'"
-            nombre="Nombre del plato 3"
-            descripcion="Descripción del plato 3"
-            precio="###"
-          />
-          <CardMenu
-            :imagen="'https://cdn0.bodas.com.mx/article-vendor/0940/3_2/960/jpg/-mg-0925_5_140940-1552761878.jpeg'"
-            nombre="Nombre del plato 3"
-            descripcion="Descripción del plato 3"
-            precio="###"
-          />
-          <CardMenu
-            :imagen="'https://cdn0.bodas.com.mx/article-vendor/0940/3_2/960/jpg/-mg-0925_5_140940-1552761878.jpeg'"
-            nombre="Nombre del plato 3"
-            descripcion="Descripción del plato 3"
-            precio="###"
-          />
-          <CardMenu
-            :imagen="'https://cdn0.bodas.com.mx/article-vendor/0940/3_2/960/jpg/-mg-0925_5_140940-1552761878.jpeg'"
-            nombre="Nombre del plato 3"
-            descripcion="Descripción del plato 3"
-            precio="###"
-          />
-        </div>
+  <div>
+    <NavbarComponent />
+    <CarouselComponent />
+    <div class="main">
+      <div class="cards">
+        <!-- Itera sobre cada platillo y pasa sus datos a CardMenu -->
+        <CardMenu
+          v-for="(platillo, index) in platillos"
+          :key="index"
+          :imagen="platillo.imagen"
+          :nombre="platillo.nombre"
+          :descripcion="platillo.descripcion"
+          :precio="platillo.precio"
+        />
       </div>
-      <FooterComponent />
     </div>
+    <FooterComponent />
+  </div>
 </template>
-  
+
 <script>
 import NavbarComponent from '@/components/Navbar.vue';
 import FooterComponent from '@/components/Footer.vue';
 import CardMenu from '@/components/CardMenu.vue';
+import axios from 'axios';
+import CarouselComponent from '@/components/CarouselComponent.vue';
 
 export default {
 name: 'MenuCliente',
 components: {
-    NavbarComponent,
-    FooterComponent,
-    CardMenu
+  NavbarComponent,
+  FooterComponent,
+  CarouselComponent,
+  CardMenu
+},
+data() {
+  return {
+    platillos: [] // Inicializamos platillos como un array vacío
+  };
+},
+mounted() {
+  this.obtenerPlatillos();
+},
+methods: {
+  async obtenerPlatillos() {
+    try {
+      const response = await axios.get('http://localhost:5000/api/platillos');
+      this.platillos = response.data; // Guardamos los datos de la respuesta en platillos
+    } catch (error) {
+      console.error("Error al obtener los platillos:", error);
+    }
+  }
 }
 };
 </script>
 
 <style scoped>
 .main {
-  max-width: 1200px;
-  margin: 0 auto;
-  margin-top: 75px;
-  margin-bottom: 100px;
+max-width: 1200px;
+margin: 0 auto;
+margin-top: 75px;
+margin-bottom: 100px;
 }
-
 .content {
 padding: 50px 20px;
 text-align: center;
 background-color: white;
-}
-
-body {
-  font-family: "Oxygen", sans-serif;
-  color: #050505;
-  background-image: url('https://b2090723.smushcdn.com/2090723/wp-content/uploads/2019/03/DSC_0614.jpg?lossy=0&strip=0&webp=1');
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
 }
 
 .title-fade {
@@ -96,21 +80,16 @@ opacity: 0;
 animation: fadeIn 3s ease-in-out forwards;
 z-index: 10; 
 }
-
 .cards {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 20px; /* Espacio entre tarjetas */
-  justify-content: center; /* Centra las tarjetas */
+display: flex;
+flex-wrap: wrap;
+gap: 20px;
+justify-content: center;
 }
-
 @media (max-width: 768px) {
-  /* Cuando la pantalla es pequeña, cada tarjeta ocupa el 100% */
-  .cards > * {
-    flex: 1 1 100%;
-    max-width: 100%;
-  }
+.cards > * {
+  flex: 1 1 100%;
+  max-width: 100%;
 }
-
+}
 </style>
-  
