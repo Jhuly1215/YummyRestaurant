@@ -140,6 +140,46 @@ exports.eliminarUsuario = async (req, res) => {
 
 
 
+exports.autenticarUsuario = async (req, res) => {
+  const { email, password } = req.body;
+  console.log('Intento de inicio de sesión con:', { email, password }); // Depuración
+
+  try {
+    // Paso 1: Buscar el usuario por correo electrónico
+    const [usuario] = await sequelize.query(
+      `SELECT * FROM usuario WHERE correo = :email`,
+      { replacements: { email }, type: sequelize.QueryTypes.SELECT }
+    );
+
+    console.log('Usuario encontrado:', usuario); // Depuración
+
+    // Paso 2: Verificar si el usuario existe
+    if (!usuario) {
+      console.log('Usuario no encontrado'); // Depuración
+      return res.status(404).json({ success: false, message: 'Usuario no encontrado' });
+    }
+
+    // Paso 3: Verificar la contraseña
+    const passwordCorrecta = await bcrypt.compare(password, usuario.password);
+    if (!passwordCorrecta) {
+      console.log('Contraseña incorrecta'); // Depuración
+      return res.status(401).json({ success: false, message: 'Contraseña incorrecta' });
+    }
+
+    // Paso 4: Autenticación exitosa
+    console.log('Autenticación exitosa'); // Depuración
+    return res.status(200).json({
+      success: true,
+      message: 'Inicio de sesión exitoso',
+      user: { id: usuario.idusuario, email: usuario.correo, rol: usuario.idrol }
+    });
+  } catch (error) {
+    console.error('Error al autenticar al usuario:', error);
+    res.status(500).json({ success: false, message: 'Error al autenticar al usuario' });
+  }
+};
+
+
 
 const nodemailer = require('nodemailer');
 
@@ -182,6 +222,8 @@ exports.verificarCodigo = async (req, res) => {
   const { email, code } = req.body;
 
   try {
+    console.log('Código recibido:', code);
+    console.log('Código almacenado:', verificationCodes[email]);
 
     if (verificationCodes[email] && verificationCodes[email].toString() === code) {
       delete verificationCodes[email]; // Limpia el código después de la verificación
@@ -192,5 +234,78 @@ exports.verificarCodigo = async (req, res) => {
   } catch (error) {
     console.error("Error al verificar el código:", error);
     res.status(500).json({ success: false, message: 'Error al verificar el código', error: error.message });
+  }
+};
+
+// Función para enviar código de recuperación
+exports.enviarCodigoRecuperacion = async (req, res) => {
+  const { email } = req.body;
+
+  try {
+    // Verificar que el correo exista en la base de datos
+    const [usuario] = await sequelize.query(
+      `SELECT * FROM usuario WHERE correo = :email`,
+      { replacements: { email }, type: sequelize.QueryTypes.SELECT }
+    );
+
+    if (!usuario) {
+      return res.status(404).json({ success: false, message: 'Usuario no encontrado' });
+    }
+
+    // Generar código de recuperación
+    const recoveryCode = Math.floor(100000 + Math.random() * 900000);
+    verificationCodes[email] = recoveryCode;  // Almacena el código temporalmente
+
+    const mailOptions = {
+      from: process.env.EMAIL_USER,
+      to: email,
+      subject: 'Recuperación de contraseña',
+      text: `Tu código de recuperación es: ${recoveryCode}`
+    };
+
+    await transporter.sendMail(mailOptions);
+    res.json({ success: true, message: 'Correo de recuperación enviado' });
+  } catch (error) {
+    console.error('Error al enviar el correo de recuperación:', error);
+    res.status(500).json({ success: false, message: 'Error al enviar el correo de recuperación' });
+  }
+};
+// Función para verificar código de recuperación
+exports.verificarCodigoRecuperacion = async (req, res) => {
+  const { email, code } = req.body;
+
+  try {
+    if (verificationCodes[email] && verificationCodes[email].toString() === code) {
+      delete verificationCodes[email];  // Limpia el código una vez verificado
+      res.json({ success: true, message: 'Código de recuperación verificado correctamente' });
+    } else {
+      res.status(400).json({ success: false, message: 'Código de recuperación incorrecto' });
+    }
+  } catch (error) {
+    console.error("Error al verificar el código de recuperación:", error);
+    res.status(500).json({ success: false, message: 'Error al verificar el código de recuperación' });
+  }
+};
+
+
+exports.actualizarContrasena = async (req, res) => {
+  const { email, code, newPassword } = req.body;
+
+  try {
+    if (verificationCodes[email] && verificationCodes[email].toString() === code) {
+      const hashedPassword = await bcrypt.hash(newPassword, 10);
+      await sequelize.query(
+        `UPDATE usuario SET password = :password WHERE correo = :email`,
+        { replacements: { password: hashedPassword, email }, type: sequelize.QueryTypes.UPDATE }
+      );
+
+      delete verificationCodes[email];
+      res.json({ success: true, message: 'Contraseña actualizada exitosamente' });
+    } else {
+      res.status(400).json({ success: false, message: 'Código de verificación incorrecto' });
+    }
+  } catch (error) {
+    console.error("Error al actualizar la contraseña:", error);
+    res.status(500).json({ success: false, message: 'Error al actualizar la contraseña' });
   }
 };
