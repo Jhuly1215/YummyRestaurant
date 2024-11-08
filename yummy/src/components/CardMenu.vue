@@ -3,7 +3,7 @@
     <div class="card-inner" :class="{ rotated: hover }">
       <!-- Cara frontal -->
       <div class="card-front">
-        <img src="https://cdn0.bodas.com.mx/article-vendor/0940/3_2/960/jpg/-mg-0925_5_140940-1552761878.jpeg" alt="plato" class="imagen" />
+        <img src="https://i.pinimg.com/564x/9b/ec/a7/9beca7153757bbc850c276f0601c794f.jpg" alt="plato" class="imagen" />
         <div class="info">
           <h2>{{ nombre }}</h2>
           <p>{{ precio }} Bs.</p>
@@ -51,7 +51,7 @@ export default {
 .menu-card {
   perspective: 1000px;
   width: 45%;
-  height: 250px;
+  height: 210px;
 }
 
 .card-inner {
@@ -73,7 +73,7 @@ export default {
   height: 100%;
   backface-visibility: hidden;
   border-radius: 15px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 10px 14px #322209;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -94,7 +94,7 @@ export default {
 }
 
 .imagen {
-  width: 250px;
+  width: 180px;
   height: auto;
   border-radius: 10px;
 }

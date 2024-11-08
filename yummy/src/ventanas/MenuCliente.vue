@@ -79,15 +79,22 @@ margin-bottom: 100px;
 }
 
 .cards {
-display: flex;
-flex-wrap: wrap;
-gap: 20px;
-justify-content: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 30px;
+  justify-content: center;
 }
+
+.cards > * {
+  flex: 1 1 calc(33.33% - 20px); /* 33.33% para tres tarjetas por fila, menos el espacio de gap */
+  max-width: calc(33.33% - 20px); /* Para asegurar que no exceda el ancho */
+}
+
 @media (max-width: 768px) {
   .cards > * {
     flex: 1 1 100%;
-    max-width: 100%;
+    max-width: 90%;
   }
 }
+
 </style>
