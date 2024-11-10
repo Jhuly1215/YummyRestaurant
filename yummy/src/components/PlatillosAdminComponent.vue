@@ -21,8 +21,14 @@
             <td>{{ platillo.precio }} Bs.</td>
             <td>{{ platillo.idcategoria }}</td>
             <td class="botones">
-              <button class="action-button edit-button"><i class="fas fa-edit"></i></button>
-              <button class="action-button delete-button"><i class="fas fa-trash"></i></button>
+              <button v-if="index !== filaEnEdicion" class="action-button edit-button" @click="seleccionarPlatilloParaEditar(index)">
+                <i class="fas fa-edit"></i>
+              </button>
+              <button v-if="index !== filaEnEdicion" class="action-button delete-button" @click="confirmarEliminacion(platillo.nombre)">
+                <i class="fas fa-trash"></i>
+              </button>
+              <!-- Muestra el botón Guardar solo en la fila en edición -->
+              <button v-if="index === filaEnEdicion" class="button-save" @click="guardarCambios">Guardar</button>
             </td>
           </tr>
         </tbody>
@@ -40,6 +46,7 @@ export default {
   data() {
     return {
       platillos: [],
+      filaEnEdicion: null, // Almacena el índice de la fila en edición
     };
   },
   mounted() {
@@ -62,6 +69,20 @@ export default {
           console.error("Error al configurar la solicitud:", error.message);
         }
       }
+    },
+    seleccionarPlatilloParaEditar(index) {
+      // Establece el índice de la fila en edición
+      this.filaEnEdicion = index;
+    },
+    confirmarEliminacion(nombrePlatillo) {
+      // Muestra un mensaje de confirmación para la eliminación
+      alert(`¿Está seguro que quiere eliminar ${nombrePlatillo}?`);
+    },
+    guardarCambios() {
+      // Aquí se pueden realizar las acciones de guardado necesarias
+      alert("Cambios guardados exitosamente.");
+      // Resetea el índice de la fila en edición
+      this.filaEnEdicion = null;
     }
   }
 };
@@ -81,7 +102,7 @@ h2 {
 }
 
 .table th, .table td {
-  border: 1;
+  border: 2;
   padding: 10px;
 }
 
@@ -111,7 +132,13 @@ h2 {
   border: 0;
   padding: 10px 20px;
   border-radius: 50px;
-
 }
 
+.button-save {
+  background-color: #4caf50;
+  color: #FFFEDC;
+  border: 0;
+  padding: 5px;
+  border-radius: 50px;
+}
 </style>
