@@ -1,12 +1,10 @@
 <template>
     <div class="overlay" v-if="mostrar">
-      <div class="modal">
         <p>¿Seguro de que quiere eliminar {{ nombrePlatillo }}?</p>
         <div class="botones">
-          <button @click="confirmarEliminacion" class="button-delete">Eliminar</button>
-          <button @click="cancelar" class="button-cancel">Cancelar</button>
+            <button @click="confirmarEliminacion" class="button-delete">Eliminar</button>
+            <button @click="cancelar" class="button-cancel">Cancelar</button>
         </div>
-      </div>
     </div>
 </template>
 
@@ -36,11 +34,11 @@ methods: {
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(0, 0, 0, 0.5); 
+  background: rgba(0, 0, 0, 0.5);
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 1003; /* Asegura que esté en la parte superior */
+  z-index: 1001; /* Aumentar este valor */
 }
 
 .modal {
@@ -49,9 +47,8 @@ methods: {
   border-radius: 8px;
   text-align: center;
   width: 300px;
-  max-width: 90%; /* Asegura que el modal sea visible en pantallas pequeñas */
   box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.3);
-  z-index: 1001; /* Superior al overlay para que sea visible */
+  z-index: 2000; /* Aumentar este valor */
 }
 
 .botones {

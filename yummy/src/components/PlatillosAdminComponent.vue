@@ -82,6 +82,7 @@ export default {
       console.log("Confirmación de eliminación activada");
       this.platilloAEliminar = platillo;
       this.mostrarConfirmacion = true;
+      console.log(this.mostrarConfirmacion);
     },
     cerrarConfirmacion() {
       this.mostrarConfirmacion = false;
