@@ -5,6 +5,7 @@ import LogIn from '@/ventanas/login.vue';
 import Reservas from '@/ventanas/reservas/Reservas.vue';
 import Recupera from '@/ventanas/recupera.vue';
 import CambioPass from '@/ventanas/cambioPassword.vue';
+import Ofertas from '@/ventanas/ofertasPage.vue';
 
 
 const router = createRouter({
@@ -14,6 +15,11 @@ const router = createRouter({
       path: '/',
       name: 'Home',
       component: Home,
+    },
+    {
+      path: '/ofertas',
+      name: 'Ofertas',
+      component: Ofertas,
     },
     {
       path: '/iniciarsesion',

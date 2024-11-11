@@ -1,8 +1,13 @@
 <template>
   <nav class="nav-container">
       <div class="navIzquierda">
-        <img src="@/assets/images/logoprincipal.jpeg" alt="Imagen del logo" class="logo" style="width: 120px;">
+        <img src="@/assets/images/logoprincipal.jpeg" alt="Imagen del logo" class="logo" style="width: 120px;" @click="goToHome">
         <h1>Tu lugar para compartir y disfrutar</h1>
+        <div class="opciones">
+          <a><router-link to="/ofertas">Ofertas</router-link></a>
+          <a><router-link to="/iniciarsesion">Login</router-link></a>
+          <a><router-link to="/registro">Registrarse</router-link></a>
+        </div>
       </div>
     </nav>
 </template>
@@ -18,6 +23,9 @@ export default {
   methods: {
     toggleLogin() {
       this.isLoggedIn = !this.isLoggedIn;
+    },
+    goToHome() {
+      this.$router.push('/');
     }
   }
 };
@@ -30,6 +38,21 @@ html, body {
   margin: 0;
   padding: 0;
 }
+.opciones {
+  text-align: end;
+}
+
+.opciones a{
+  padding-right: 3%;
+  text-decoration: none;
+  color: white;
+}
+
+.opciones a:hover{
+  text-decoration: underline;
+  color: black;
+}
+
 .navIzquierda h1{
     color: aliceblue;
     font-size: 2vh;
