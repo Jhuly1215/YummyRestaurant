@@ -24,7 +24,7 @@
               <button v-if="index !== filaEnEdicion" class="action-button edit-button" @click="seleccionarPlatilloParaEditar(index)">
                 <i class="fas fa-edit"></i>
               </button>
-              <button v-if="index !== filaEnEdicion" class="action-button delete-button" @click="confirmarEliminacion(platillo.nombre)">
+              <button v-if="index !== filaEnEdicion" class="action-button delete-button" @click="confirmarEliminacion(platillo)">
                 <i class="fas fa-trash"></i>
               </button>
               <!-- Muestra el botón Guardar solo en la fila en edición -->
@@ -35,18 +35,32 @@
       </table>
     </div>
     <button class="button-new">Nuevo platillo</button>
+
+    <!-- Componente ConfirmacionEliminar -->
+    <ConfirmacionEliminar
+      v-if="mostrarConfirmacion"
+      :mostrar="mostrarConfirmacion"
+      :nombrePlatillo="platilloAEliminar.nombre"
+      :idPlatillo="platilloAEliminar.idplato"
+      @confirmarEliminacion="eliminarPlatillo"
+      @cancelar="cerrarConfirmacion"
+    />
   </div>
 </template>
 
 <script>
 import axios from 'axios';
+import ConfirmacionEliminar from './ConfirmacionEliminar.vue';
 
 export default {
   name: "PlatillosAdminComponent",
+  components: { ConfirmacionEliminar },
   data() {
     return {
       platillos: [],
-      filaEnEdicion: null, // Almacena el índice de la fila en edición
+      filaEnEdicion: null,
+      mostrarConfirmacion: false,
+      platilloAEliminar: {}
     };
   },
   mounted() {
@@ -56,32 +70,33 @@ export default {
     async obtenerPlatillos() {
       try {
         const response = await axios.get('http://localhost:5000/api/platillos');
-        const data = response.data;
-
-        this.platillos = Array.isArray(data) ? data : [data];
+        this.platillos = Array.isArray(response.data) ? response.data : [response.data];
       } catch (error) {
         console.error("Error al obtener los platillos:", error);
-        if (error.response) {
-          console.error("Error en la respuesta:", error.response);
-        } else if (error.request) {
-          console.error("No se recibió respuesta del servidor:", error.request);
-        } else {
-          console.error("Error al configurar la solicitud:", error.message);
-        }
       }
     },
     seleccionarPlatilloParaEditar(index) {
-      // Establece el índice de la fila en edición
       this.filaEnEdicion = index;
     },
-    confirmarEliminacion(nombrePlatillo) {
-      // Muestra un mensaje de confirmación para la eliminación
-      alert(`¿Está seguro que quiere eliminar ${nombrePlatillo}?`);
+    confirmarEliminacion(platillo) {
+      console.log("Confirmación de eliminación activada");
+      this.platilloAEliminar = platillo;
+      this.mostrarConfirmacion = true;
+    },
+    cerrarConfirmacion() {
+      this.mostrarConfirmacion = false;
+    },
+    async eliminarPlatillo(idPlatillo) {
+      try {
+        await axios.delete(`http://localhost:5000/api/platillos/${idPlatillo}`);
+        this.platillos = this.platillos.filter(p => p.idplato !== idPlatillo);
+        this.cerrarConfirmacion();
+      } catch (error) {
+        console.error("Error al eliminar el platillo:", error);
+      }
     },
     guardarCambios() {
-      // Aquí se pueden realizar las acciones de guardado necesarias
       alert("Cambios guardados exitosamente.");
-      // Resetea el índice de la fila en edición
       this.filaEnEdicion = null;
     }
   }
@@ -109,6 +124,7 @@ h2 {
 .table th {
   background-color: #FFFDA4;
   color: #322209;
+  align-items: center;
 }
 
 .action-button {
@@ -138,7 +154,7 @@ h2 {
   background-color: #4caf50;
   color: #FFFEDC;
   border: 0;
-  padding: 5px;
+  padding: 6px;
   border-radius: 50px;
 }
 </style>
