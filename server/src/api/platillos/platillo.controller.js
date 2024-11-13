@@ -68,7 +68,7 @@ exports.eliminarPlatillo = async (req, res) => {
 
     try {
         const eliminado = await sequelize.query(
-            `DELETE FROM platillo WHERE idPlatillo = :id`,
+            `DELETE FROM platillo WHERE idplato = :id`, // Cambia idPlatillo a idplato
             {
                 replacements: { id },
                 type: sequelize.QueryTypes.DELETE,
@@ -82,6 +82,7 @@ exports.eliminarPlatillo = async (req, res) => {
         }
     } catch (error) {
         console.error("Error al eliminar el platillo:", error);
-        res.status(500).json({ error: 'Error al eliminar el platillo' });
+        res.status(500).json({ error: 'Error al eliminar el platillo', details: error.message });
     }
 };
+

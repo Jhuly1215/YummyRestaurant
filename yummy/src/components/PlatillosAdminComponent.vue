@@ -14,6 +14,16 @@
           </tr>
         </thead>
         <tbody>
+          <!-- Muestra el mensaje de confirmación -->
+          <tr v-if="idPlatilloSeleccionado === platilloAEliminar.idplato">
+            <td colspan="6">
+              <ConfirmacionEliminar
+                :nombrePlatillo="platilloAEliminar.nombre"
+                @confirmarEliminacion="eliminarPlatillo"
+                @cancelar="cancelarConfirmacion"
+              />
+            </td>
+          </tr>
           <tr v-for="(platillo, index) in platillos" :key="index">
             <td>{{ platillo.idplato }}</td>
             <td>{{ platillo.nombre }}</td>
@@ -24,27 +34,18 @@
               <button v-if="index !== filaEnEdicion" class="action-button edit-button" @click="seleccionarPlatilloParaEditar(index)">
                 <i class="fas fa-edit"></i>
               </button>
-              <button v-if="index !== filaEnEdicion" class="action-button delete-button" @click="confirmarEliminacion(platillo)">
+              <button v-if="index !== filaEnEdicion" class="action-button delete-button" @click="mostrarConfirmacion(platillo)">
                 <i class="fas fa-trash"></i>
               </button>
               <!-- Muestra el botón Guardar solo en la fila en edición -->
               <button v-if="index === filaEnEdicion" class="button-save" @click="guardarCambios">Guardar</button>
             </td>
           </tr>
+          
         </tbody>
       </table>
     </div>
     <button class="button-new">Nuevo platillo</button>
-
-    <!-- Componente ConfirmacionEliminar -->
-    <ConfirmacionEliminar
-      v-if="mostrarConfirmacion"
-      :mostrar="mostrarConfirmacion"
-      :nombrePlatillo="platilloAEliminar.nombre"
-      :idPlatillo="platilloAEliminar.idplato"
-      @confirmarEliminacion="eliminarPlatillo"
-      @cancelar="cerrarConfirmacion"
-    />
   </div>
 </template>
 
@@ -59,7 +60,7 @@ export default {
     return {
       platillos: [],
       filaEnEdicion: null,
-      mostrarConfirmacion: false,
+      idPlatilloSeleccionado: null,
       platilloAEliminar: {}
     };
   },
@@ -78,20 +79,19 @@ export default {
     seleccionarPlatilloParaEditar(index) {
       this.filaEnEdicion = index;
     },
-    confirmarEliminacion(platillo) {
-      console.log("Confirmación de eliminación activada");
+    mostrarConfirmacion(platillo) {
       this.platilloAEliminar = platillo;
-      this.mostrarConfirmacion = true;
-      console.log(this.mostrarConfirmacion);
+      this.idPlatilloSeleccionado = platillo.idplato;
     },
-    cerrarConfirmacion() {
-      this.mostrarConfirmacion = false;
+    cancelarConfirmacion() {
+      this.idPlatilloSeleccionado = null;
+      this.platilloAEliminar = {};
     },
-    async eliminarPlatillo(idPlatillo) {
+    async eliminarPlatillo() {
       try {
-        await axios.delete(`http://localhost:5000/api/platillos/${idPlatillo}`);
-        this.platillos = this.platillos.filter(p => p.idplato !== idPlatillo);
-        this.cerrarConfirmacion();
+        await axios.delete(`http://localhost:5000/api/platillos/${this.platilloAEliminar.idplato}`);
+        this.platillos = this.platillos.filter(p => p.idplato !== this.platilloAEliminar.idplato);
+        this.cancelarConfirmacion();
       } catch (error) {
         console.error("Error al eliminar el platillo:", error);
       }
