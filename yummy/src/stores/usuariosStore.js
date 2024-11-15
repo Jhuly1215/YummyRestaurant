@@ -59,7 +59,34 @@ export const useAuthStore = defineStore('auth', {
           this.loading = false;
         }
       },
+      async crearActividad(usuario, estado) {
+        if (!usuario || !estado) {
+          console.error('Usuario y estado son obligatorios');
+          return false;
+        }
       
+        try {
+          const response = await axios.post(`${RutaApi.baseURL}actividad/`, {
+            usuario: usuario,
+            estado: estado,
+          }, {
+            headers: {
+              'Content-Type': 'application/json',
+            },
+          });
+      
+          if (response.status === 201) {
+            console.log('Actividad creada exitosamente:', response.data);
+            return response.data; // Devuelve los datos de la actividad creada
+          } else {
+            console.error('Error al crear la actividad');
+            return false;
+          }
+        } catch (error) {
+          console.error('Error en la solicitud:', error);
+          return false;
+        }
+      },
       logout() {
         this.token = null;
         this.user = null;

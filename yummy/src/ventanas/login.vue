@@ -1,12 +1,12 @@
 <template>
-    <div class="login-container">
-      <div class="login-card">
-        <h2 class="title">Bienvenido</h2>
-        <form @submit.prevent="handleSubmit">
-          <label for="email">Correo electrónico:</label>
-          <input type="email" id="email" v-model="email" required placeholder="Ingresa tu correo" />
-  
-          <label for="password">Contraseña:</label>
+  <div class="login-container">
+    <div class="login-card">
+      <h2 class="title">Bienvenido</h2>
+      <form @submit.prevent="handleSubmit">
+        <label for="email">Correo electrónico:</label>
+        <input type="email" id="email" v-model="email" required placeholder="Ingresa tu correo" />
+
+        <label for="password">Contraseña:</label>
         <div class="password-container">
           <input
             :type="showPassword ? 'text' : 'password'"
@@ -19,59 +19,77 @@
             <i :class="showPassword ? 'fas fa-eye-slash' : 'fas fa-eye'"></i>
           </span>
         </div>
-  
-          <p class="signup-text"> ¿No tienes una cuenta? <router-link to="/registro">Regístrate aquí</router-link></p>
-          <p class="signup-text"><router-link to="/recupera">¿Olvidaste tu contraseña?</router-link></p>
 
-  
-          <button type="submit" class="login-button">Listo</button>
-        </form>
-      </div>
+        <p class="signup-text">¿No tienes una cuenta? <router-link to="/registro">Regístrate aquí</router-link></p>
+        <p class="signup-text"><router-link to="/recupera">¿Olvidaste tu contraseña?</router-link></p>
+
+        <button type="submit" class="login-button">Listo</button>
+      </form>
     </div>
-  </template>
-  
-  <script>
-  import { useAuthStore } from '../stores/usuariosStore'; // Asegúrate de importar el store correcto
-  import Swal from 'sweetalert2';
-  
-  export default {
-    name: "LogIn",
-    data() {
-      return {
-        showPassword: false,
-        email: '',
-        password: '',
-        error: null, // Para manejar errores
+  </div>
+</template>
+
+<script>
+import { useAuthStore } from '../stores/usuariosStore'; // Asegúrate de importar el store correcto
+import Swal from 'sweetalert2';
+
+export default {
+  name: "LogIn",
+  data() {
+    return {
+      showPassword: false,
+      email: '',
+      password: '',
+      error: null, // Para manejar errores
+      loginAttempts: 0, // Contador de intentos fallidos
+      maxAttempts: 3, // Máximo de intentos permitidos
+    };
+  },
+  computed: {
+    loading() {
+      return this.store.loading; // Usamos el estado de loading del store
+    }
+  },
+  methods: {
+    togglePasswordVisibility() {
+      this.showPassword = !this.showPassword;
+    },
+
+    async handleSubmit() {
+      const credentials = {
+        correo: this.email,
+        password: this.password,
       };
-    },
-    computed: {
-      loading() {
-        return this.store.loading; // Usamos el estado de loading del store
-      }
-    },
-    methods: {
-      togglePasswordVisibility() {
-        this.showPassword = !this.showPassword;
-      },
-  
-      async handleSubmit() {
-        const credentials = {
-          correo: this.email,
-          password: this.password,
-        };
-  
-        // Usamos el método login del store
-        const success = await this.store.login(credentials);
-        if (success) {
-          // Muestra una alerta de éxito cuando el login es exitoso
+
+      // Usamos el método login del store
+      const success = await this.store.login(credentials);
+      let estadoActividad;
+
+      if (success) {
+        // Reinicia los intentos fallidos al iniciar sesión correctamente
+        this.loginAttempts = 0;
+
+        // Muestra una alerta de éxito cuando el login es exitoso
+        Swal.fire({
+          icon: 'success',
+          title: '¡Bienvenido!',
+          text: 'Has iniciado sesión correctamente.',
+        });
+
+        // Redirige al Home si el login es exitoso
+        this.$router.push('/');
+        estadoActividad = 'exitoso';
+      } else {
+        // Incrementa el contador de intentos fallidos
+        this.loginAttempts++;
+        estadoActividad = 'fallido';
+
+        if (this.loginAttempts >= this.maxAttempts) {
           Swal.fire({
-            icon: 'success',
-            title: '¡Bienvenido!',
-            text: 'Has iniciado sesión correctamente.',
+            icon: 'warning',
+            title: 'Cuenta bloqueada',
+            text: 'Has alcanzado el máximo de intentos fallidos. Tu cuenta acaba de ser bloqueada.',
           });
-  
-          // Redirige al Home si el login es exitoso
-          this.$router.push('/'); // Redirige a la ruta 'Home' que definiste
         } else {
           // Si el login falla, muestra un mensaje de error
           this.error = 'Correo o contraseña incorrectos';
@@ -82,21 +100,29 @@
           });
         }
       }
-    },
-    created() {
-      this.store = useAuthStore(); // Vincula el store de Pinia a este componente
-    },
-    watch: {
-      // Se puede escuchar el token y redirigir si ya está autenticado (opcional)
-      token(newToken) {
-        if (newToken) {
-          this.$router.push({ name: 'Home' }); // Redirige al Home si ya está autenticado
-        }
+
+      // Llama a la función crearActividad del store
+      try {
+        await this.store.crearActividad(this.email, estadoActividad);
+      } catch (error) {
+        console.error('Error al registrar la actividad:', error);
       }
-    },
-  };
-  </script>
-  
+    }
+  },
+  created() {
+    this.store = useAuthStore(); // Vincula el store de Pinia a este componente
+  },
+  watch: {
+    // Se puede escuchar el token y redirigir si ya está autenticado (opcional)
+    token(newToken) {
+      if (newToken) {
+        this.$router.push({ name: 'Home' }); // Redirige al Home si ya está autenticado
+      }
+    }
+  },
+};
+</script>
+
   
   <style scoped>
   
