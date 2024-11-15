@@ -55,6 +55,11 @@ export default {
   methods: {
     toggleModal() {
       this.isModalOpen = !this.isModalOpen;
+      if (this.isModalOpen) {
+        // Imprime en la consola los IDs de los productos con cantidad seleccionada > 0
+        const idsSeleccionados = this.platillosSeleccionados.map(platillo => platillo.idplato);
+        console.log("IDs de productos seleccionados:", idsSeleccionados);
+      }
     },
   },
 };
