@@ -4,6 +4,16 @@
     <div class="table-container">
       <table class="table">
         <thead>
+          <!-- Muestra el mensaje de confirmación -->
+          <tr v-if="idPlatilloSeleccionado === platilloAEliminar.idplato">
+            <td colspan="6">
+              <ConfirmacionEliminar
+                :nombrePlatillo="platilloAEliminar.nombre"
+                @confirmarEliminacion="eliminarPlatillo"
+                @cancelar="cancelarConfirmacion"
+              />
+            </td>
+          </tr>
           <tr>
             <th>Id</th>
             <th>Nombre</th>

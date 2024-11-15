@@ -1,21 +1,22 @@
 <template>
   <div>
-    <NavbarComponent />
     <CarouselComponent />
-    
-    <!-- Escucha el evento y almacena el ID de la categoría seleccionada -->
+    <ListaProductosPedidos :cantidadesSeleccionadas="cantidadesSeleccionadas" :platillos="platillos" />
+
     <FiltroCategorias @categoriaSeleccionada="categoriaSeleccionada = $event" />
 
     <div class="main">
       <div class="cards">
-        <!-- Filtra y muestra los platillos según la categoría seleccionada -->
         <CardMenuPedido
-          v-for="(platillo, index) in platillosFiltrados"
-          :key="index"
+          v-for="platillo in platillosFiltrados"
+          :key="platillo.idplato"
           :imagen="platillo.imagen"
           :nombre="platillo.nombre"
           :descripcion="platillo.descripcion"
           :precio="platillo.precio"
+          :id="platillo.idplato"
+          :cantidad="cantidadesSeleccionadas[platillo.idplato] || 0"
+          @actualizarCantidad="actualizarCantidad"
         />
       </div>
     </div>
@@ -25,44 +26,44 @@
 
 <script>
 import axios from 'axios';
-import NavbarComponent from '@/components/Navbar.vue';
 import FooterComponent from '@/components/Footer.vue';
 import CarouselComponent from '@/components/CarouselComponent.vue';
 import FiltroCategorias from '@/components/FiltroCategorias.vue';
 import CardMenuPedido from '@/components/CardMenuPedido.vue';
+import ListaProductosPedidos from '@/components/ListaProductosPedidos.vue';
 
 export default {
   name: 'MenuPedido',
   components: {
-    NavbarComponent,
     FooterComponent,
     CarouselComponent,
     CardMenuPedido,
     FiltroCategorias,
+    ListaProductosPedidos,
   },
   data() {
     return {
       platillos: [],
       categoriaSeleccionada: null,
       cargando: false,
-      error: null
+      error: null,
+      cantidadesSeleccionadas: {}, // Almacena las cantidades seleccionadas por ID de platillo
     };
   },
   computed: {
-    // Filtra los platillos según la categoría seleccionada
     platillosFiltrados() {
       return this.categoriaSeleccionada
         ? this.platillos.filter(p => p.idcategoria === this.categoriaSeleccionada)
         : this.platillos;
-    }
+    },
   },
   mounted() {
     this.obtenerPlatillos();
   },
   methods: {
     async obtenerPlatillos() {
-      this.cargando = true; // Inicia el estado de carga
-      this.error = null; // Limpia errores anteriores
+      this.cargando = true;
+      this.error = null;
       try {
         const response = await axios.get('http://localhost:5000/api/platillos');
         this.platillos = response.data;
@@ -70,10 +71,17 @@ export default {
         console.error("Error al obtener los platillos:", error);
         this.error = "No se pudieron cargar los platillos. Por favor, intenta más tarde.";
       } finally {
-        this.cargando = false; // Finaliza el estado de carga
+        this.cargando = false;
       }
-    }
-  }
+    },
+    actualizarCantidad(idplato, cantidad) {
+      // Actualiza la cantidad directamente
+      this.cantidadesSeleccionadas = {
+        ...this.cantidadesSeleccionadas,
+        [idplato]: cantidad,
+      };
+    },
+  },
 };
 </script>
 

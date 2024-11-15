@@ -10,10 +10,13 @@
           <h3>{{ nombre }}</h3>
           <p>{{ precio }} Bs.</p>
         </div>
-        <div>
-          <button class="button-add">
-            <i class="fas fa-plus"></i>
-          </button>
+        <div class="cantidad">
+          <input
+            type="number" 
+            min="0" 
+            v-model.number="cantidadInterna" 
+            @input="validarCantidad"
+          />
         </div>
       </div>
     </div>
@@ -39,6 +42,32 @@ export default {
     precio: {
       type: String,
       required: true
+    },
+    id: {
+      type: Number,
+      required: true
+    },
+    cantidad: {
+      type: Number,
+      required: true
+    }
+  },
+  data() {
+    return {
+      cantidadInterna: this.cantidad // Controla la cantidad seleccionada internamente
+    };
+  },
+  watch: {
+    cantidad(newCantidad) {
+      this.cantidadInterna = newCantidad;
+    }
+  },
+  methods: {
+    validarCantidad() {
+      if (this.cantidadInterna < 0) {
+        this.cantidadInterna = 0; // Reinicia el valor si es menor a 0
+      }
+      this.$emit('actualizarCantidad', this.id, this.cantidadInterna);
     }
   }
 };
@@ -80,12 +109,22 @@ export default {
   align-items: center;
   text-align: center;
 }
-.button-add {
+
+.cantidad {
+  display: flex;
+}
+
+.button-num {
   color: #FFFEDC;
   border: 0;
   background-color: #322209;
-  padding: 10px 15px 10px 15px;
+  padding: 2px 6px 2px 6px;
   border-radius: 100px;
+  margin: 5px;
+}
+
+input {
+  width: 50px;
 }
 
 @media (max-width: 768px) {
