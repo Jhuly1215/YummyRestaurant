@@ -28,6 +28,10 @@ const Platillo = sequelize.define('Platillo', {
       key: 'idCategoria',
     },
   },
+  imagen: {
+    type: DataTypes.STRING(255), // Longitud para URLs
+    allowNull: true, // Opcional si no es obligatorio
+  },
 });
 
 module.exports = Platillo;

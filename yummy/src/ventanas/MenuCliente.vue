@@ -43,7 +43,9 @@ export default {
   data() {
     return {
       platillos: [],
-      categoriaSeleccionada: null // Guarda la categoría seleccionada
+      categoriaSeleccionada: null,
+      cargando: false,
+      error: null
     };
   },
   computed: {
@@ -59,11 +61,16 @@ export default {
   },
   methods: {
     async obtenerPlatillos() {
+      this.cargando = true; // Inicia el estado de carga
+      this.error = null; // Limpia errores anteriores
       try {
         const response = await axios.get('http://localhost:5000/api/platillos');
         this.platillos = response.data;
       } catch (error) {
         console.error("Error al obtener los platillos:", error);
+        this.error = "No se pudieron cargar los platillos. Por favor, intenta más tarde.";
+      } finally {
+        this.cargando = false; // Finaliza el estado de carga
       }
     }
   }

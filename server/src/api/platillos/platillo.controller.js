@@ -7,13 +7,13 @@ exports.crearPlatillo = async (req, res) => {
 
     try {
         await sequelize.query(
-            `INSERT INTO platillo (nombre, descripcion, precio, idCategoria)
-             VALUES (:nombre, :descripcion, :precio, :idCategoria)`,
+            `INSERT INTO platillo (nombre, descripcion, precio, idCategoria, imagen)
+             VALUES (:nombre, :descripcion, :precio, :idCategoria, :imagen)`,
             {
-                replacements: { nombre, descripcion, precio, idCategoria },
+                replacements: { nombre, descripcion, precio, idCategoria, imagen },
                 type: sequelize.QueryTypes.INSERT,
             }
-        );
+        );        
         res.status(201).json({ message: 'Platillo creado exitosamente' });
     } catch (error) {
         console.error("Error al crear el platillo:", error);
@@ -38,15 +38,15 @@ exports.obtenerPlatillos = async (req, res) => {
 // Actualizar un platillo
 exports.actualizarPlatillo = async (req, res) => {
     const { id } = req.params;
-    const { nombre, descripcion, precio, idCategoria } = req.body;
+    const { nombre, descripcion, precio, idCategoria, imagen } = req.body;
 
     try {
         const [actualizado] = await sequelize.query(
             `UPDATE platillo SET nombre = :nombre, descripcion = :descripcion, 
-             precio = :precio, idCategoria = :idCategoria
-             WHERE idPlatillo = :id`,
+             precio = :precio, idcategoria = :idCategoria, imagen = :imagen
+             WHERE idplato = :id`,
             {
-                replacements: { id, nombre, descripcion, precio, idCategoria },
+                replacements: { id, nombre, descripcion, precio, idCategoria, imagen },
                 type: sequelize.QueryTypes.UPDATE,
             }
         );
@@ -58,7 +58,7 @@ exports.actualizarPlatillo = async (req, res) => {
         }
     } catch (error) {
         console.error("Error al actualizar el platillo:", error);
-        res.status(500).json({ error: 'Error al actualizar el platillo' });
+        res.status(500).json({ error: 'Error al actualizar el platillo', details: error.message });
     }
 };
 

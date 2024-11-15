@@ -14,34 +14,47 @@
           </tr>
         </thead>
         <tbody>
-          <!-- Muestra el mensaje de confirmación -->
-          <tr v-if="idPlatilloSeleccionado === platilloAEliminar.idplato">
-            <td colspan="6">
-              <ConfirmacionEliminar
-                :nombrePlatillo="platilloAEliminar.nombre"
-                @confirmarEliminacion="eliminarPlatillo"
-                @cancelar="cancelarConfirmacion"
-              />
-            </td>
-          </tr>
           <tr v-for="(platillo, index) in platillos" :key="index">
             <td>{{ platillo.idplato }}</td>
-            <td>{{ platillo.nombre }}</td>
-            <td>{{ platillo.descripcion }}</td>
-            <td>{{ platillo.precio }} Bs.</td>
-            <td>{{ platillo.idcategoria }}</td>
+            
+            <!-- Si la fila está en edición, muestra campos de entrada -->
+            <td v-if="index === filaEnEdicion">
+              <input v-model="platilloEditado.nombre" />
+            </td>
+            <td v-else>{{ platillo.nombre }}</td>
+            
+            <td v-if="index === filaEnEdicion">
+              <input v-model="platilloEditado.descripcion" />
+            </td>
+            <td v-else>{{ platillo.descripcion }}</td>
+            
+            <td v-if="index === filaEnEdicion">
+              <input type="number" v-model="platilloEditado.precio" />
+            </td>
+            <td v-else>{{ platillo.precio }} Bs.</td>
+            
+            <td v-if="index === filaEnEdicion">
+              <input type="number" v-model="platilloEditado.idcategoria" />
+            </td>
+            <td v-else>{{ platillo.idcategoria }}</td>
+            
             <td class="botones">
-              <button v-if="index !== filaEnEdicion" class="action-button edit-button" @click="seleccionarPlatilloParaEditar(index)">
+              <!-- Botones de acción -->
+              <button v-if="index !== filaEnEdicion" class="action-button edit-button" @click="seleccionarPlatilloParaEditar(index, platillo)">
                 <i class="fas fa-edit"></i>
               </button>
               <button v-if="index !== filaEnEdicion" class="action-button delete-button" @click="mostrarConfirmacion(platillo)">
                 <i class="fas fa-trash"></i>
               </button>
-              <!-- Muestra el botón Guardar solo en la fila en edición -->
-              <button v-if="index === filaEnEdicion" class="button-save" @click="guardarCambios">Guardar</button>
+              <!-- Botones de Guardar y Cancelar solo en la fila en edición -->
+              <button v-if="index === filaEnEdicion" class="action-button button-save" @click="guardarCambios">
+                <i class="fa-solid fa-floppy-disk"></i>
+              </button>
+              <button v-if="index === filaEnEdicion" class="action-button button-cancel" @click="cancelarCambios">
+                <i class="fa-solid fa-xmark"></i>
+              </button>
             </td>
           </tr>
-          
         </tbody>
       </table>
     </div>
@@ -60,6 +73,7 @@ export default {
     return {
       platillos: [],
       filaEnEdicion: null,
+      platilloEditado: {}, // Nuevo objeto para los datos de edición
       idPlatilloSeleccionado: null,
       platilloAEliminar: {}
     };
@@ -76,8 +90,26 @@ export default {
         console.error("Error al obtener los platillos:", error);
       }
     },
-    seleccionarPlatilloParaEditar(index) {
+    seleccionarPlatilloParaEditar(index, platillo) {
       this.filaEnEdicion = index;
+      this.platilloEditado = { ...platillo }; // Copia los datos del platillo para editarlos
+    },
+    
+    async guardarCambios() {
+      console.log(this.platilloEditado); // Verificar valores
+      try {
+        await axios.put(`http://localhost:5000/api/platillos/${this.platilloEditado.idplato}`, this.platilloEditado);
+        this.platillos.splice(this.filaEnEdicion, 1, this.platilloEditado);
+        this.filaEnEdicion = null;
+        this.platilloEditado = {};
+      } catch (error) {
+        console.error("Error al guardar los cambios del platillo:", error)
+      }
+    },
+
+    cancelarCambios() {
+      this.filaEnEdicion = null;
+      this.platilloEditado = {}; // Limpia los cambios sin guardarlos
     },
     mostrarConfirmacion(platillo) {
       this.platilloAEliminar = platillo;
@@ -95,10 +127,6 @@ export default {
       } catch (error) {
         console.error("Error al eliminar el platillo:", error);
       }
-    },
-    guardarCambios() {
-      alert("Cambios guardados exitosamente.");
-      this.filaEnEdicion = null;
     }
   }
 };
@@ -120,6 +148,7 @@ h2 {
 .table th, .table td {
   border: 2;
   padding: 10px;
+  width: 20px;
 }
 
 .table th {
@@ -152,10 +181,10 @@ h2 {
 }
 
 .button-save {
-  background-color: #4caf50;
-  color: #FFFEDC;
-  border: 0;
-  padding: 6px;
-  border-radius: 50px;
+  color: #2f0cf5;
+}
+
+.button-cancel {
+  color: #f44336;
 }
 </style>

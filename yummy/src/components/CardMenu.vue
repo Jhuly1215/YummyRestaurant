@@ -3,9 +3,11 @@
     <div class="card-inner" :class="{ rotated: hover }">
       <!-- Cara frontal -->
       <div class="card-front">
-        <img src="https://i.pinimg.com/564x/9b/ec/a7/9beca7153757bbc850c276f0601c794f.jpg" alt="plato" class="imagen" />
         <div class="info">
-          <h2>{{ nombre }}</h2>
+          <img :src="imagen" alt="plato" class="imagen" />
+        </div>
+        <div class="info">
+          <h3>{{ nombre }}</h3>
           <p>{{ precio }} Bs.</p>
         </div>
       </div>
@@ -21,11 +23,10 @@
 export default {
   name: 'CardMenu',
   props: {
-    // Comentado para que no se requiera pasar la imagen como prop por ahora
-    // imagen: {
-    //   type: String,
-    //   required: true
-    // },
+    imagen: {
+      type: String,
+      required: true
+    },
     nombre: {
       type: String,
       required: true
@@ -73,7 +74,7 @@ export default {
   height: 100%;
   backface-visibility: hidden;
   border-radius: 15px;
-  box-shadow: 0 10px 10px #7c5b27;
+  box-shadow: 0  4px 10px #322209;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -86,7 +87,7 @@ export default {
 }
 
 .card-back {
-  background-color: #ffd275;
+  background-color: #FE9900;
   color: white;
   transform: rotateY(180deg);
   justify-content: center;
@@ -94,16 +95,29 @@ export default {
 }
 
 .imagen {
-  width: 180px;
+  width: 100%;
   height: auto;
   border-radius: 10px;
 }
 
 .info {
+  width: 50%;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
   text-align: center;
+}
+
+@media (max-width: 768px) {
+  .card-inner.rotated {
+  transform: rotateY(180deg);
+  }
+  .menu-card {
+    perspective: 1000px;
+    width: 45%;
+
+  }
+  
 }
 </style>
