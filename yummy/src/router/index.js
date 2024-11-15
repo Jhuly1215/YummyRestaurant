@@ -56,20 +56,16 @@ const router = createRouter({
   ],
 });
 
-// Guardia global de navegación
+
 router.beforeEach((to, from, next) => {
-  // Verifica si la ruta requiere autenticación
   if (to.meta.requiresAuth) {
-    const token = localStorage.getItem('token');  // O usa Vuex si prefieres
+    const token = localStorage.getItem('token'); 
     if (!token) {
-      // Si no hay token, redirige a la página de login
       next({ name: 'LogIn' });
     } else {
-      // Si hay token, deja pasar
       next();
     }
   } else {
-    // Si no requiere autenticación, deja pasar
     next();
   }
 });
