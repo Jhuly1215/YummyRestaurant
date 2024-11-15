@@ -5,6 +5,7 @@
         <h1>Tu lugar para compartir y disfrutar</h1>
         <div class="opciones">
           <a><router-link to="/ofertas">Ofertas</router-link></a>
+          <a><router-link to="/mapa">Mapa Interactivo</router-link></a>
           <a><router-link to="/iniciarsesion">Login</router-link></a>
           <a><router-link to="/registro">Registrarse</router-link></a>
         </div>

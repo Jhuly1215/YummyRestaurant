@@ -6,6 +6,8 @@ import Reservas from '@/ventanas/reservas/Reservas.vue';
 import Recupera from '@/ventanas/recupera.vue';
 import CambioPass from '@/ventanas/cambioPassword.vue';
 import Ofertas from '@/ventanas/ofertasPage.vue';
+import MapaInteractivo from '@/ventanas/mapaInteractivo.vue';
+
 
 
 const router = createRouter({
@@ -45,6 +47,11 @@ const router = createRouter({
       path: '/cambioPass/:id',
       name: 'CambioPassword',
       component: CambioPass,
+    },
+    {
+      path: '/mapa',
+      name: 'Mapa',
+      component: MapaInteractivo,
     },
   ],
 });
