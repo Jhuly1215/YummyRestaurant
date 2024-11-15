@@ -95,10 +95,12 @@ export default {
 }
 
 .imagen {
-  width: 100%;
-  height: auto;
+  width: 100%; 
+  aspect-ratio: 1 / 1; 
+  object-fit: cover; /* Recorta la imagen para llenar el contenedor */
   border-radius: 10px;
 }
+
 
 .info {
   width: 50%;

@@ -1,10 +1,11 @@
 <template>
-  <MenuCliente />
+  <MenuPedido />
   
 </template>
 
 <script>
-import MenuCliente from './ventanas/MenuCliente.vue';
+//import MenuCliente from './ventanas/MenuCliente.vue';
+import MenuPedido from './ventanas/MenuPedido.vue';
 //import HomePage from './ventanas/home.vue'
 //import OfertasPage from './ventanas/ofertasPage.vue';
 
@@ -13,7 +14,8 @@ export default {
   components: {
     //OfertasPage,
     //HomePage,
-    MenuCliente,
+    //MenuCliente,
+    MenuPedido,
   }
 }
 </script>

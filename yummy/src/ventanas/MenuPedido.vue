@@ -1,106 +1,107 @@
 <template>
-    <div>
-      <NavbarComponent />
-      <div class="main">
-        <div class="cards">
-          <!-- Varias tarjetas CardMenu -->
-          <CardMenuPedido
-            :imagen="'https://cdn0.bodas.com.mx/article-vendor/0940/3_2/960/jpg/-mg-0925_5_140940-1552761878.jpeg'"
-            nombre="Nombre del plato 1"
-            descripcion="Descripción del plato 1"
-            precio="###"
-          />
-          <CardMenuPedido
-            :imagen="'https://cdn0.bodas.com.mx/article-vendor/0940/3_2/960/jpg/-mg-0925_5_140940-1552761878.jpeg'"
-            nombre="Nombre del plato 1"
-            descripcion="Descripción del plato 1"
-            precio="###"
-          />
-          <CardMenuPedido
-            :imagen="'https://cdn0.bodas.com.mx/article-vendor/0940/3_2/960/jpg/-mg-0925_5_140940-1552761878.jpeg'"
-            nombre="Nombre del plato 1"
-            descripcion="Descripción del plato 1"
-            precio="###"
-          />
-          <CardMenuPedido
-            :imagen="'https://cdn0.bodas.com.mx/article-vendor/0940/3_2/960/jpg/-mg-0925_5_140940-1552761878.jpeg'"
-            nombre="Nombre del plato 1"
-            descripcion="Descripción del plato 1"
-            precio="###"
-          />
+  <div>
+    <NavbarComponent />
+    <CarouselComponent />
+    
+    <!-- Escucha el evento y almacena el ID de la categoría seleccionada -->
+    <FiltroCategorias @categoriaSeleccionada="categoriaSeleccionada = $event" />
 
-        </div>
+    <div class="main">
+      <div class="cards">
+        <!-- Filtra y muestra los platillos según la categoría seleccionada -->
+        <CardMenuPedido
+          v-for="(platillo, index) in platillosFiltrados"
+          :key="index"
+          :imagen="platillo.imagen"
+          :nombre="platillo.nombre"
+          :descripcion="platillo.descripcion"
+          :precio="platillo.precio"
+        />
       </div>
-      <FooterComponent />
     </div>
+    <FooterComponent />
+  </div>
 </template>
-  
+
 <script>
+import axios from 'axios';
 import NavbarComponent from '@/components/Navbar.vue';
 import FooterComponent from '@/components/Footer.vue';
+import CarouselComponent from '@/components/CarouselComponent.vue';
+import FiltroCategorias from '@/components/FiltroCategorias.vue';
 import CardMenuPedido from '@/components/CardMenuPedido.vue';
 
-
 export default {
-name: 'MenuCliente',
-components: {
+  name: 'MenuPedido',
+  components: {
     NavbarComponent,
     FooterComponent,
+    CarouselComponent,
     CardMenuPedido,
-}
+    FiltroCategorias,
+  },
+  data() {
+    return {
+      platillos: [],
+      categoriaSeleccionada: null,
+      cargando: false,
+      error: null
+    };
+  },
+  computed: {
+    // Filtra los platillos según la categoría seleccionada
+    platillosFiltrados() {
+      return this.categoriaSeleccionada
+        ? this.platillos.filter(p => p.idcategoria === this.categoriaSeleccionada)
+        : this.platillos;
+    }
+  },
+  mounted() {
+    this.obtenerPlatillos();
+  },
+  methods: {
+    async obtenerPlatillos() {
+      this.cargando = true; // Inicia el estado de carga
+      this.error = null; // Limpia errores anteriores
+      try {
+        const response = await axios.get('http://localhost:5000/api/platillos');
+        this.platillos = response.data;
+      } catch (error) {
+        console.error("Error al obtener los platillos:", error);
+        this.error = "No se pudieron cargar los platillos. Por favor, intenta más tarde.";
+      } finally {
+        this.cargando = false; // Finaliza el estado de carga
+      }
+    }
+  }
 };
 </script>
 
 <style scoped>
 .main {
-  max-width: 1200px;
-  margin: 0 auto;
-  margin-top: 75px;
-  margin-bottom: 100px;
-}
-
-.content {
-padding: 50px 20px;
-text-align: center;
-background-color: white;
-}
-
-body {
-  font-family: "Oxygen", sans-serif;
-  color: #050505;
-  background-image: url('https://b2090723.smushcdn.com/2090723/wp-content/uploads/2019/03/DSC_0614.jpg?lossy=0&strip=0&webp=1');
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
-}
-
-.title-fade {
-position: absolute;
-top: 30%;
-left: 50%;
-transform: translate(-50%, -50%);
-text-align: center;
-width: 100%;
-color: white;
-opacity: 0; 
-animation: fadeIn 3s ease-in-out forwards;
-z-index: 10; 
+max-width: 1200px;
+margin: 0 auto;
+margin-top: 20px;
+margin-bottom: 100px;
 }
 
 .cards {
   display: flex;
   flex-wrap: wrap;
-  gap: 20px; /* Espacio entre tarjetas */
-  justify-content: center; /* Centra las tarjetas */
+  gap: 30px;
+  justify-content: center;
+}
+
+.cards > * {
+  flex: 1 1 calc(33.33% - 20px); /* 33.33% para tres tarjetas por fila, menos el espacio de gap */
+  max-width: calc(33.33% - 20px); /* Para asegurar que no exceda el ancho */
 }
 
 @media (max-width: 768px) {
-  /* Cuando la pantalla es pequeña, cada tarjeta ocupa el 100% */
   .cards > * {
     flex: 1 1 100%;
-    max-width: 100%;
+    max-width: 90%;
   }
 }
 
 </style>
-  
