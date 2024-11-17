@@ -6,7 +6,7 @@
     <p>Nombre: {{ nombre }}</p>
     <!-- Botón para cambiar el estado -->
     <button :class="['estado', estadoClase]" @click.stop="toggleEstado">
-      {{ estado === '1' ? 'Pendiente' : 'Entregado' }}
+      {{ estado === '1' ? 'Pendiente' : 'Finalizada' }}
     </button>
   </div>
 </template>
@@ -24,7 +24,7 @@ export default {
   computed: {
     estadoClase() {
       // Clase CSS según el estado
-      return this.estado === '1' ? 'pendiente' : 'entregada';
+      return this.estado === '1' ? 'pendiente' : 'finalizada';
     },
   },
   methods: {
@@ -56,7 +56,7 @@ export default {
     font-weight: bold;
   }
   
-  .entregada {
+  .finalizada {
     background-color: #FFFEDC; /* Color de fondo para estado "Entregada" */
   }
   
@@ -74,7 +74,7 @@ export default {
     cursor: pointer;
   }
   
-  .entregada.estado {
+  .finalizada.estado {
     background-color: #D8D8A7; /* Color para botón de estado "Entregada" */
   }
   

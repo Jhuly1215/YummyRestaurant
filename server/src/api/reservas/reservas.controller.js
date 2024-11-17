@@ -106,3 +106,31 @@ exports.eliminarReserva = async (req, res) => {
         res.status(500).json({ error: 'Error al eliminar la reserva' });
     }
 };
+exports.verificarDisponibilidad = async (req, res) => {
+    const { idmesa, fecha, hora, idreserva } = req.query;
+
+    try {
+        const reservasConflicto = await sequelize.query(
+            `SELECT * 
+             FROM reserva 
+             WHERE idmesa = :idmesa 
+             AND fecha = :fecha 
+             AND ABS(EXTRACT(EPOCH FROM (hora::time - :hora::time)) / 60) <= 90
+             AND idreserva != :idreserva`, // Excluye la reserva actual
+            {
+                replacements: { idmesa, fecha, hora, idreserva },
+                type: sequelize.QueryTypes.SELECT,
+            }
+        );
+
+        if (reservasConflicto.length > 0) {
+            return res.json({ disponible: false });
+        }
+        res.json({ disponible: true });
+    } catch (error) {
+        console.error("Error al verificar disponibilidad:", error);
+        res.status(500).json({ error: 'Error al verificar disponibilidad' });
+    }
+};
+
+

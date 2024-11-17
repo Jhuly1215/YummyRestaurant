@@ -8,6 +8,8 @@ router.post('/', reservasController.crearReserva);
 router.get('/', reservasController.obtenerReservas);
 router.put('/:id', reservasController.actualizarReserva);
 router.delete('/:id', reservasController.eliminarReserva);
+router.get('/verificar-disponibilidad', reservasController.verificarDisponibilidad)
+
 
 
 module.exports = router;

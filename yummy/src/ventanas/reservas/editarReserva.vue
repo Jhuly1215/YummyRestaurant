@@ -4,7 +4,10 @@
       <div class="modal-content">
         <span class="close-button" @click="onClose">&times;</span>
         <h2>{{ titulo }}</h2>
-        
+        <ErrorCard
+          v-if="mensajeError.mostrar"
+          :mensaje="mensajeError.texto"
+        ></ErrorCard>
         <!-- Formulario para editar la reserva -->
         <form @submit.prevent="guardarCambios">
           <div class="form-group">
@@ -43,9 +46,12 @@
   
   <script>
   import { reactive } from 'vue';
-  
+  import ErrorCard from "@/components/ErrorCard.vue";
   export default {
     name: "EditarReserva",
+    components: {
+      ErrorCard // Regístralo aquí
+    },
     props: {
       titulo: String,
       reserva: {
@@ -58,28 +64,57 @@
       // Usamos reactive para que reservaData sea reactivo
       const reservaData = reactive({
         idreserva: props.reserva.idreserva,
-        idusuario: props.reserva.idusuario, // Mantén el valor original
-        idmesa: props.reserva.idmesa, // Mantén el valor original
+        idusuario: props.reserva.idusuario,
+        idmesa: props.reserva.idmesa,
         fecha: props.reserva.fecha,
         hora: props.reserva.hora,
         nombre: props.reserva.nombre,
         estado: props.reserva.estado
       });
+      const mensajeError = reactive({
+        texto: "", 
+        mostrar: false 
+      });
   
-      // Función para guardar cambios
-      const guardarCambios = () => {
-        console.log("Datos enviados al guardar:", reservaData);
-        emit('onSave', { ...reservaData }); // Emitir la reserva actualizada
-        emit('onClose'); // Cerrar el modal después de guardar
-      };
+    
+      const guardarCambios = async () => {
+    try {
+        const { idmesa, fecha, hora, idreserva } = reservaData;
 
-  
+        // Verificar disponibilidad
+        const response = await fetch(
+            `/api/reservas/verificar-disponibilidad?idmesa=${idmesa}&fecha=${fecha}&hora=${hora}&idreserva=${idreserva}`
+        );
+
+        const { disponible } = await response.json();
+
+        if (!disponible) {
+          
+          mensajeError.texto =
+            "La mesa seleccionada ya tiene una reserva en la misma fecha y hora (o dentro de 1 hora y media).";
+          mensajeError.mostrar = true;
+          return;
+        }
+
+        // Proceder a guardar si está disponible
+        console.log("Datos enviados al guardar:", reservaData);
+        emit('onSave', { ...reservaData }); // Emitir los datos al componente padre para guardarlos
+        emit('onClose'); // Cerrar el modal
+    } catch (error) {
+        console.error("Error al verificar disponibilidad:", error);
+        mensajeError.texto =
+          "Ocurrió un error al verificar la disponibilidad. Intenta de nuevo.";
+        mensajeError.mostrar = true;
+      }
+};
+
+
       // Función para cerrar el modal sin guardar
       const onClose = () => {
         emit('onClose');
       };
   
-      return { reservaData, guardarCambios, onClose };
+      return { reservaData, guardarCambios, onClose, mensajeError };
     }
   };
   </script>
