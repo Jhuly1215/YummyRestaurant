@@ -3,23 +3,32 @@ const sequelize = require('../../config/db');
 
 // Crear una nueva reserva
 exports.crearReserva = async (req, res) => {
-    const { fecha, hora, estado, idUsuario, idMesa } = req.body;
+    const { idusuario, idmesa, fecha, hora, estado } = req.body; // Extraer datos del body
+    console.log("Datos recibidos para crear reserva:", req.body);
+    // Validar que todos los campos requeridos estén presentes
+    if (!idusuario || !idmesa || !fecha || !hora || estado === undefined) {
+        return res.status(400).json({ error: 'Todos los campos son obligatorios' });
+    }
 
     try {
-        await sequelize.query(
-            `INSERT INTO reserva (fecha, hora, estado, idusuario, idmesa)
-             VALUES (:fecha, :hora, :estado, :idusuario, :idmesa)`,
+        // Ejecutar la consulta para crear la reserva
+        const nuevaReserva = await sequelize.query(
+            `INSERT INTO reserva (idusuario, idmesa, fecha, hora, estado)
+             VALUES (:idusuario, :idmesa, :fecha, :hora, :estado)`,
             {
-                replacements: { fecha, hora, estado, idUsuario, idMesa },
+                replacements: { idusuario, idmesa, fecha, hora, estado },
                 type: sequelize.QueryTypes.INSERT,
             }
         );
-        res.status(201).json({ message: 'Reserva creada exitosamente' });
+
+        // Responder con éxito
+        res.status(201).json({ message: 'Reserva creada exitosamente', data: nuevaReserva });
     } catch (error) {
         console.error("Error al crear la reserva:", error);
-        res.status(500).json({ error: 'Error al crear la reserva', details: error.message });
+        res.status(500).json({ error: 'Error al crear la reserva' });
     }
 };
+
 
 // Obtener todas las reservas
 exports.obtenerReservas = async (req, res) => {
