@@ -146,6 +146,7 @@ export default {
 h2 {
   color: #322209;
 }
+
 .table-container {
   overflow-x: auto;
 }

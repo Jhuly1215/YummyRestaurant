@@ -6,15 +6,35 @@
     <transition name="fade">
       <div v-if="isModalOpen" class="modal-overlay" @click.self="toggleModal">
         <div class="modal-content">
-          <div class="side-menu">
+          
             <h2>Tu Pedido</h2>
-            <ul v-if="platillosSeleccionados.length">
-              <li v-for="platillo in platillosSeleccionados" :key="platillo.idplato">
-                {{ platillo.nombre }} - {{ platillo.precio }} Bs. x {{ platillo.cantidad }} = {{ platillo.total }} Bs.
-              </li>
-            </ul>
-            <p v-else>No hay productos seleccionados</p>
-          </div>
+            <div class="table-container">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th>Platillo</th>
+                    <th>Precio</th>
+                    <th>Cantidad</th>
+                    <th>Subtotal</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr v-for="platillo in platillosSeleccionados" :key="platillo.idplato">
+                    <td>{{ platillo.nombre }}</td>
+                    <td>{{ platillo.precio }} Bs.</td>
+                    <td>{{ platillo.cantidad }}</td>
+                    <td>{{ platillo.subtotal }} Bs.</td>
+                  </tr>
+                </tbody>
+              </table>
+              <tfoot>
+                <tr>
+                  <td colspan="3" style="text-align: right;"><strong>Total</strong></td>
+                  <td><strong>{{ total }} Bs.</strong></td>
+                </tr>
+              </tfoot>
+
+            </div>
           <button class="close-button" @click="toggleModal">Cerrar</button>
         </div>
       </div>
@@ -37,14 +57,16 @@ export default {
   },
   computed: {
     platillosSeleccionados() {
-      // Filtra solo los platillos con cantidades mayores a cero
       return this.platillos
         .filter(p => this.cantidadesSeleccionadas[p.idplato] > 0)
         .map(p => ({
           ...p,
           cantidad: this.cantidadesSeleccionadas[p.idplato],
-          total: this.cantidadesSeleccionadas[p.idplato] * p.precio,
+          subtotal: this.cantidadesSeleccionadas[p.idplato] * p.precio,
         }));
+    },
+    total() {
+      return this.platillosSeleccionados.reduce((sum, p) => sum + p.subtotal, 0);
     },
   },
   data() {
@@ -56,19 +78,25 @@ export default {
     toggleModal() {
       this.isModalOpen = !this.isModalOpen;
       if (this.isModalOpen) {
-        // Imprime en la consola los IDs de los productos con cantidad seleccionada > 0
-        const idsSeleccionados = this.platillosSeleccionados.map(platillo => platillo.idplato);
-        console.log("IDs de productos seleccionados:", idsSeleccionados);
+        const seleccionados = this.platillosSeleccionados.map(platillo => ({
+          id: platillo.idplato,
+          nombre: platillo.nombre,
+          precio: platillo.precio,
+          cantidad: platillo.cantidad,
+          subtotal: platillo.subtotal
+        }));
+        console.log("Productos seleccionados:", seleccionados);
       }
     },
   },
+
 };
 </script>
 
 <style scoped>
 .floating-button {
   position: fixed;
-  top: 40px;
+  top: 50px;
   right: 0px;
   background-color: #322209;
   color: white;
@@ -107,33 +135,47 @@ export default {
   padding: 20px;
 }
 
-.side-menu {
-  background-color: #FFFEDC;
-  color: white;
-  padding: 20px;
-  border-radius: 8px;
+.table-container {
+  overflow-x: auto;
+  width: 100%;
 }
 
-.side-menu h2 {
-  margin-top: 0;
-  color: #724A0E;
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 20px 0;
+  font-size: 16px;
+  text-align: left;
+}
+
+.table th, .table td {
+  border: 1px solid #ddd;
+  padding: 12px;
+}
+
+.table th {
+  background-color: #FFFDA4;
+  color: #322209;
   text-align: center;
 }
 
-.side-menu ul {
-  list-style: none;
-  padding: 0;
+.table tbody tr:nth-child(even) {
+  background-color: #f9f9f9;
 }
 
-.side-menu li {
-  margin: 10px 0;
-  font-size: 18px;
-  display: flex;
-  align-items: center;
+.table tbody tr:hover {
+  background-color: #f1f1f1;
 }
 
-.side-menu i {
-  margin-right: 10px;
+.table tfoot tr td {
+  background-color: #FFFDA4;
+  font-weight: bold;
+  text-align: center;
+}
+
+h2 {
+  color: #322209;
+
 }
 
 .close-button {
@@ -151,11 +193,4 @@ export default {
   background-color: #807f7f;
 }
 
-/* Animación para mostrar el modal */
-.fade-enter-active, .fade-leave-active {
-  transition: opacity 0.3s ease;
-}
-.fade-enter, .fade-leave-to {
-  opacity: 0;
-}
 </style>
