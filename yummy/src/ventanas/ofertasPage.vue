@@ -1,6 +1,5 @@
 <template>
   <div>
-    <NavbarComponent />
     <CarouselComponent />
     <AdminPanelComponent />
 
@@ -12,16 +11,12 @@
           :date="oferta.fecha_inicio" />
       </ul>
     </div>
-
-    <FooterComponent />
   </div>
 </template>
 
 <script>
 import axios from 'axios';
 
-import NavbarComponent from '@/components/Navbar.vue';
-import FooterComponent from '@/components/Footer.vue';
 import CarouselComponent from '@/components/CarouselComponent.vue';
 import FlipCardComponent from '@/components/FlipCardComponent.vue';
 import AdminPanelComponent from '@/components/AdminPanelComponent.vue';
@@ -29,8 +24,6 @@ import AdminPanelComponent from '@/components/AdminPanelComponent.vue';
 export default {
   name: "OfertasPage",
   components: {
-    NavbarComponent,
-    FooterComponent,
     FlipCardComponent,
     CarouselComponent,
     AdminPanelComponent,
