@@ -34,24 +34,34 @@
             <label for="estado">Estado:</label>
             <select id="estado" v-model="reservaData.estado" required>
               <option value="1">Pendiente</option>
-              <option value="0">Entregada</option>
+              <option value="0">Finalizada</option>
             </select>
           </div>
   
           <button type="submit" class="save-button">Guardar</button>
+          
         </form>
+        <button class="delete-button" @click="eliminarReserva">Eliminar Reserva</button>
       </div>
     </div>
+
+
   </template>
   
   <script>
   import { reactive } from 'vue';
   import ErrorCard from "@/components/ErrorCard.vue";
+
+
+
   export default {
     name: "EditarReserva",
     components: {
-      ErrorCard // Regístralo aquí
+      ErrorCard, // Regístralo aquí
+
     },
+
+
     props: {
       titulo: String,
       reserva: {
@@ -78,35 +88,63 @@
   
     
       const guardarCambios = async () => {
-    try {
-        const { idmesa, fecha, hora, idreserva } = reservaData;
+          try {
+              const { idmesa, fecha, hora, idreserva } = reservaData;
 
-        // Verificar disponibilidad
-        const response = await fetch(
-            `/api/reservas/verificar-disponibilidad?idmesa=${idmesa}&fecha=${fecha}&hora=${hora}&idreserva=${idreserva}`
-        );
+              // Verificar disponibilidad
+              const response = await fetch(
+                  `/api/reservas/verificar-disponibilidad?idmesa=${idmesa}&fecha=${fecha}&hora=${hora}&idreserva=${idreserva}`
+              );
 
-        const { disponible } = await response.json();
+              const { disponible } = await response.json();
 
-        if (!disponible) {
+              if (!disponible) {
+                
+                mensajeError.texto =
+                  "La mesa seleccionada ya tiene una reserva en la misma fecha y hora (o dentro de 1 hora y media).";
+                mensajeError.mostrar = true;
+                return;
+              }
+
+              // Proceder a guardar si está disponible
+              console.log("Datos enviados al guardar:", reservaData);
+              emit('onSave', { ...reservaData }); // Emitir los datos al componente padre para guardarlos
+              emit('onClose'); // Cerrar el modal
+          } catch (error) {
+              console.error("Error al verificar disponibilidad:", error);
+              mensajeError.texto =
+                "Ocurrió un error al verificar la disponibilidad. Intenta de nuevo.";
+              mensajeError.mostrar = true;
+            }
+      };
+
+      //borrar reserva
+      const eliminarReserva = async () => {
+          const confirmacion = window.confirm(
+              "¿Estás seguro de que deseas eliminar esta reserva? Esta acción no se puede deshacer."
+          );
           
-          mensajeError.texto =
-            "La mesa seleccionada ya tiene una reserva en la misma fecha y hora (o dentro de 1 hora y media).";
-          mensajeError.mostrar = true;
-          return;
-        }
+          if (!confirmacion) return;
 
-        // Proceder a guardar si está disponible
-        console.log("Datos enviados al guardar:", reservaData);
-        emit('onSave', { ...reservaData }); // Emitir los datos al componente padre para guardarlos
-        emit('onClose'); // Cerrar el modal
-    } catch (error) {
-        console.error("Error al verificar disponibilidad:", error);
-        mensajeError.texto =
-          "Ocurrió un error al verificar la disponibilidad. Intenta de nuevo.";
-        mensajeError.mostrar = true;
-      }
-};
+          try {
+              const response = await fetch(`/api/reservas/${reservaData.idreserva}`, {
+                  method: "DELETE",
+              });
+
+              if (response.ok) {
+                  console.log("Reserva eliminada exitosamente");
+                  emit('onClose'); // Cerrar el modal
+              } else {
+                  const errorData = await response.json();
+                  mensajeError.texto = errorData.error || "No se pudo eliminar la reserva.";
+                  mensajeError.mostrar = true;
+              }
+          } catch (error) {
+              console.error("Error al eliminar la reserva:", error);
+              mensajeError.texto = "Ocurrió un error al intentar eliminar la reserva.";
+              mensajeError.mostrar = true;
+          }
+      };
 
 
       // Función para cerrar el modal sin guardar
@@ -114,8 +152,10 @@
         emit('onClose');
       };
   
-      return { reservaData, guardarCambios, onClose, mensajeError };
+      return { reservaData, guardarCambios, onClose, mensajeError , eliminarReserva};
     }
+
+
   };
   </script>
   
@@ -192,6 +232,20 @@
   }
   .save-button:hover {
     background-color: #45a049;
+  }
+
+  .delete-button {
+    margin-top: 1rem;
+    padding: 0.75rem 1.5rem;
+    font-size: 1rem;
+    background-color: #ff5c5c;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+  .delete-button:hover {
+    background-color: #e04141;
   }
 </style>
   
