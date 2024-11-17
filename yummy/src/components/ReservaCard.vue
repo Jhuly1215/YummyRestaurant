@@ -4,45 +4,39 @@
     <p>Fecha: {{ fecha }}</p>
     <p>Hora: {{ hora }}</p>
     <p>Nombre: {{ nombre }}</p>
-    <!-- Evita la propagación del evento de clic al componente padre -->
-    <button :class="['estado', estadoClase]" @click.stop="toggleEstado">{{ estado }}</button>
+    <!-- Botón para cambiar el estado -->
+    <button :class="['estado', estadoClase]" @click.stop="toggleEstado">
+      {{ estado === '1' ? 'Pendiente' : 'Entregado' }}
+    </button>
   </div>
 </template>
 
 <script>
 export default {
-name: "ReservaCard",
-props: {
-  mesa: String,
-  fecha: String,
-  hora: String,
-  nombre: String,
-  estadoInicial: {
-    type: String,
-    default: 'Pendiente'
-  }
-},
-data() {
-  return {
-    estado: this.estadoInicial // Inicializa el estado con el valor de estadoInicial
-  };
-},
-computed: {
-  estadoClase() {
-    // Cambia la clase de la tarjeta según el estado actual
-    return this.estado === 'Entregada' ? 'entregada' : 'pendiente';
-  }
-},
-methods: {
-  toggleEstado() {
-    // Alterna el estado entre "Pendiente" y "Entregada"
-    this.estado = this.estado === 'Pendiente' ? 'Entregada' : 'Pendiente';
-    this.$emit("estadoCambiado", this.estado); // Emitir evento al cambiar estado
+  name: "ReservaCard",
+  props: {
+    mesa: String,
+    fecha: String,
+    hora: String,
+    nombre: String,
+    estado: String, // Recibe el estado como "0" o "1" desde el padre
   },
-  abrirModal() {
-    this.$emit("abrirModal"); // Emitir evento para abrir el modal
-  }
-}
+  computed: {
+    estadoClase() {
+      // Clase CSS según el estado
+      return this.estado === '1' ? 'pendiente' : 'entregada';
+    },
+  },
+  methods: {
+    toggleEstado() {
+      // Cambiar el estado localmente entre "0" (Entregado) y "1" (Pendiente)
+      const nuevoEstado = this.estado === '1' ? '0' : '1';
+      this.$emit("cambiarEstado", nuevoEstado); // Emitir evento para el cambio de estado
+    },
+    abrirModal() {
+      this.$emit("abrirModal"); // Emitir evento para abrir el modal
+    },
+  },
 };
 </script>
   

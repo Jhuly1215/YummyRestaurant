@@ -10,9 +10,11 @@
           :fecha="reserva.fecha"
           :hora="reserva.hora"
           :nombre="reserva.nombre"
-          :estado="reserva.estado === 1 ? 'Entregada' : 'Pendiente'"
+          :estado="String(reserva.estado)"
           @click="editarReserva(reserva)"
+          @cambiarEstado="actualizarEstadoReserva(reserva, $event)" 
         />
+
 
         <ModalEditReserva
             v-if="modalVisible"
@@ -61,7 +63,7 @@
       console.log("Nueva reserva recibida del modal:", nuevaReserva);
       try {
         // Traduce estado textual a numérico
-        const estadoInt = nuevaReserva.estado === 'Entregada' ? 1 : 0;
+        const estadoInt = parseInt(nuevaReserva.estado);
         const idUsuario = this.reservaSeleccionada.idUsuario;
 
         // Usa el campo `mesa` para el idMesa
@@ -87,17 +89,25 @@
       }
     },
 
-  async actualizarEstadoReserva(reserva, nuevoEstado) {
-    try {
-      await axios.put(`/api/reservas/${reserva.idreserva}`, {
-        ...reserva,
-        estado: nuevoEstado, // Cambiar estado como texto
-      });
-      reserva.estado = nuevoEstado; // Actualiza la reserva localmente
-    } catch (error) {
-      console.error("Error al actualizar el estado de la reserva:", error);
-    }
-  },
+    async actualizarEstadoReserva(reserva, nuevoEstado) {
+      try {
+        const estadoInt = parseInt(nuevoEstado); // Aseguramos que sea un número
+        // Enviar actualización al backend
+        await axios.put(`/api/reservas/${reserva.idreserva}`, {
+          idreserva: reserva.idreserva,
+          idusuario: reserva.idusuario,
+          idmesa: reserva.idmesa,
+          fecha: reserva.fecha,
+          hora: reserva.hora,
+          estado: estadoInt, // Solo cambia el estado
+        });
+
+        // Actualiza el estado localmente
+        reserva.estado = estadoInt;
+      } catch (error) {
+        console.error("Error al actualizar el estado de la reserva:", error);
+      }
+    },
   },
     mounted() {
       this.cargarReservas(); // Cargar reservas al montar el componente

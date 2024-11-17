@@ -13,7 +13,7 @@
           </div>
           <div class="form-group">
             <label for="nombre">Nombre:</label>
-            <input type="text" id="nombre" v-model="reservaData.nombre" required />
+            <input type="text" id="nombre" v-model="reservaData.nombre" required disabled/>
           </div>
   
           <div class="form-group">
@@ -30,8 +30,8 @@
           <div class="form-group">
             <label for="estado">Estado:</label>
             <select id="estado" v-model="reservaData.estado" required>
-              <option value=1>Pendiente</option>
-              <option value=0>Entregada</option>
+              <option value="1">Pendiente</option>
+              <option value="0">Entregada</option>
             </select>
           </div>
   

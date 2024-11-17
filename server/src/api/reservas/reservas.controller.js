@@ -42,7 +42,15 @@ exports.actualizarReserva = async (req, res) => {
     const { id } = req.params;
     const { fecha, hora, estado, idusuario, idmesa } = req.body;
 
-
+    console.log("Datos antes de la consulta SQL:", {
+        id,
+        fecha,
+        hora,
+        estado: typeof estado, // Debe ser number
+        idusuario: typeof idusuario, // Debe ser number
+        idmesa: typeof idmesa, // Debe ser number
+      });
+      
     console.log("Datos recibidos en el backend para actualizar:", {
         id,
         fecha,
@@ -51,8 +59,6 @@ exports.actualizarReserva = async (req, res) => {
         idusuario,
         idmesa
     });
-    // Convertir el estado a un número si es necesario
-    const estadoInt = estado === 'Entregada' ? 1 : 0;
 
     try {
         const [actualizado] = await sequelize.query(
@@ -60,7 +66,7 @@ exports.actualizarReserva = async (req, res) => {
              SET fecha = :fecha, hora = :hora, estado = :estado, idusuario = :idusuario, idmesa = :idmesa
              WHERE idreserva = :id`,
             {
-                replacements: { id, fecha, hora, estado: estadoInt, idusuario, idmesa },
+                replacements: { id, fecha, hora, estado: estado, idusuario, idmesa },
                 type: sequelize.QueryTypes.UPDATE,
             }
         );
