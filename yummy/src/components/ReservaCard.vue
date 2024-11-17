@@ -1,45 +1,49 @@
-<!-- src/components/ReservaCard.vue -->
 <template>
-    <div :class="['reserva-card', estadoClase]">
-      <h3 class="mesa">{{ mesa }}</h3>
-      <p>Fecha: {{ fecha }}</p>
-      <p>Hora: {{ hora }}</p>
-      <p>Nombre: {{ nombre }}</p>
-      <button :class="['estado', estadoClase]" @click="toggleEstado">{{ estado }}</button>
-    </div>
+  <div :class="['reserva-card', estadoClase]" @click="abrirModal">
+    <h3 class="mesa">{{ mesa }}</h3>
+    <p>Fecha: {{ fecha }}</p>
+    <p>Hora: {{ hora }}</p>
+    <p>Nombre: {{ nombre }}</p>
+    <!-- Evita la propagación del evento de clic al componente padre -->
+    <button :class="['estado', estadoClase]" @click.stop="toggleEstado">{{ estado }}</button>
+  </div>
 </template>
-  
+
 <script>
-  export default {
-    name: "ReservaCard",
-    props: {
-      mesa: String,
-      fecha: String,
-      hora: String,
-      nombre: String,
-      estadoInicial: {
-        type: String,
-        default: 'Pendiente'
-      }
-    },
-    data() {
-      return {
-        estado: this.estadoInicial // Inicializa el estado con el valor de estadoInicial
-      };
-    },
-    computed: {
-      estadoClase() {
-        // Cambia la clase de la tarjeta según el estado actual
-        return this.estado === 'Entregada' ? 'entregada' : 'pendiente';
-      }
-    },
-    methods: {
-      toggleEstado() {
-        // Alterna el estado entre "Pendiente" y "Entregada"
-        this.estado = this.estado === 'Pendiente' ? 'Entregada' : 'Pendiente';
-      }
-    }
+export default {
+name: "ReservaCard",
+props: {
+  mesa: String,
+  fecha: String,
+  hora: String,
+  nombre: String,
+  estadoInicial: {
+    type: String,
+    default: 'Pendiente'
+  }
+},
+data() {
+  return {
+    estado: this.estadoInicial // Inicializa el estado con el valor de estadoInicial
   };
+},
+computed: {
+  estadoClase() {
+    // Cambia la clase de la tarjeta según el estado actual
+    return this.estado === 'Entregada' ? 'entregada' : 'pendiente';
+  }
+},
+methods: {
+  toggleEstado() {
+    // Alterna el estado entre "Pendiente" y "Entregada"
+    this.estado = this.estado === 'Pendiente' ? 'Entregada' : 'Pendiente';
+    this.$emit("estadoCambiado", this.estado); // Emitir evento al cambiar estado
+  },
+  abrirModal() {
+    this.$emit("abrirModal"); // Emitir evento para abrir el modal
+  }
+}
+};
 </script>
   
 <style scoped>

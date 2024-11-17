@@ -9,7 +9,11 @@
         <form @submit.prevent="guardarCambios">
           <div class="form-group">
             <label for="mesa">Mesa:</label>
-            <input type="text" id="mesa" v-model="reservaData.mesa" required />
+            <input type="text" id="mesa" v-model="reservaData.idmesa" required />
+          </div>
+          <div class="form-group">
+            <label for="nombre">Nombre:</label>
+            <input type="text" id="nombre" v-model="reservaData.nombre" required />
           </div>
   
           <div class="form-group">
@@ -22,16 +26,12 @@
             <input type="time" id="hora" v-model="reservaData.hora" required />
           </div>
   
-          <div class="form-group">
-            <label for="nombre">Nombre:</label>
-            <input type="text" id="nombre" v-model="reservaData.nombre" required />
-          </div>
-  
+          
           <div class="form-group">
             <label for="estado">Estado:</label>
             <select id="estado" v-model="reservaData.estado" required>
-              <option value="Pendiente">Pendiente</option>
-              <option value="Entregada">Entregada</option>
+              <option value=1>Pendiente</option>
+              <option value=0>Entregada</option>
             </select>
           </div>
   
@@ -57,7 +57,9 @@
     setup(props, { emit }) {
       // Usamos reactive para que reservaData sea reactivo
       const reservaData = reactive({
-        mesa: props.reserva.mesa,
+        idreserva: props.reserva.idreserva,
+        idusuario: props.reserva.idusuario, // Mantén el valor original
+        idmesa: props.reserva.idmesa, // Mantén el valor original
         fecha: props.reserva.fecha,
         hora: props.reserva.hora,
         nombre: props.reserva.nombre,
@@ -66,9 +68,11 @@
   
       // Función para guardar cambios
       const guardarCambios = () => {
-        emit('onSave', { ...reservaData });
-        emit('onClose'); // Cierra el modal después de guardar
+        console.log("Datos enviados al guardar:", reservaData);
+        emit('onSave', { ...reservaData }); // Emitir la reserva actualizada
+        emit('onClose'); // Cerrar el modal después de guardar
       };
+
   
       // Función para cerrar el modal sin guardar
       const onClose = () => {
@@ -80,7 +84,7 @@
   };
   </script>
   
-  <style scoped>
+<style scoped>
   .modal-success h2 {
     font-family: 'Roboto Condensed', sans-serif;
     font-size: 5vh;
@@ -154,5 +158,5 @@
   .save-button:hover {
     background-color: #45a049;
   }
-  </style>
+</style>
   

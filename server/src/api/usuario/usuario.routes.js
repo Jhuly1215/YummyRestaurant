@@ -14,9 +14,8 @@ router.delete('/:id', usuarioController.eliminarUsuario);
 router.post('/enviar-codigo', usuarioController.enviarCodigo); // Ruta para enviar código de verificación
 router.post('/verificar-codigo', usuarioController.verificarCodigo); // Ruta para verificar el código de verificación
 
-router.post('/iniciar', usuarioController.autenticarUsuario);  
-router.post('/actualizar-contrasena', usuarioController.actualizarContrasena);
-router.post('/enviar-recuperacion', usuarioController.enviarRecuperacion);
-router.post('/verificar-codigo-recuperacion', usuarioController.verificarCodigoRecuperacion);
+
+
+
 
 module.exports = router;

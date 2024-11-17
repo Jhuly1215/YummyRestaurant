@@ -5,14 +5,15 @@
       <div class="reservas-grid">
         <ReservaCard
           v-for="reserva in reservas"
-          :key="reserva.id"
-          :mesa="reserva.mesa"
+          :key="reserva.idreserva"
+          :mesa="String(reserva.idmesa)"
           :fecha="reserva.fecha"
           :hora="reserva.hora"
           :nombre="reserva.nombre"
-          :estado="reserva.estado"
+          :estado="reserva.estado === 1 ? 'Entregada' : 'Pendiente'"
           @click="editarReserva(reserva)"
         />
+
         <ModalEditReserva
             v-if="modalVisible"
             :titulo="'Editar Reserva'"
@@ -25,6 +26,7 @@
   </template>
   
   <script>
+  import axios from 'axios';
   import ReservaCard from '@/components/ReservaCard.vue';
   import ModalEditReserva from '@/ventanas/reservas/editarReserva.vue';
 
@@ -35,38 +37,75 @@
       ModalEditReserva
     },
     data() {
-      return {
-        reservas: [
-          { id: 1, mesa: 'Mesa D', fecha: '10/10/2024', hora: '14:00', nombre: 'Juan Perez', estado: 'Pendiente' },
-          { id: 2, mesa: 'Mesa A', fecha: '10/10/2024', hora: '14:00', nombre: 'Juan Perez', estado: 'Entregada' },
-          { id: 3, mesa: 'Mesa D', fecha: '10/10/2024', hora: '14:00', nombre: 'Juan Perez', estado: 'Pendiente' },
-          { id: 4, mesa: 'Mesa C', fecha: '10/10/2024', hora: '14:00', nombre: 'Juan Perez', estado: 'Entregada' },
-          { id: 5, mesa: 'Mesa D', fecha: '10/10/2024', hora: '14:00', nombre: 'Juan Perez', estado: 'Pendiente' },
-          { id: 6, mesa: 'Mesa D', fecha: '10/10/2024', hora: '14:00', nombre: 'Juan Perez', estado: 'Entregada' },
-          { id: 7, mesa: 'Mesa D4', fecha: '10/10/2024', hora: '14:00', nombre: 'Juan Perez', estado: 'Pendiente' },
-          { id: 8, mesa: 'Mesa D2', fecha: '10/10/2024', hora: '14:00', nombre: 'Juan Perez', estado: 'Entregada' }
-        ],
-        modalVisible: false,
-        reservaSeleccionada: null
-      };
+    return {
+      reservas: [],
+      modalVisible: false,
+      reservaSeleccionada: null
+    };
+  },
+  methods: {
+    async cargarReservas() {
+      try {
+        const response = await axios.get('/api/reservas');
+        this.reservas = response.data;
+      } catch (error) {
+        console.error("Error al cargar reservas:", error);
+      }
     },
-    methods: {
-        editarReserva(reserva) {
-        this.reservaSeleccionada = { ...reserva }; // Copia la reserva seleccionada
-        this.modalVisible = true; // Muestra el modal
-        },
-        guardarReservaEditada(nuevaReserva) {
-        const index = this.reservas.findIndex(r => r.id === nuevaReserva.id);
+    editarReserva(reserva) {
+      this.reservaSeleccionada = { ...reserva };
+      this.modalVisible = true;
+    },
+    //console.log("Nueva reserva recibida del modal:", nuevaReserva);
+    async guardarReservaEditada(nuevaReserva) {
+      console.log("Nueva reserva recibida del modal:", nuevaReserva);
+      try {
+        // Traduce estado textual a numérico
+        const estadoInt = nuevaReserva.estado === 'Entregada' ? 1 : 0;
+        const idUsuario = this.reservaSeleccionada.idUsuario;
+
+        // Usa el campo `mesa` para el idMesa
+        const idMesa = nuevaReserva.mesa;
+        await axios.put(`/api/reservas/${nuevaReserva.idreserva}`, {
+          ...nuevaReserva,
+          estado: estadoInt,
+          idUsuario,
+          idMesa, // Envía estado numérico al backend
+        });
+
+        // Actualiza la lista de reservas localmente
+        const index = this.reservas.findIndex(r => r.idreserva === nuevaReserva.idreserva);
         if (index !== -1) {
-            this.reservas.splice(index, 1, nuevaReserva); // Actualiza la reserva en la lista
+          this.reservas.splice(index, 1, {
+            ...nuevaReserva,
+            estado: estadoInt // Asegura que también se actualice localmente
+          });
         }
-        this.modalVisible = false; // Oculta el modal
-        }
+        this.modalVisible = false; // Cierra el modal
+      } catch (error) {
+        console.error("Error al guardar la reserva editada:", error);
+      }
+    },
+
+  async actualizarEstadoReserva(reserva, nuevoEstado) {
+    try {
+      await axios.put(`/api/reservas/${reserva.idreserva}`, {
+        ...reserva,
+        estado: nuevoEstado, // Cambiar estado como texto
+      });
+      reserva.estado = nuevoEstado; // Actualiza la reserva localmente
+    } catch (error) {
+      console.error("Error al actualizar el estado de la reserva:", error);
+    }
+  },
+  },
+    mounted() {
+      this.cargarReservas(); // Cargar reservas al montar el componente
     }
   };
   </script>
   
-  <style scoped>
+<style scoped>
   .reservas-container {
     padding-top: 3%;
     padding-bottom: 3%;
@@ -88,5 +127,5 @@
     flex-wrap: wrap;
     gap: 16px;
   }
-  </style>
+</style>
   
