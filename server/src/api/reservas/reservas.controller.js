@@ -108,17 +108,21 @@ exports.eliminarReserva = async (req, res) => {
 };
 exports.verificarDisponibilidad = async (req, res) => {
     const { idmesa, fecha, hora, idreserva } = req.query;
-
+    console.log("Parámetros recibidos:", { idmesa, fecha, hora, idreserva });
+    if (!idmesa || !fecha || !hora) {
+        return res.status(400).json({ error: 'Parámetros inválidos o incompletos.' });
+    }
     try {
         const reservasConflicto = await sequelize.query(
             `SELECT * 
              FROM reserva 
              WHERE idmesa = :idmesa 
              AND fecha = :fecha 
+             AND estado = 1
              AND ABS(EXTRACT(EPOCH FROM (hora::time - :hora::time)) / 60) <= 90
-             AND idreserva != :idreserva`, // Excluye la reserva actual
+             AND (idreserva != :idreserva OR :idreserva IS NULL)`, // Excluye la reserva actual
             {
-                replacements: { idmesa, fecha, hora, idreserva },
+                replacements: { idmesa, fecha, hora, idreserva: idreserva || null },
                 type: sequelize.QueryTypes.SELECT,
             }
         );
@@ -130,6 +134,30 @@ exports.verificarDisponibilidad = async (req, res) => {
     } catch (error) {
         console.error("Error al verificar disponibilidad:", error);
         res.status(500).json({ error: 'Error al verificar disponibilidad' });
+    }
+};
+
+// Controlador para verificar si el usuario está registrado
+exports.verificarUsuario = async (req, res) => {
+    const { idusuario } = req.query;
+
+    try {
+        const [usuario] = await sequelize.query(
+            `SELECT * FROM usuario WHERE idusuario = :idusuario`,
+            {
+                replacements: { idusuario },
+                type: sequelize.QueryTypes.SELECT,
+            }
+        );
+
+        if (!usuario) {
+            return res.json({ registrado: false });
+        }
+
+        res.json({ registrado: true });
+    } catch (error) {
+        console.error("Error al verificar usuario:", error);
+        res.status(500).json({ error: "Error al verificar usuario" });
     }
 };
 

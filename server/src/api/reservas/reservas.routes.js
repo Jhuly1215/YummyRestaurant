@@ -9,6 +9,8 @@ router.get('/', reservasController.obtenerReservas);
 router.put('/:id', reservasController.actualizarReserva);
 router.delete('/:id', reservasController.eliminarReserva);
 router.get('/verificar-disponibilidad', reservasController.verificarDisponibilidad)
+router.get('/verificar-usuario', reservasController.verificarUsuario);
+
 
 
 
