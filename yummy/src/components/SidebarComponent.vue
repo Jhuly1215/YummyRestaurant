@@ -6,7 +6,7 @@
             <li @click="navigate('Section1')">Dashboard</li>
             <li>Usuarios</li>
             <li @click="navigate('OfertasAdminComponent')">Ofertas</li>
-            <li>Platillos</li>
+            <li @click="navigate('PlatillosAdminComponent')">Platillos</li>
         </ul>
     </div>
 </template>

@@ -15,6 +15,7 @@ import Topbar from '../components/TopbarComponent.vue';
 import Section1 from '../ventanas/Section1Page.vue';
 import Section2 from '../ventanas/Section2Page.vue';
 import OfertasAdminComponent from '../ventanas/OfertasAdminComponent.vue'
+import PlatillosAdminComponent from '@/components/PlatillosAdminComponent.vue';
 
 export default {
     name: "PanelAdministrativo",
@@ -23,7 +24,8 @@ export default {
         Topbar,
         Section1,
         Section2,
-        OfertasAdminComponent   
+        OfertasAdminComponent ,
+        PlatillosAdminComponent 
     },
     data() {
         return {
