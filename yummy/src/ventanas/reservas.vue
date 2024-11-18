@@ -1,5 +1,4 @@
 <template>
-    <NavbarComponent />
     <div class="container mt-5">
       <h2 class="text-center">Reservas</h2>
   
@@ -29,18 +28,14 @@
   
       <a href="index.html" class="btn-back">Volver</a>
     </div>
-    <FooterComponent />
   </template>
   
   <script>
-  import NavbarComponent from '@/components/Navbar.vue';
-  import FooterComponent from '@/components/Footer.vue';
 
   export default {
     name: "ReservasPage",
     components: {
-      NavbarComponent,
-      FooterComponent,
+
       
     },
     data() {

@@ -17,4 +17,8 @@ router.put('/actualizar-contrasena/:id', usuarioController.actualizarContrasena)
 router.post('/enviar-codigo', usuarioController.enviarCodigo); // Ruta para enviar código de verificación
 router.post('/verificar-codigo', usuarioController.verificarCodigo); // Ruta para verificar el código de verificación
 
+
+
+
+
 module.exports = router;

@@ -200,8 +200,8 @@ export default {
   }
 
   .password-container {
-  position: relative;
-}
+    position: relative;
+  }
 
 .toggle-password {
   position: absolute;

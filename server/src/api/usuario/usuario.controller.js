@@ -196,6 +196,46 @@ exports.eliminarUsuario = async (req, res) => {
 
 
 
+exports.autenticarUsuario = async (req, res) => {
+  const { email, password } = req.body;
+  console.log('Intento de inicio de sesión con:', { email, password }); // Depuración
+
+  try {
+    // Paso 1: Buscar el usuario por correo electrónico
+    const [usuario] = await sequelize.query(
+      `SELECT * FROM usuario WHERE correo = :email`,
+      { replacements: { email }, type: sequelize.QueryTypes.SELECT }
+    );
+
+    console.log('Usuario encontrado:', usuario); // Depuración
+
+    // Paso 2: Verificar si el usuario existe
+    if (!usuario) {
+      console.log('Usuario no encontrado'); // Depuración
+      return res.status(404).json({ success: false, message: 'Usuario no encontrado' });
+    }
+
+    // Paso 3: Verificar la contraseña
+    const passwordCorrecta = await bcrypt.compare(password, usuario.password);
+    if (!passwordCorrecta) {
+      console.log('Contraseña incorrecta'); // Depuración
+      return res.status(401).json({ success: false, message: 'Contraseña incorrecta' });
+    }
+
+    // Paso 4: Autenticación exitosa
+    console.log('Autenticación exitosa'); // Depuración
+    return res.status(200).json({
+      success: true,
+      message: 'Inicio de sesión exitoso',
+      user: { id: usuario.idusuario, email: usuario.correo, rol: usuario.idrol }
+    });
+  } catch (error) {
+    console.error('Error al autenticar al usuario:', error);
+    res.status(500).json({ success: false, message: 'Error al autenticar al usuario' });
+  }
+};
+
+
 
 const nodemailer = require('nodemailer');
 
@@ -238,6 +278,8 @@ exports.verificarCodigo = async (req, res) => {
   const { email, code } = req.body;
 
   try {
+    console.log('Código recibido:', code);
+    console.log('Código almacenado:', verificationCodes[email]);
 
     if (verificationCodes[email] && verificationCodes[email].toString() === code) {
       delete verificationCodes[email]; // Limpia el código después de la verificación
@@ -250,3 +292,5 @@ exports.verificarCodigo = async (req, res) => {
     res.status(500).json({ success: false, message: 'Error al verificar el código', error: error.message });
   }
 };
+
+
