@@ -15,9 +15,9 @@ const obtenerMesa = async (req, res) => {
 // Función para crear una nueva actividad
 const crearMesa = async (req, res) => {
   try {
-    const { capacidad, nombre, posx, posy } = req.body;
+    const { nombre, capacidad, posx, posy } = req.body;
 
-    const nuevaMesa = await Mesa.create({ capacidad, nombre, posx, posy });
+    const nuevaMesa = await Mesa.create({ nombre, capacidad, posx, posy });
     res.status(201).json(nuevaMesa);
   } catch (error) {
     console.error('Error al crear Mesa:', error);
