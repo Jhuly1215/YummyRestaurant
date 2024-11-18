@@ -5,86 +5,88 @@
 -- Table: categoria
 CREATE TABLE categoria (
     idcategoria SERIAL PRIMARY KEY,
-    tipo varchar(30) NOT NULL,
-    descripcion varchar(100) NOT NULL
+    tipo varchar(30),
+    descripcion varchar(100)
 );
 
 -- Table: detalle_pedido
 CREATE TABLE detalle_pedido (
     iddetalle SERIAL PRIMARY KEY,
-    cantidad int NOT NULL,
-    idplato int NOT NULL,
-    idpedido int NOT NULL,
-    idreserva int NOT NULL
+    cantidad int,
+    idplato int,
+    idpedido int,
+    idreserva int
 );
 
 -- Table: mesa
 CREATE TABLE mesa (
     idmesa SERIAL PRIMARY KEY,
-    capacidad int NOT NULL
+    capacidad int
 );
 
 -- Table: oferta
 CREATE TABLE oferta (
     idoferta SERIAL PRIMARY KEY,
-    requerimiento varchar(100) NOT NULL,
-    descripcion varchar(70) NOT NULL,
-    fecha_inicio date NOT NULL,
-    fecha_fin date NOT NULL,
-    descuento int NOT NULL,
-    idplato int NOT NULL
+	src varchar(120),
+    requerimiento varchar(100),
+    descripcion varchar(70),
+    fecha_inicio date,
+    fecha_fin date,
+    descuento int,
+    idplato int
 );
 
 -- Table: pago
 CREATE TABLE pago (
     idpago SERIAL PRIMARY KEY,
-    fecha int NOT NULL,
-    monto real NOT NULL,
-    idpedido int NOT NULL,
-    idusuario int NOT NULL
+    fecha int,
+    monto real,
+    idpedido int,
+    idusuario int
 );
 
 -- Table: pedido
 CREATE TABLE pedido (
     idpedido SERIAL PRIMARY KEY,
-    fecha date NOT NULL,
-    hora time NOT NULL,
-    estado int NOT NULL,
-    idusuario int NOT NULL,
-    precio_total real NOT NULL
+    fecha date,
+    hora time,
+    estado int,
+    idusuario int,
+    precio_total real
 );
 
 -- Table: platillo
 CREATE TABLE platillo (
     idplato SERIAL PRIMARY KEY,
-    nombre varchar(30) NOT NULL,
-    descripcion varchar(70) NOT NULL,
-    precio int NOT NULL,
-    idcategoria int NOT NULL
+    nombre varchar(30),
+	src varchar(120),
+    descripcion varchar(70),
+    precio int,
+    idcategoria int
 );
 
 -- Table: resenia
 CREATE TABLE resenia (
     idresenia SERIAL PRIMARY KEY,
     puntuacion int NOT NULL,
-    idusuario int NOT NULL,
-    idplato int NOT NULL
+    idusuario int,
+    idplato int
 );
 
 -- Table: reserva
 CREATE TABLE reserva (
     idreserva SERIAL PRIMARY KEY,
-    fecha date NOT NULL,
-    hora time NOT NULL,
-    estado int NOT NULL,
-    idusuario int NOT NULL,
-    idmesa int NOT NULL
+    fecha date ,
+    hora time ,
+    estado int,
+    idusuario int,
+    idmesa int
 );
 
 -- Table: rol
 CREATE TABLE rol (
     idrol SERIAL PRIMARY KEY,
-    rol varchar(25) NOT NULL
+    rol varchar(25)
 );
 
 -- Table: usuario

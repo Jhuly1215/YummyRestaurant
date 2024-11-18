@@ -3,23 +3,32 @@ const sequelize = require('../../config/db');
 
 // Crear una nueva reserva
 exports.crearReserva = async (req, res) => {
-    const { fecha, hora, estado, idUsuario, idMesa } = req.body;
+    const { idusuario, idmesa, fecha, hora, estado } = req.body; // Extraer datos del body
+    console.log("Datos recibidos para crear reserva:", req.body);
+    // Validar que todos los campos requeridos estén presentes
+    if (!idusuario || !idmesa || !fecha || !hora || estado === undefined) {
+        return res.status(400).json({ error: 'Todos los campos son obligatorios' });
+    }
 
     try {
-        await sequelize.query(
-            `INSERT INTO reserva (fecha, hora, estado, idusuario, idmesa)
-             VALUES (:fecha, :hora, :estado, :idusuario, :idmesa)`,
+        // Ejecutar la consulta para crear la reserva
+        const nuevaReserva = await sequelize.query(
+            `INSERT INTO reserva (idusuario, idmesa, fecha, hora, estado)
+             VALUES (:idusuario, :idmesa, :fecha, :hora, :estado)`,
             {
-                replacements: { fecha, hora, estado, idUsuario, idMesa },
+                replacements: { idusuario, idmesa, fecha, hora, estado },
                 type: sequelize.QueryTypes.INSERT,
             }
         );
-        res.status(201).json({ message: 'Reserva creada exitosamente' });
+
+        // Responder con éxito
+        res.status(201).json({ message: 'Reserva creada exitosamente', data: nuevaReserva });
     } catch (error) {
         console.error("Error al crear la reserva:", error);
-        res.status(500).json({ error: 'Error al crear la reserva', details: error.message });
+        res.status(500).json({ error: 'Error al crear la reserva' });
     }
 };
+
 
 // Obtener todas las reservas
 exports.obtenerReservas = async (req, res) => {
@@ -89,7 +98,7 @@ exports.eliminarReserva = async (req, res) => {
 
     try {
         const eliminado = await sequelize.query(
-            `DELETE FROM reserva WHERE idReserva = :id`,
+            `DELETE FROM reserva WHERE idreserva = :id`,
             {
                 replacements: { id },
                 type: sequelize.QueryTypes.DELETE,
@@ -108,17 +117,21 @@ exports.eliminarReserva = async (req, res) => {
 };
 exports.verificarDisponibilidad = async (req, res) => {
     const { idmesa, fecha, hora, idreserva } = req.query;
-
+    console.log("Parámetros recibidos:", { idmesa, fecha, hora, idreserva });
+    if (!idmesa || !fecha || !hora) {
+        return res.status(400).json({ error: 'Parámetros inválidos o incompletos.' });
+    }
     try {
         const reservasConflicto = await sequelize.query(
             `SELECT * 
              FROM reserva 
              WHERE idmesa = :idmesa 
              AND fecha = :fecha 
+             AND estado = 1
              AND ABS(EXTRACT(EPOCH FROM (hora::time - :hora::time)) / 60) <= 90
-             AND idreserva != :idreserva`, // Excluye la reserva actual
+             AND (idreserva != :idreserva OR :idreserva IS NULL)`, // Excluye la reserva actual
             {
-                replacements: { idmesa, fecha, hora, idreserva },
+                replacements: { idmesa, fecha, hora, idreserva: idreserva || null },
                 type: sequelize.QueryTypes.SELECT,
             }
         );
@@ -130,6 +143,30 @@ exports.verificarDisponibilidad = async (req, res) => {
     } catch (error) {
         console.error("Error al verificar disponibilidad:", error);
         res.status(500).json({ error: 'Error al verificar disponibilidad' });
+    }
+};
+
+// Controlador para verificar si el usuario está registrado
+exports.verificarUsuario = async (req, res) => {
+    const { idusuario } = req.query;
+
+    try {
+        const [usuario] = await sequelize.query(
+            `SELECT * FROM usuario WHERE idusuario = :idusuario`,
+            {
+                replacements: { idusuario },
+                type: sequelize.QueryTypes.SELECT,
+            }
+        );
+
+        if (!usuario) {
+            return res.json({ registrado: false });
+        }
+
+        res.json({ registrado: true });
+    } catch (error) {
+        console.error("Error al verificar usuario:", error);
+        res.status(500).json({ error: "Error al verificar usuario" });
     }
 };
 

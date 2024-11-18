@@ -1,6 +1,15 @@
 <template>
   <div class="reservas-container">
     <h2 class="titulo">Reservas:</h2>
+    <button @click="abrirModalNuevaReserva" class="nuevo-button">Nueva Reserva</button>
+        <!-- Modal de nueva reserva -->
+        <NuevaReserva
+            v-if="modalNuevaReservaVisible"
+            :titulo="'Nueva Reserva'"
+            @onClose="cerrarModalNuevaReserva"
+            @onSave="guardarNuevaReserva"
+        />
+
 
     <!-- Filtros -->
     <div class="filtros">
@@ -64,22 +73,27 @@
 import axios from "axios";
 import ReservaCard from "@/components/ReservaCard.vue";
 import ModalEditReserva from "@/ventanas/reservas/editarReserva.vue";
+import NuevaReserva from "@/ventanas/reservas/newReserva.vue";
 
 export default {
   name: "ReservasView",
   components: {
     ReservaCard,
     ModalEditReserva,
+    NuevaReserva,
   },
   data() {
     return {
-      reservas: [], // Todas las reservas cargadas desde el backend
+      reservas: [],
       modalVisible: false,
       reservaSeleccionada: null,
       filtroFechaDesde: "",
       filtroFechaHasta: "",
       filtroHoraDesde: "",
       filtroHoraHasta: "",
+
+      //para anadir reserva
+      modalNuevaReservaVisible: false,
     };
   },
   computed: {
@@ -103,6 +117,13 @@ export default {
     },
   },
   methods: {
+    abrirModalNuevaReserva() {
+      this.modalNuevaReservaVisible = true;
+    },
+    cerrarModalNuevaReserva() {
+      this.modalNuevaReservaVisible = false;
+    },
+
     async cargarReservas() {
       try {
         const response = await axios.get("/api/reservas");
@@ -157,6 +178,27 @@ export default {
         reserva.estado = estadoInt;
       } catch (error) {
         console.error("Error al actualizar el estado de la reserva:", error);
+      }
+    },
+
+
+    //anadir reserva
+    async guardarNuevaReserva(nuevaReserva) {
+      try {
+        // Llamar al backend para guardar la nueva reserva
+        const response = await axios.post('/api/reservas', nuevaReserva);
+
+        // Agregar la nueva reserva a la lista localmente
+        this.reservas.push(response.data);
+
+        // Mostrar mensaje de éxito (opcional)
+        alert('Reserva creada exitosamente.');
+
+        // Cerrar el modal
+        this.cerrarModalNuevaReserva();
+      } catch (error) {
+        console.error('Error al guardar la nueva reserva:', error);
+        alert('Ocurrió un error al guardar la nueva reserva.');
       }
     },
   },

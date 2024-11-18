@@ -1,12 +1,14 @@
 import axios from 'axios';
 import { RutaApi } from '@/api/localApi';
 import { defineStore } from 'pinia';
+import { jwtDecode } from 'jwt-decode';
 
 export const useAuthStore = defineStore('auth', {
     state: () => ({
       token: localStorage.getItem('token') || null,
       user: null, // Puedes almacenar más información del usuario si es necesario
       loading: false,
+      rol: null,
       error: null,
     }),
     actions: {
@@ -28,11 +30,16 @@ export const useAuthStore = defineStore('auth', {
           if (response.status === 200) {
             // Extrae el token del response
             const { token } = response.data;
-      
+            // Decodificar el token para obtener el rol
+            const decodedToken = jwtDecode(token);
+            const { rol } = decodedToken;
+
             // Almacenar el token en el estado y en localStorage
             this.token = token;
+            this.rol = rol;
             // Almacenar el token en localStorage
             localStorage.setItem('token', token);
+            localStorage.setItem('rol', rol);
             console.log("Token almacenado:", localStorage.getItem('token'));
   
             console.log('Inicio de sesión exitoso');
@@ -52,7 +59,34 @@ export const useAuthStore = defineStore('auth', {
           this.loading = false;
         }
       },
+      async crearActividad(usuario, estado) {
+        if (!usuario || !estado) {
+          console.error('Usuario y estado son obligatorios');
+          return false;
+        }
       
+        try {
+          const response = await axios.post(`${RutaApi.baseURL}actividad/`, {
+            usuario: usuario,
+            estado: estado,
+          }, {
+            headers: {
+              'Content-Type': 'application/json',
+            },
+          });
+      
+          if (response.status === 201) {
+            console.log('Actividad creada exitosamente:', response.data);
+            return response.data; // Devuelve los datos de la actividad creada
+          } else {
+            console.error('Error al crear la actividad');
+            return false;
+          }
+        } catch (error) {
+          console.error('Error en la solicitud:', error);
+          return false;
+        }
+      },
       logout() {
         this.token = null;
         this.user = null;

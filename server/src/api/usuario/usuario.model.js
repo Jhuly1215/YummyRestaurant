@@ -33,8 +33,12 @@ const Usuario = sequelize.define('Usuario', {
       key: 'idrol',
     },
   },
-},
-{
+  activo: {
+    type: DataTypes.BOOLEAN,
+    allowNull: false,
+    defaultValue: true, // Asegura que el valor por defecto sea `true`
+  },
+}, {
   timestamps: false, // Desactiva createdAt y updatedAt
   tableName: 'usuario'
 });
