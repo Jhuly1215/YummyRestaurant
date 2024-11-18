@@ -1,9 +1,7 @@
 // server/src/app.js
 const express = require('express');
 const sequelize = require('./src/config/db');
-const ofertasRoutes = require('./src/api/ofertas/oferta.routes');
-const platillosRoutes = require('./src/api/platillos/platillo.routes');
-const categoriasRoutes = require('./src/api/categorias/categoria.routes');
+
 const cors = require('cors');
 const app = express();
 
@@ -17,12 +15,8 @@ const usuarioRoutes = require('./src/api/usuario/usuario.routes');
 const authRoutes = require('./src/api/autenticacion/authRoutes');
 const actividadRoutes = require('./src/api/usuario/actividadRoutes');
 const mesasRoutes = require('./src/api/mesas/mesasRoutes');
-
-
-
-
-
-
+const platillosRoutes = require('./src/api/platillos/platillo.routes');
+const categoriasRoutes = require('./src/api/categorias/categoria.routes');
 
 app.use('/api/ofertas', ofertasRoutes);
 app.use('/api', platillosRoutes);
