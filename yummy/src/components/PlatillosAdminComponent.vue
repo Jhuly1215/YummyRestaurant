@@ -116,16 +116,27 @@ export default {
     },
     
     async guardarCambios() {
-      console.log(this.platilloEditado); // Verificar valores
       try {
-        await axios.put(`http://localhost:5000/api/platillos/${this.platilloEditado.idplato}`, this.platilloEditado);
-        this.platillos.splice(this.filaEnEdicion, 1, this.platilloEditado);
-        this.filaEnEdicion = null;
-        this.platilloEditado = {};
+          // Ajustar los datos enviados al backend
+          const payload = {
+              idplato: this.platilloEditado.idplato,
+              nombre: this.platilloEditado.nombre,
+              descripcion: this.platilloEditado.descripcion,
+              precio: this.platilloEditado.precio,
+              idcategoria: this.platilloEditado.idCategoria, // Mapea correctamente idCategoria
+              imagen: this.platilloEditado.imagen || null, // Permitir null en caso de que esté vacío
+          };
+
+          // Realizar la petición PUT
+          const response = await axios.put(`http://localhost:5000/api/platillos/${this.platilloEditado.idplato}`, payload);
+          console.log('Respuesta del servidor:', response.data);
+
+          alert('Platillo actualizado correctamente');
       } catch (error) {
-        console.error("Error al guardar los cambios del platillo:", error)
+          console.error('Error al guardar los cambios del platillo:', error);
+          alert('Ocurrió un error al intentar guardar los cambios.');
       }
-    },
+  },
 
     cancelarCambios() {
       this.filaEnEdicion = null;
