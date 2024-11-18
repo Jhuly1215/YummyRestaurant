@@ -44,7 +44,7 @@
   
   <script>
   import { reactive, ref } from 'vue';
-  
+  import axios from 'axios';
   export default {
     name: "NuevaReserva",
     props: {
@@ -114,6 +114,12 @@
                   hora,
                   estado: 1, // Por defecto, pendiente
               };
+
+              const responseGuardar = await axios.post('/api/reservas', nuevaReserva);
+              if (responseGuardar.status === 201) {
+                  emit('onSave', responseGuardar.data.data);
+                  emit('onClose');
+              }
 
               emit('onSave', nuevaReserva);
               emit('onClose');

@@ -1,6 +1,5 @@
 <template>
   <div>
-    <NavbarComponent />
     <CarouselComponent />
     <AdminPanelComponent />
 
@@ -13,7 +12,6 @@
       </ul>
     </div>
 
-    <FooterComponent />
   </div>
 </template>
 
@@ -29,8 +27,7 @@ import AdminPanelComponent from '@/components/AdminPanelComponent.vue';
 export default {
   name: "OfertasPage",
   components: {
-    NavbarComponent,
-    FooterComponent,
+
     FlipCardComponent,
     CarouselComponent,
     AdminPanelComponent,

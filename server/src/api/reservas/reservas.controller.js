@@ -98,7 +98,7 @@ exports.eliminarReserva = async (req, res) => {
 
     try {
         const eliminado = await sequelize.query(
-            `DELETE FROM reserva WHERE idReserva = :id`,
+            `DELETE FROM reserva WHERE idreserva = :id`,
             {
                 replacements: { id },
                 type: sequelize.QueryTypes.DELETE,

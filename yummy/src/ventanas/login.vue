@@ -20,19 +20,18 @@
           </span>
         </div>
 
-        <p class="signup-text">
-          ¿No tienes una cuenta? <router-link to="/registro">Regístrate aquí</router-link>
-        </p>
+        <p class="signup-text">¿No tienes una cuenta? <router-link to="/registro">Regístrate aquí</router-link></p>
+        <p class="signup-text"><router-link to="/recupera">¿Olvidaste tu contraseña?</router-link></p>
 
-  
-          <button type="submit" class="login-button">Listo</button>
-        </form>
-      </div>
+        <button type="submit" class="login-button">Listo</button>
+      </form>
     </div>
-  </template>
-  
-  <script>
+  </div>
+</template>
+
+<script>
 import { useAuthStore } from '../stores/usuariosStore'; // Asegúrate de importar el store correcto
+import Swal from 'sweetalert2';
 
 export default {
   name: "LogIn",
@@ -42,6 +41,8 @@ export default {
       email: '',
       password: '',
       error: null, // Para manejar errores
+      loginAttempts: 0, // Contador de intentos fallidos
+      maxAttempts: 3, // Máximo de intentos permitidos
     };
   },
   computed: {
@@ -62,12 +63,49 @@ export default {
 
       // Usamos el método login del store
       const success = await this.store.login(credentials);
+      let estadoActividad;
+
       if (success) {
+        // Reinicia los intentos fallidos al iniciar sesión correctamente
+        this.loginAttempts = 0;
+
+        // Muestra una alerta de éxito cuando el login es exitoso
+        Swal.fire({
+          icon: 'success',
+          title: '¡Bienvenido!',
+          text: 'Has iniciado sesión correctamente.',
+        });
+
         // Redirige al Home si el login es exitoso
-        this.$router.push('/'); // Redirige a la ruta 'Home' que definiste
+        this.$router.push('/');
+        estadoActividad = 'exitoso';
       } else {
-        // Si el login falla, muestra un mensaje de error
-        this.error = 'Correo o contraseña incorrectos';
+        // Incrementa el contador de intentos fallidos
+        this.loginAttempts++;
+        estadoActividad = 'fallido';
+
+        if (this.loginAttempts >= this.maxAttempts) {
+          Swal.fire({
+            icon: 'warning',
+            title: 'Cuenta bloqueada',
+            text: 'Has alcanzado el máximo de intentos fallidos. Tu cuenta acaba de ser bloqueada.',
+          });
+        } else {
+          // Si el login falla, muestra un mensaje de error
+          this.error = 'Correo o contraseña incorrectos';
+          Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: this.error,
+          });
+        }
+      }
+
+      // Llama a la función crearActividad del store
+      try {
+        await this.store.crearActividad(this.email, estadoActividad);
+      } catch (error) {
+        console.error('Error al registrar la actividad:', error);
       }
     }
   },
@@ -83,11 +121,10 @@ export default {
     }
   },
 };
+</script>
 
-  </script>
   
-  
-<style scoped>
+  <style scoped>
   
   
   .login-container {

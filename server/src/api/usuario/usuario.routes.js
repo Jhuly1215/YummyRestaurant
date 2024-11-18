@@ -7,8 +7,11 @@ const usuarioController = require('./usuario.controller');
 router.post('/registrar', usuarioController.registrarUsuario);
 router.get('/', usuarioController.obtenerUsuarios);
 router.get('/:id', usuarioController.obtenerUsuarioPorId); // Ruta para obtener un usuario específico
+router.get('/correo/:correo', usuarioController.obtenerUsuarioPorCorreo);// Ruta para obtener un usuario por correo
 router.put('/:id', usuarioController.actualizarUsuario);
 router.delete('/:id', usuarioController.eliminarUsuario);
+router.put('/actualizar-contrasena/:id', usuarioController.actualizarContrasena);// Ruta para actualizar solo la contraseña de un usuario
+
 
 // Rutas para verificación de correo
 router.post('/enviar-codigo', usuarioController.enviarCodigo); // Ruta para enviar código de verificación
