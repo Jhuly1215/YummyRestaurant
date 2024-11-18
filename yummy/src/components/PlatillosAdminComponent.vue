@@ -4,9 +4,12 @@
     <div class="table-container">
       <table class="table">
         <thead>
-          <!-- Muestra el mensaje de confirmación -->
-          <tr v-if="idPlatilloSeleccionado === platilloAEliminar.idplato">
-            <td colspan="6">
+          <!-- Fila de confirmación de eliminación -->
+          <tr 
+            v-if="idPlatilloSeleccionado === platilloAEliminar.idplato" 
+            class="confirm-row"
+          >
+            <td colspan="7">
               <ConfirmacionEliminar
                 :nombrePlatillo="platilloAEliminar.nombre"
                 @confirmarEliminacion="eliminarPlatillo"
@@ -20,6 +23,7 @@
             <th>Descripción</th>
             <th>Precio</th>
             <th>Categoría</th>
+            <th>Imagen</th>
             <th>Acciones</th>
           </tr>
         </thead>
@@ -47,6 +51,11 @@
               <input type="number" v-model="platilloEditado.idcategoria" />
             </td>
             <td v-else>{{ platillo.idcategoria }}</td>
+
+            <td v-if="index === filaEnEdicion">
+              <input v-model="platilloEditado.imagen" />
+            </td>
+            <td v-else>{{ platillo.imagen }}</td>
             
             <td class="botones">
               <!-- Botones de acción -->
@@ -71,6 +80,7 @@
     <button class="button-new">Nuevo platillo</button>
   </div>
 </template>
+
 
 <script>
 import axios from 'axios';
@@ -143,31 +153,60 @@ export default {
 </script>
 
 <style scoped>
+/* Encabezado principal */
 h2 {
   color: #322209;
+  text-align: center;
+  margin-bottom: 20px;
 }
 
+/* Contenedor de la tabla */
 .table-container {
   overflow-x: auto;
+  margin: 20px 0;
 }
 
+/* Estilos generales de la tabla */
 .table {
   width: 100%;
   border-collapse: collapse;
+  table-layout: fixed; /* Asegura que las columnas tengan el mismo ancho */
 }
 
-.table th, .table td {
-  border: 2;
-  padding: 10px;
-  width: 20px;
-}
-
+/* Encabezado de la tabla */
 .table th {
+  width: 40px; /* Ancho fijo para las columnas */
   background-color: #FFFDA4;
   color: #322209;
-  align-items: center;
+  text-align: center;
+  padding: 10px;
+  border: 1px solid #ddd;
+  white-space: nowrap; /* Evita el salto de línea en las celdas */
 }
 
+/* Celdas del cuerpo de la tabla */
+.table td {
+  width: 40px; /* Ancho fijo para las columnas */
+  text-align: center;
+  padding: 5px;
+  border: 1px solid #ddd;
+  background-color: #fff;
+  overflow: hidden; /* Oculta el contenido si excede el ancho */
+  text-overflow: ellipsis; /* Agrega puntos suspensivos si el texto es largo */
+  white-space: nowrap; /* Mantiene el contenido en una sola línea */
+}
+
+/* Fila del mensaje de confirmación */
+.table .confirm-row td {
+  background-color: #f9f9f9; /* Fondo diferenciado */
+  padding: 15px;
+  text-align: center;
+  border: none; /* Sin bordes */
+  font-weight: bold;
+  color: #444;
+}
+
+/* Botones de acción */
 .action-button {
   background: none;
   border: none;
@@ -183,14 +222,6 @@ h2 {
   color: #f44336;
 }
 
-.button-new {
-  background-color: #FE9900;
-  color: #FFFEDC;
-  border: 0;
-  padding: 10px 20px;
-  border-radius: 50px;
-}
-
 .button-save {
   color: #2f0cf5;
 }
@@ -198,4 +229,37 @@ h2 {
 .button-cancel {
   color: #f44336;
 }
+
+/* Botón para agregar nuevo platillo */
+.button-new {
+  background-color: #FE9900;
+  color: #FFFEDC;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 50px;
+  cursor: pointer;
+  display: block;
+  margin: 20px auto;
+  text-align: center;
+}
+
+.button-new:hover {
+  background-color: #FFA500;
+}
+
+/* Estilo para ocultar scrollbar horizontal */
+.table-container::-webkit-scrollbar {
+  height: 8px;
+}
+
+.table-container::-webkit-scrollbar-thumb {
+  background: #ccc;
+  border-radius: 10px;
+}
+
+.table-container::-webkit-scrollbar-thumb:hover {
+  background: #bbb;
+}
 </style>
+
+
