@@ -1,7 +1,6 @@
 <template>
   <div>
     <CarouselComponent />
-    <AdminPanelComponent />
 
     <div class="main">
       <ul class="cards">
@@ -19,14 +18,12 @@ import axios from 'axios';
 
 import CarouselComponent from '@/components/CarouselComponent.vue';
 import FlipCardComponent from '@/components/FlipCardComponent.vue';
-import AdminPanelComponent from '@/components/AdminPanelComponent.vue';
 
 export default {
   name: "OfertasPage",
   components: {
     FlipCardComponent,
     CarouselComponent,
-    AdminPanelComponent,
   },
   data() {
     return {
