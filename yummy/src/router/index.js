@@ -3,6 +3,7 @@ import Home from '@/ventanas/home.vue';
 import RegistroUsuario from '@/ventanas/registro.vue';
 import LogIn from '@/ventanas/login.vue';
 import Reservas from '@/ventanas/reservas/Reservas.vue';
+import PanelAdministrativo from '@/ventanas/panelAdministrativo.vue';
 import Recupera from '@/ventanas/recupera.vue';
 import CambioPass from '@/ventanas/cambioPassword.vue';
 import Ofertas from '@/ventanas/ofertasPage.vue';
@@ -34,9 +35,19 @@ const router = createRouter({
       component: RegistroUsuario,
     },
     {
-        path: '/reservas',
-        name: 'Reservas',
-        component: Reservas,
+      path: '/reservas',
+      name: 'Reservas',
+      component: Reservas,
+    },
+    {
+      path: '/ofertas',
+      name: 'Ofertas',
+      component: Ofertas,
+    },
+    {
+      path: '/panelAdministrativo',
+      name: 'PanelAdministrativo',
+      component: PanelAdministrativo,
     },
       {
         path: '/recupera',

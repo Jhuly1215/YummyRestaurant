@@ -1,41 +1,27 @@
+<!-- CardComponent.vue -->
 <template>
-    <div class="artboard">
-        <div class="card">
-            <div class="card__side card__side--front" :style="{ backgroundImage: `url(${imageSrc})` }"
-                @mouseover="flipCard(true)" @mouseleave="flipCard(false)">
-                <div class="card__theme">
-                    <div class="card__theme-box">
-                    </div>
+    <div class="card-container">
+        <a href="/" class="hero-image-container">
+            <img class="hero-image" :src="imageSrc"
+                alt="Spinning glass cube" />
+        </a>
+        <main class="main-content">
+            <h1><a href="#">{{ title }}</a></h1>
+            <p>{{ requirement }}, aplicando esta oferta en tus pedidos obtendras un {{ discount }}% de descuento</p>
+            <div class="flex-row">
+                <div class="coin-base">
+                    <img src="https://i.postimg.cc/T1F1K0bW/Ethereum.png" alt="Ethereum" class="small-image" />
+                    <h2>Hasta {{ date }}</h2>
+                </div>
+                <div class="time-left">
+                    <img src="https://i.postimg.cc/prpyV4mH/clock-selection-no-bg.png" alt="clock"
+                        class="small-image" />
+                    <p>{{ daysLeft }} días restantes</p>
                 </div>
             </div>
-
-            <div class="card__side card__side--back" :class="{ 'is-flipped': isFlipped }">
-                <div class="card__cover">
-                    <h4 class="card__heading">
-                        <span class="card__heading-span">Descripcion de oferta</span>
-                    </h4>
-                </div>
-                <div class="card__details">
-                    <ul>
-                        <li>
-                            <p>{{ title }}</p>
-                        </li>
-                        <li>
-                            <p>{{ requirement }}</p>
-                        </li>
-                        <li>
-                            <p>{{ discount }}%</p>
-                        </li>
-                        <li>
-                            <p>Valido hasta el {{ date }}</p>
-                        </li>
-                    </ul>
-                </div>
-            </div>
-        </div>
+        </main>
     </div>
 </template>
-
 <script>
 export default {
     name: "CardComponent",
@@ -61,157 +47,161 @@ export default {
             required: true
         }
     },
-    data() {
-        return {
-            isFlipped: false
-        };
-    },
-    methods: {
-        flipCard(state) {
-            this.isFlipped = state;
+    computed: {
+        daysLeft() {
+        const end = new Date(this.endDate);
+        const now = new Date();
+        const diffTime = end - now;
+        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+        return diffDays > 0 ? diffDays : 0;
         },
     },
 };
 </script>
 
-<style scoped lang="scss">
-$background-color: #fdc47a;
-$color-primary-light: #f3971e;
-$color-primary-dark: #704b0c;
-$color-black: #000;
-$color-gray-light: #eee;
-$color-white: #fff;
+<style scoped>
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600&display=swap');
 
-.artboard {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 1rem;
-    height: 50vh;
-    background-color: $background-color;
+/* Variables */
+:root {
+    --var-soft-blue: hsl(215, 51%, 70%);
+    --var-cyan: hsl(178, 100%, 50%);
+    --var-main-darkest: hsl(217, 54%, 11%);
+    --var-card-dark: hsl(216, 50%, 16%);
+    --var-line-dark: hsl(215, 32%, 27%);
+    --var-lightest: white;
+    --var-heading: normal normal 600 1.5em/1.6em 'Outfit', sans-serif;
+    --var-small-heading: normal normal 400 1em/1em 'Outfit', sans-serif;
+    --var-para: normal normal 300 1em/1.55em 'Outfit', sans-serif;
 }
 
-.card {
+body {
+    background-color: var(--var-main-darkest);
+}
+
+img {
+    width: 100%;
+    border-radius: 15px;
+    display: block;
+}
+
+a {
+    color: inherit;
+    text-decoration: none;
+}
+
+/* Font Styling */
+h1 {
+    font: var(--var-heading);
+    color: var(--var-lightest);
+    padding: 1.2em 0;
+}
+
+h2 {
+    font: var(--var-small-heading);
+    color: var(--var-lightest);
+}
+
+p {
+    font: var(--var-para);
+    color: var(--var-soft-blue);
+}
+
+span {
+    color: white;
+}
+
+.main-content {
+    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+}
+
+.card-container {
+    width: 100%;
+    max-width: 400px;
+    margin: 2em auto;
+    background-color: var(--var-card-dark);
+    border-radius: 15px;
+    padding: 2rem;
+    background-color: rgb(217, 221, 206);
+}
+
+.flex-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.coin-base,
+.time-left,
+.card-attribute {
+    display: flex;
+    align-items: center;
+    padding: 1em 0;
+}
+
+.card-attribute {
+    padding-bottom: 1.5em;
+    border-top: 2px solid var(--var-line-dark);
+}
+
+.hero-image-container {
     position: relative;
-    height: 28rem;
-    width: 20rem;
-    perspective: 200rem;
-    margin: 1rem;
+    display: block;
+}
 
-    &__side {
-        height: 100%;
-        width: 100%;
-        position: absolute;
-        top: 0;
-        left: 0;
-        backface-visibility: hidden;
-        border-radius: 3px;
-        overflow: hidden;
-        box-shadow: 0 2rem 6rem rgba($color-black, 0.15);
-        transition: transform 0.8s ease;
-    }
+/* Hover Effect */
+.hero-image-container::after {
+    content: '';
+    background-image: url('https://i.postimg.cc/9MtT4GZY/view.png');
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: 5rem;
+    background-color: hsla(178, 100%, 50%, 0.3);
+    width: 100%;
+    height: 100%;
+    border-radius: 1rem;
+    position: absolute;
+    top: 0;
+    left: 0;
+    display: block;
+    z-index: 2;
+    opacity: 0;
+    transition: opacity 0.3s ease-out;
+}
 
-    &__side--front {
-        background-size: contain;
-        /* Para que la imagen cubra todo el fondo */
-        background-position: center;
-        /* Centra la imagen */
-        background-repeat: no-repeat;
-    }
+.hero-image-container:hover::after {
+    opacity: 1;
+}
 
-    &__side--back {
-        background-color: $color-white;
-        transform: rotateY(180deg);
-    }
+.small-image {
+    width: 1.2em;
+    margin-right: 0.5em;
+}
 
-    &__theme {
-        position: absolute;
-        top: 54%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        width: 90%;
-        text-align: center;
-    }
+.small-avatar {
+    width: 2em;
+    border-radius: 200px;
+    outline: 2px solid white;
+    margin-right: 1.4em;
+}
 
-    &__theme-box {
-        color: $color-white;
-        margin-bottom: 8rem;
-    }
+.attribution {
+    margin: 0 auto;
+    width: 100%;
+    font: var(--var-para);
+    text-align: center;
+    padding: 1.5em 0 4em 0;
+    color: var(--var-line-dark);
+}
 
-    &__subject {
-        font-family: "Inconsolata", monospace;
-        letter-spacing: 0.8rem;
-        font-size: 1.6rem;
-        text-transform: uppercase;
-        margin-bottom: 1rem;
-    }
+.attribution a {
+    color: var(--var-soft-blue);
+}
 
-    &__title {
-        font-family: "VT323", monospace;
-        text-transform: uppercase;
-        font-size: 1rem;
-        font-weight: 100;
-    }
-
-    &__cover {
-        background-size: cover;
-        height: 5rem;
-        clip-path: polygon(0 0, 100% 0, 100% 85%, 0 100%);
-        background-image: linear-gradient(to top right,
-                rgba($color-primary-dark, 0.65),
-                rgba($color-primary-light, 0.65)),
-            url("https://cdn.spacetelescope.org/archives/images/screen/heic0406a.jpg");
-    }
-
-    &__heading {
-        text-align: center;
-        color: $color-white;
-        position: absolute;
-        top: 10%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        width: 75%;
-    }
-
-    &__heading-span {
-        font-family: "VT323", monospace;
-        font-size: 1.5rem;
-        font-weight: 200;
-        text-transform: uppercase;
-        color: $color-white;
-    }
-
-    &__details {
-        font-family: "Inconsolata", monospace;
-        padding: 1rem;
-
-        ul {
-            list-style: none;
-            width: 80%;
-            margin: 0 auto;
-
-            li {
-                text-align: center;
-                font-size: 1rem;
-                padding: 0.5rem;
-
-                &:not(:last-child) {
-                    border-bottom: 1px solid $color-gray-light;
-                }
-            }
-        }
-    }
-
-    &:hover &__side--back {
-        transform: rotateY(0);
-    }
-
-    &:hover &__side--front {
-        transform: rotateY(-180deg);
-    }
-
-    &.is-flipped {
-        transform: rotateY(-180deg);
+/* Responsive */
+@media (min-width: 600px) {
+    body {
+        font-size: 18px;
     }
 }
 </style>

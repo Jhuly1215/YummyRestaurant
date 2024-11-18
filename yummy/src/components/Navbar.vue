@@ -6,6 +6,7 @@
       <div class="opciones">
         <a><router-link to="/ofertas">Ofertas</router-link></a>
         <a><router-link to="/mapa">Mapa Interactivo</router-link></a>
+        <a><router-link to="/panelAdministrativo">Panel Administrativo</router-link></a>
         <a @click="handleAuthAction">
           <router-link v-if="!isLoggedIn" to="/iniciarsesion">Login</router-link>
           <span v-else>Cerrar sesión</span>

@@ -80,6 +80,8 @@ export default {
   width: 100%;
   min-width: 1000px;
   border-collapse: collapse;
+  margin-right: 1em;
+  margin-left: 1em;
 }
 
 .offers-table th, .offers-table td {

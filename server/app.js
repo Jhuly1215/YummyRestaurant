@@ -17,14 +17,20 @@ const actividadRoutes = require('./src/api/usuario/actividadRoutes');
 const mesasRoutes = require('./src/api/mesas/mesasRoutes');
 const platillosRoutes = require('./src/api/platillos/platillo.routes');
 const categoriasRoutes = require('./src/api/categorias/categoria.routes');
+const reservaRoutes = require('./src/api/reservas/reservas.routes');
+
+
+
 
 app.use('/api/ofertas', ofertasRoutes);
 app.use('/api', platillosRoutes);
 app.use('/api', categoriasRoutes);
 app.use('/api/usuario', usuarioRoutes);
 app.use('/api/auth', authRoutes);
+app.use('/api/reservas', reservaRoutes);
 app.use('/api/actividad', actividadRoutes);
 app.use('/api/mesas', mesasRoutes);
+
 
 sequelize.sync()
   .then(() => console.log("Base de datos conectada"))

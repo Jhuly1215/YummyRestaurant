@@ -1,45 +1,43 @@
-<!-- src/components/ReservaCard.vue -->
 <template>
-    <div :class="['reserva-card', estadoClase]">
-      <h3 class="mesa">{{ mesa }}</h3>
-      <p>Fecha: {{ fecha }}</p>
-      <p>Hora: {{ hora }}</p>
-      <p>Nombre: {{ nombre }}</p>
-      <button :class="['estado', estadoClase]" @click="toggleEstado">{{ estado }}</button>
-    </div>
+  <div :class="['reserva-card', estadoClase]" @click="abrirModal">
+    <h3 class="mesa">{{ mesa }}</h3>
+    <p>Fecha: {{ fecha }}</p>
+    <p>Hora: {{ hora }}</p>
+    <p>Nombre: {{ nombre }}</p>
+    <!-- Botón para cambiar el estado -->
+    <button :class="['estado', estadoClase]" @click.stop="toggleEstado">
+      {{ estado === '1' ? 'Pendiente' : 'Finalizada' }}
+    </button>
+  </div>
 </template>
-  
+
 <script>
-  export default {
-    name: "ReservaCard",
-    props: {
-      mesa: String,
-      fecha: String,
-      hora: String,
-      nombre: String,
-      estadoInicial: {
-        type: String,
-        default: 'Pendiente'
-      }
+export default {
+  name: "ReservaCard",
+  props: {
+    mesa: String,
+    fecha: String,
+    hora: String,
+    nombre: String,
+    estado: String, // Recibe el estado como "0" o "1" desde el padre
+  },
+  computed: {
+    estadoClase() {
+      // Clase CSS según el estado
+      return this.estado === '1' ? 'pendiente' : 'finalizada';
     },
-    data() {
-      return {
-        estado: this.estadoInicial // Inicializa el estado con el valor de estadoInicial
-      };
+  },
+  methods: {
+    toggleEstado() {
+      // Cambiar el estado localmente entre "0" (Entregado) y "1" (Pendiente)
+      const nuevoEstado = this.estado === '1' ? '0' : '1';
+      this.$emit("cambiarEstado", nuevoEstado); // Emitir evento para el cambio de estado
     },
-    computed: {
-      estadoClase() {
-        // Cambia la clase de la tarjeta según el estado actual
-        return this.estado === 'Entregada' ? 'entregada' : 'pendiente';
-      }
+    abrirModal() {
+      this.$emit("abrirModal"); // Emitir evento para abrir el modal
     },
-    methods: {
-      toggleEstado() {
-        // Alterna el estado entre "Pendiente" y "Entregada"
-        this.estado = this.estado === 'Pendiente' ? 'Entregada' : 'Pendiente';
-      }
-    }
-  };
+  },
+};
 </script>
   
 <style scoped>
@@ -58,7 +56,7 @@
     font-weight: bold;
   }
   
-  .entregada {
+  .finalizada {
     background-color: #FFFEDC; /* Color de fondo para estado "Entregada" */
   }
   
@@ -76,7 +74,7 @@
     cursor: pointer;
   }
   
-  .entregada.estado {
+  .finalizada.estado {
     background-color: #D8D8A7; /* Color para botón de estado "Entregada" */
   }
   

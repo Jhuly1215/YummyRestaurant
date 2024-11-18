@@ -1,40 +1,41 @@
+// src/api/reserva.model.js
 const { DataTypes } = require('sequelize');
 const sequelize = require('../config/db');
 
-const Oferta = sequelize.define('Oferta', {
-  idOferta: {
+const Reserva = sequelize.define('Reserva', {
+  idReserva: {
     type: DataTypes.INTEGER,
     primaryKey: true,
     autoIncrement: true,
   },
-  descripcion: {
-    type: DataTypes.STRING(100),
-    allowNull: false,
-  },
-  requerimiento: {
-    type: DataTypes.STRING(70),
-    allowNull: false,
-  },
-  fecha_inicio: {
+  fecha: {
     type: DataTypes.DATE,
     allowNull: false,
   },
-  fecha_fin: {
-    type: DataTypes.DATE,
+  hora: {
+    type: DataTypes.TIME,
     allowNull: false,
   },
-  descuento: {
+  estado: {
     type: DataTypes.INTEGER,
     allowNull: false,
   },
-  idPlato: {
+  idUsuario: {
     type: DataTypes.INTEGER,
     allowNull: false,
     references: {
-      model: 'platos',
-      key: 'idPlato',
+      model: 'usuario',
+      key: 'idUsuario',
+    },
+  },
+  idMesa: {
+    type: DataTypes.INTEGER,
+    allowNull: false,
+    references: {
+      model: 'mesa',
+      key: 'idMesa',
     },
   },
 });
 
-module.exports = Oferta;
+module.exports = Reserva;
