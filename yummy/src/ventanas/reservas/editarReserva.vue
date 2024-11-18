@@ -69,7 +69,7 @@
         required: true
       }
     },
-    emits: ['onClose', 'onSave'],
+    emits: ['onClose', 'onSave', "onDelete"],
     setup(props, { emit }) {
       // Usamos reactive para que reservaData sea reactivo
       const reservaData = reactive({
@@ -133,6 +133,7 @@
 
               if (response.ok) {
                   console.log("Reserva eliminada exitosamente");
+                  emit("onDelete");
                   emit('onClose'); // Cerrar el modal
               } else {
                   const errorData = await response.json();
