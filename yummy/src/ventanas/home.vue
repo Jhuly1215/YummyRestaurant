@@ -1,6 +1,5 @@
 <template>
     <div>
-      <NavbarComponent />
       <CarouselComponent />
 
       <div class="descripcion">
@@ -54,13 +53,11 @@
       </div>
       
       <!-- Importar y usar Footer -->
-      <FooterComponent />
     </div>
   </template>
   
   <script>
-  import NavbarComponent from '@/components/Navbar.vue';
-  import FooterComponent from '@/components/Footer.vue';
+
   import CardComponent from '@/components/CardComponent.vue';
   import CarouselComponent from '@/components/CarouselComponent.vue';
   import HorizontalCardComponent from '@/components/HorizontalCardComponent.vue';
@@ -68,8 +65,7 @@
   export default {
     name: "HomePage",
     components: {
-      NavbarComponent,
-      FooterComponent,
+
       CardComponent,
       CarouselComponent,
       HorizontalCardComponent,
