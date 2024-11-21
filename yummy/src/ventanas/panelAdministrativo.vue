@@ -3,7 +3,6 @@
     <div id="app" class="dashboard">
         <Sidebar @navigate="currentSection = $event" />
         <div class="main-content">
-            <Topbar />
             <component :is="currentSection" />
         </div>
     </div>
@@ -12,8 +11,7 @@
 <script>
 import Sidebar from '../components/SidebarComponent.vue';
 import Topbar from '../components/TopbarComponent.vue';
-import Section1 from '../ventanas/Section1Page.vue';
-import Section2 from '../ventanas/Section2Page.vue';
+import DashboardComponent from '../ventanas/dashboardComponent.vue';
 import OfertasAdminComponent from '../ventanas/OfertasAdminComponent.vue'
 
 export default {
@@ -21,13 +19,12 @@ export default {
     components: {
         Sidebar,
         Topbar,
-        Section1,
-        Section2,
+        DashboardComponent,
         OfertasAdminComponent   
     },
     data() {
         return {
-            currentSection: 'Section1',
+            currentSection: 'DashboardComponent',
         };
     },
 };
@@ -37,10 +34,14 @@ export default {
 .dashboard {
     display: flex;
     height: 100vh;
+    padding-bottom: 0;
 }
 
 .main-content {
-    flex-grow: 1;
-    background-color: #f8f9fa;
+  flex-grow: 1;
+  background-color: #f8f9fa;
+  padding-top: 1.5em;
+  overflow-y: auto; /* Permite desplazamiento vertical si el contenido excede */
 }
+
 </style>

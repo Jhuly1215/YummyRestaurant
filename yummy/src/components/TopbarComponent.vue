@@ -20,8 +20,9 @@ export default {
     display: flex;
     align-items: center;
     justify-content: end;
-    padding: 0 20px;
+    margin-bottom: 1.5em;
     border-bottom: 1px solid #dcdcdc;
+    position: static;
 }
 
 .user-menu {
