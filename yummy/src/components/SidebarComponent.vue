@@ -2,13 +2,12 @@
 <template>
     <div class="sidebar">
         <h2 class="logo">Yummy</h2>
-        <ul>
-            <li @click="navigate('Section1')">Dashboard</li>
-            <li>Usuarios</li>
-            <li @click="navigate('OfertasAdminComponent')">Ofertas</li>
-            <li @click="navigate('PlatillosAdminComponent')">Platillos</li>
-            <li @click="navigate('JReservasAdminComponent')">Reservas</li>
-        </ul>
+        <div class="opciones">
+            <a><router-link to="/panelAdministrativo/section1" active-class="active-link" class="sidebar-link">Dashboard</router-link></a>
+            <a><router-link to="/panelAdministrativo/ofertas" active-class="active-link" class="sidebar-link">Ofertas</router-link></a>
+            <a><router-link to="/panelAdministrativo/platillos" active-class="active-link" class="sidebar-link">Platillos</router-link></a>
+            <a><router-link to="/panelAdministrativo/reservas" active-class="active-link" class="sidebar-link">Reservas</router-link></a>
+        </div>
     </div>
 </template>
 
@@ -38,19 +37,43 @@ export default {
     font-weight: bold;
     margin-bottom: 20px;
 }
-
-ul {
-    list-style: none;
-    padding: 0;
+.opciones {
+  display: flex;
+  flex-direction: column;
 }
 
-li {
-    padding: 10px 0;
-    cursor: pointer;
-    transition: background 0.3s;
+.sidebar-link {
+  display: flex;
+  align-items: center;
+  position: relative;
+  padding: 10px 20px;
+  color: white;
+  text-decoration: none;
+  font-size: 1rem;
+  transition: background-color 0.3s ease;
 }
 
-li:hover {
-    background: #A16F23;
+
+.sidebar-link:hover {
+  background-color: #a16f23; 
+}
+
+.active-link {
+  background-color: #a16f23; 
+  font-weight: bold;
+}
+
+/* Triángulo decorativo en la opción activa */
+.active-link::after {
+  content: '';
+  position: absolute;
+  right: -10px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 0;
+  height: 0;
+  border-style: solid;
+  border-width: 10px 0 10px 10px;
+  border-color: transparent transparent transparent #a16f23; /* Triángulo marrón */
 }
 </style>

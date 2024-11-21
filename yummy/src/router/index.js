@@ -11,6 +11,12 @@ import MapaInteractivo from '@/ventanas/mapaInteractivo.vue';
 import MenuCliente from '@/ventanas/MenuCliente.vue'
 import TemporalCalificacion from '@/ventanas/temporalCalificacion.vue'
 
+//para el administrador
+
+import Section1 from '../ventanas/Section1Page.vue';
+import OfertasAdminComponent from '../ventanas/OfertasAdminComponent.vue'
+import PlatillosAdminComponent from '@/components/PlatillosAdminComponent.vue';
+import JReservasAdminComponent from '@/ventanas/reservas/Reservas.vue';
 
 const router = createRouter({
   history: createWebHistory(),
@@ -50,11 +56,6 @@ const router = createRouter({
       name: 'Menu',
       component: MenuCliente,
     },
-    {
-      path: '/panelAdministrativo',
-      name: 'PanelAdministrativo',
-      component: PanelAdministrativo,
-    },
       {
         path: '/recupera',
         name: 'Recupera',
@@ -74,6 +75,36 @@ const router = createRouter({
       path: '/temporal',
       name: 'Calificaciones',
       component: TemporalCalificacion,
+    },
+
+    //Para el Panel Administrativo
+    {
+      path: '/panelAdministrativo',
+      name: 'PanelAdministrativo',
+      component: PanelAdministrativo,
+      //meta: { requiresAuth: true }, // Requiere autenticación
+      children: [
+        {
+          path: 'section1', // Ruta base de panel administrativo
+          name: 'Dashboard',
+          component: Section1, // Componente del Dashboard
+        },
+        {
+          path: 'ofertas',
+          name: 'AdminOfertas',
+          component: OfertasAdminComponent, // Gestión de ofertas
+        },
+        {
+          path: 'platillos',
+          name: 'AdminPlatillos',
+          component: PlatillosAdminComponent, // Gestión de platillos
+        },
+        {
+          path: 'reservas',
+          name: 'AdminReservas',
+          component: JReservasAdminComponent, // Gestión de reservas
+        },
+      ],
     },
   ],
 });
