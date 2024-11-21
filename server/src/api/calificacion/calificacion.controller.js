@@ -2,14 +2,14 @@ const sequelize = require('../../config/db');
 
 // Crear una nueva calificación
 exports.crearCalificacion = async (req, res) => {
-  const { puntuacion, idUsuario, idPlato } = req.body;
+  const { puntuacion, idusuario, idplato } = req.body;
 
   try {
     const nuevaCalificacion = await sequelize.query(
       `INSERT INTO resenia (puntuacion, idusuario, idplato)
-       VALUES (:puntuacion, :idUsuario, :idPlato)`,
+       VALUES (:puntuacion, :idusuario, :idplato)`,
       {
-        replacements: { puntuacion, idUsuario, idPlato },
+        replacements: { puntuacion, idusuario, idplato },
         type: sequelize.QueryTypes.INSERT,
       }
     );
@@ -46,15 +46,15 @@ exports.obtenerCalificaciones = async (req, res) => {
 // Actualizar una calificación
 exports.actualizarCalificacion = async (req, res) => {
   const { id } = req.params;
-  const { puntuacion, idUsuario, idPlato } = req.body;
+  const { puntuacion, idusuario, idplato } = req.body;
 
   try {
     const [actualizado] = await sequelize.query(
       `UPDATE resenia
-       SET puntuacion = :puntuacion, idusuario = :idUsuario, idplato = :idPlato
+       SET puntuacion = :puntuacion, idusuario = :idusuario, idplato = :idplato
        WHERE idresenia = :id`,
       {
-        replacements: { id, puntuacion, idUsuario, idPlato },
+        replacements: { id, puntuacion, idusuario, idplato },
         type: sequelize.QueryTypes.UPDATE,
       }
     );

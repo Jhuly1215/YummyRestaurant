@@ -8,7 +8,7 @@ import Recupera from '@/ventanas/recupera.vue';
 import CambioPass from '@/ventanas/cambioPassword.vue';
 import Ofertas from '@/ventanas/ofertasPage.vue';
 import MapaInteractivo from '@/ventanas/mapaInteractivo.vue';
-
+import TemporalCalificacion from '@/ventanas/temporalCalificacion.vue'
 
 
 const router = createRouter({
@@ -63,6 +63,11 @@ const router = createRouter({
       path: '/mapa',
       name: 'Mapa',
       component: MapaInteractivo,
+    },
+    {
+      path: '/temporal',
+      name: 'Calificaciones',
+      component: TemporalCalificacion,
     },
   ],
 });
