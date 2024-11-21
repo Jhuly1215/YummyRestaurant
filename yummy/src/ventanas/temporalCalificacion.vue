@@ -6,20 +6,35 @@
         @close="closeModal"
         @submitted="handleSubmitted"
       />
+      <!-- Botón para abrir el modal del platillo -->
+    <button @click="openModalPlatillo('Tacos al Pastor')" class="open-modal-button">
+      Calificar Platillo
+    </button>
+    <StarRatingModalPlatillo
+      :show="isModalPlatilloOpen"
+      :platillo="platilloActual"
+      @close="closeModalPlatillo"
+      @submitted="handleSubmittedPlatillo"
+    />
     </div>
   </template>
   
   <script>
   import StarRatingModal from "../components/ExpCalificacion.vue";
+  import StarRatingModalPlatillo from "../components/PlatilloCalificacion.vue";
   
+
   export default {
     name: "TemporalCalificacion",
     components: {
       StarRatingModal,
+      StarRatingModalPlatillo,
     },
     data() {
       return {
         isModalOpen: false,
+        isModalPlatilloOpen:false,
+        platilloActual: "",
       };
     },
     methods: {
@@ -29,10 +44,25 @@
       closeModal() {
         this.isModalOpen = false;
       },
+
+      
       handleSubmitted(rating) {
         console.log("Calificación enviada:", rating);
        
       },
+
+
+        openModalPlatillo(platillo) {
+            this.platilloActual = platillo; // Define el platillo actual
+            this.isModalPlatilloOpen = true;
+        },
+        closeModalPlatillo() {
+            this.isModalPlatilloOpen = false;
+        },
+        handleSubmittedPlatillo({ platillo, rating }) {
+        console.log(`Calificación enviada: ${rating} para ${platillo}`);
+        // Aquí puedes manejar la lógica de envío o guardado
+        },
     },
   };
   </script>

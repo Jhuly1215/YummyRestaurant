@@ -191,10 +191,8 @@ export default {
         // Agregar la nueva reserva a la lista localmente
         this.reservas.push(response.data);
 
-        // Mostrar mensaje de éxito (opcional)
         alert('Reserva creada exitosamente.');
 
-        // Cerrar el modal
         this.cerrarModalNuevaReserva();
       } catch (error) {
         console.error('Error al guardar la nueva reserva:', error);
