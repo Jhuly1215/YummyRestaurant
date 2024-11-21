@@ -13,6 +13,7 @@ import Sidebar from '../components/SidebarComponent.vue';
 import Topbar from '../components/TopbarComponent.vue';
 import DashboardComponent from '../ventanas/dashboardComponent.vue';
 import OfertasAdminComponent from '../ventanas/OfertasAdminComponent.vue'
+import PlatillosAdminComponent from '@/components/PlatillosAdminComponent.vue';
 
 export default {
     name: "PanelAdministrativo",

@@ -6,7 +6,7 @@
 CREATE TABLE categoria (
     idcategoria SERIAL PRIMARY KEY,
     tipo varchar(30),
-    descripcion varchar(100)
+    descripcion varchar(150)
 );
 
 -- Table: detalle_pedido
@@ -59,11 +59,11 @@ CREATE TABLE pedido (
 -- Table: platillo
 CREATE TABLE platillo (
     idplato SERIAL PRIMARY KEY,
-    nombre varchar(30),
-	src varchar(120),
-    descripcion varchar(70),
-    precio int,
-    idcategoria int
+    nombre varchar(100),
+    descripcion varchar(200),
+    precio real,
+    idcategoria int,
+    imagen varchar(100)
 );
 
 -- Table: resenia

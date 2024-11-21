@@ -51,7 +51,7 @@
           />
         </ul>
       </div>
-  
+      
       <!-- Importar y usar Footer -->
     </div>
   </template>
