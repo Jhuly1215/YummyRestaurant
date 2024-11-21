@@ -1,6 +1,12 @@
 <template>
   <div>
-    <h2>Ofertas</h2>
+    <header class="offers-header">
+      <h2>
+        <i class="fas fa-tags"></i>
+        Ofertas
+      </h2>
+      <p>Administra y crea nuevas ofertas para tus clientes</p>
+    </header>
     <div class="table-container">
       <table class="offers-table">
         <thead>
@@ -117,12 +123,6 @@
             </div>
           </div>
 
-          <SuccessModal
-            v-if="mostrarModalExito"
-            :mensaje="mensajeModal"
-            @onClose="cerrarModal"
-          />
-
           <div class="form-group image-upload">
             <label for="src">Imagen</label>
             <div class="upload-area" @drop.prevent="handleFileDrop" @dragover.prevent>
@@ -141,12 +141,14 @@
         <button type="submit" class="submit-button">Crear Oferta</button>
       </form>
     </div>
+
+    <SuccessModal v-if="mostrarModalExito" :mensaje="mensajeModal" @onClose="cerrarModal" />
   </div>
 </template>
 
 <script>
 import axios from 'axios';
-import SuccessModal from "@/components/SuccessModal.vue";
+import SuccessModal from "../components/SuccessModal.vue";
 
 export default {
   name: "OfertasAdminComponent",
@@ -156,7 +158,7 @@ export default {
   data() {
     return {
       mostrarModalExito: false,
-      mensajeModal:"Oferta creada con exito!",
+      mensajeModal: "Oferta creada con exito!",
       ofertas: [],
       nuevaOferta: {
         titulo: "",
@@ -252,10 +254,8 @@ export default {
           }
         }
 
-        // Enviar datos al backend
-        const response = await axios.post("http://localhost:5000/api/ofertas", formData, {
-          headers: { "Content-Type": "multipart/form-data" },
-        });
+        // Mostrar el modal de éxito
+        this.mostrarModalExito = true;
 
         // Reiniciar el formulario
         this.nuevaOferta = {
@@ -273,8 +273,11 @@ export default {
         // Actualizar la tabla de ofertas
         this.obtenerOfertas();
 
-        // Mostrar el modal de éxito
-        this.mostrarModalExito = true;
+        // Enviar datos al backend
+        const response = await axios.post("http://localhost:5000/api/ofertas", formData, {
+          headers: { "Content-Type": "multipart/form-data" },
+        });
+
       } catch (error) {
         console.error("Error al crear la oferta:", error);
         alert("Ocurrió un error al crear la oferta. Por favor, inténtalo de nuevo.");
@@ -317,6 +320,64 @@ export default {
 </script>
 
 <style scoped>
+/* Encabezado de Ofertas */
+.offers-header {
+  text-align: center;
+  background: linear-gradient(180deg, #ff9900, #ffcc00);
+  color: white;
+  padding: 20px 10px;
+  border-radius: 0 0 15px 15px;
+  /* Redondeo en las esquinas inferiores */
+  box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.2);
+  /* Sombra para dar profundidad */
+  margin-bottom: 20px;
+}
+
+/* Título principal */
+.offers-header h2 {
+  font-size: 2.5em;
+  font-weight: bold;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  /* Espacio entre el texto y el icono */
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+  /* Sombra del texto */
+}
+
+/* Icono decorativo */
+.offers-header h2 i {
+  font-size: 0.8em;
+  color: #ffd700;
+  /* Color dorado para el icono */
+  animation: bounce 1s infinite;
+  /* Animación de rebote */
+}
+
+/* Subtítulo */
+.offers-header p {
+  font-size: 1.2em;
+  margin-top: 10px;
+  color: #fff8e7;
+  /* Color claro para contraste */
+  font-style: italic;
+}
+
+/* Animación del icono */
+@keyframes bounce {
+
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
 .table-container {
   overflow-x: auto;
   overflow-y: auto;

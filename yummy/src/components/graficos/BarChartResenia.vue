@@ -1,6 +1,11 @@
 <template>
     <div>
-        <canvas ref="chartCanvas"></canvas>
+        <div v-if="data && data.length > 0">
+            <canvas ref="chartCanvas"></canvas>
+        </div>
+        <div v-else>
+            <p>No hay datos disponibles para esta fecha.</p>
+        </div>
     </div>
 </template>
 
@@ -36,6 +41,15 @@ export default {
     watch: {
         data: {
             handler(newData) {
+                if (!newData || newData.length === 0) {
+                    console.warn('Datos vacíos detectados.');
+                    if (this.chart) {
+                        this.chart.destroy(); // Destruye el gráfico existente
+                        this.chart = null; // Limpia la referencia
+                    }
+                    return;
+                }
+
                 if (this.chart) {
                     const clonedData = JSON.parse(JSON.stringify(newData));
                     this.chart.data.labels = clonedData.map(item => item.nombre_plato);
@@ -53,6 +67,7 @@ export default {
     methods: {
         createChart() {
             if (!this.data || this.data.length === 0) {
+                console.warn('No hay datos para crear el gráfico.');
                 return;
             }
 
@@ -62,64 +77,74 @@ export default {
             const dataPromedio = clonedData.map(item => item.promedio_resenia);
             const dataTotal = clonedData.map(item => item.total_resenias);
 
-            const ctx = this.$refs.chartCanvas.getContext('2d');
+            this.$nextTick(() => {
+                const ctx = this.$refs.chartCanvas.getContext('2d');
+                if (!ctx) {
+                    console.error('No se pudo obtener el contexto del canvas.');
+                    return;
+                }
 
-            const chartData = {
-                labels: labels,
-                datasets: [
-                    {
-                        label: 'Promedio de Reseñas',
-                        data: dataPromedio,
-                        backgroundColor: 'rgba(75, 192, 192, 0.2)',
-                        borderColor: 'rgba(75, 192, 192, 1)',
-                    },
-                    {
-                        label: 'Total de Reseñas',
-                        data: dataTotal,
-                        backgroundColor: 'rgba(255, 99, 132, 0.2)',
-                        borderColor: 'rgba(255, 99, 132, 1)',
-                    },
-                ],
-            };
+                const chartData = {
+                    labels: labels,
+                    datasets: [
+                        {
+                            label: 'Promedio de Reseñas',
+                            data: dataPromedio,
+                            backgroundColor: 'rgba(255, 153, 0, 0.2)',
+                            borderColor: 'rgba(255, 153, 0, 1)',
+                            borderWidth: 2,
+                            fill: true,
+                        },
+                        {
+                            label: 'Total de Reseñas',
+                            data: dataTotal,
+                            backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                            borderColor: 'rgba(255, 99, 132, 1)',
+                            borderWidth: 2,
+                            fill: true,
+                        },
+                    ],
+                };
 
-            const options = {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: {
-                        display: true,
-                    },
-                    title: {
-                        display: true,
-                        text: this.chartTitle,
-                    },
-                },
-                scales: {
-                    x: {
+                const options = {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: true,
+                        },
                         title: {
                             display: true,
-                            text: 'Platillos',
+                            text: this.chartTitle,
                         },
                     },
-                    y: {
-                        beginAtZero: true,
-                        title: {
-                            display: true,
-                            text: 'Reseñas',
+                    scales: {
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Platillos',
+                            },
+                        },
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Reseñas',
+                            },
                         },
                     },
-                },
-            };
+                };
 
-            // Clonamos profundamente las opciones para eliminar reactividad
-            const clonedOptions = JSON.parse(JSON.stringify(options));
-            // Asignamos el título después de clonar para evitar reactividad
-            clonedOptions.plugins.title.text = this.chartTitle;
+                // Clonamos profundamente las opciones para eliminar reactividad
+                const clonedOptions = JSON.parse(JSON.stringify(options));
+                // Asignamos el título después de clonar para evitar reactividad
+                clonedOptions.plugins.title.text = this.chartTitle;
 
-            this.chart = new Chart(ctx, {
-                type: 'bar',
-                data: chartData,
-                options: clonedOptions,
+                this.chart = new Chart(ctx, {
+                    type: 'bar',
+                    data: chartData,
+                    options: clonedOptions,
+                });
             });
         },
     },

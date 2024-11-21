@@ -1,4 +1,4 @@
-/* eslint-disable */ 
+/* eslint-disable */
 <template>
     <div id="app" class="dashboard">
         <Sidebar @navigate="currentSection = $event" />
@@ -20,7 +20,7 @@ export default {
         Sidebar,
         Topbar,
         DashboardComponent,
-        OfertasAdminComponent   
+        OfertasAdminComponent
     },
     data() {
         return {
@@ -38,10 +38,9 @@ export default {
 }
 
 .main-content {
-  flex-grow: 1;
-  background-color: #f8f9fa;
-  padding-top: 1.5em;
-  overflow-y: auto; /* Permite desplazamiento vertical si el contenido excede */
+    flex-grow: 1;
+    background-color: #f8f9fa;
+    overflow-y: auto;
+    /* Permite desplazamiento vertical si el contenido excede */
 }
-
 </style>

@@ -67,8 +67,8 @@ export default {
                         {
                             label: 'Ingresos (Bs)',
                             data: this.data,
-                            backgroundColor: 'rgba(75, 192, 192, 0.2)',
-                            borderColor: 'rgba(75, 192, 192, 1)',
+                            backgroundColor: 'rgba(255, 153, 0, 0.2)',
+                            borderColor: 'rgba(255, 153, 0, 1)',
                             borderWidth: 2,
                             fill: true,
                         },
@@ -104,7 +104,7 @@ export default {
                         y: {
                             title: {
                                 display: true,
-                                text: 'Ingresos ($)',
+                                text: 'Ingresos (Bs)',
                             },
                         },
                     },

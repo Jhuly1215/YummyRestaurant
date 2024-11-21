@@ -41,13 +41,12 @@ export default {
 <style scoped>
 .sidebar {
     width: 250px;
-    background-color: #FE9900;
+    background: linear-gradient(180deg, #ff9900, #ffcc00);
     color: white;
     padding: 20px;
     display: flex;
     flex-direction: column;
     height: 100%;
-    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
     animation: slideInFromLeft 1s ease-out;
 }
 
@@ -85,10 +84,14 @@ li:hover {
 }
 
 li.active {
-  background-color: #A16F23; /* Color para la opción seleccionada */
-  font-weight: bold; /* Resalta el texto */
-  border-left: 4px solid white; /* Indicador visual adicional */
-  transform: translateX(0); /* Evita el movimiento al pasar el mouse */
+    background-color: #A16F23;
+    /* Color para la opción seleccionada */
+    font-weight: bold;
+    /* Resalta el texto */
+    border-left: 4px solid white;
+    /* Indicador visual adicional */
+    transform: translateX(0);
+    /* Evita el movimiento al pasar el mouse */
 }
 
 li:nth-child(1) {

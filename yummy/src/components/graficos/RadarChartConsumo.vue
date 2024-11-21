@@ -1,6 +1,11 @@
 <template>
     <div>
-        <canvas ref="chartCanvas"></canvas>
+        <div v-if="data && data.length > 0">
+            <canvas ref="chartCanvas"></canvas>
+        </div>
+        <div v-else>
+            <p>No hay datos disponibles para esta fecha.</p>
+        </div>
     </div>
 </template>
 
@@ -40,6 +45,15 @@ export default {
     watch: {
         data: {
             handler(newData) {
+                if (!newData || newData.length === 0) {
+                    console.warn('Datos vacíos detectados.');
+                    if (this.chart) {
+                        this.chart.destroy(); // Destruye el gráfico existente
+                        this.chart = null; // Limpia la referencia
+                    }
+                    return;
+                }
+
                 if (this.chart) {
                     this.chart.data.labels = newData.map(item => item.x); // Actualiza etiquetas
                     this.chart.data.datasets[0].data = newData.map(item => item.y); // Actualiza datos
@@ -60,43 +74,52 @@ export default {
                 const dataPoint = this.data.find((item) => item.x == hora); // Busca si existe un dato para la hora
                 return dataPoint ? dataPoint.y : 0; // Usa el dato encontrado o 0 si no hay datos
             });
+
             if (!this.data || this.data.length === 0) {
+                console.warn('No hay datos para crear el gráfico.');
                 return;
             }
-            const ctx = this.$refs.chartCanvas.getContext('2d');
-            this.chart = new Chart(ctx, {
-                type: 'radar', // Tipo de gráfico
-                data: {
-                    labels: labels,// Horas (0-23)
-                    datasets: [
-                        {
-                            label: 'Consumo por Hora',
-                            data: defaultData, // Valores de consumo
-                            backgroundColor: 'rgba(75, 192, 192, 0.2)',
-                            borderColor: 'rgba(75, 192, 192, 1)',
-                            pointBackgroundColor: 'rgba(75, 192, 192, 1)',
+
+            this.$nextTick(() => {
+                const ctx = this.$refs.chartCanvas.getContext('2d');
+                if (!ctx) {
+                    console.error('No se pudo obtener el contexto del canvas.');
+                    return;
+                }
+                this.chart = new Chart(ctx, {
+                    type: 'radar', // Tipo de gráfico
+                    data: {
+                        labels: labels,// Horas (0-23)
+                        datasets: [
+                            {
+                                label: 'Consumo por Hora',
+                                data: defaultData, // Valores de consumo
+                                backgroundColor: 'rgba(255, 153, 0, 0.2)',
+                                borderColor: 'rgba(255, 153, 0, 1)',
+                                pointBackgroundColor: 'rgba(255, 153, 0, 1)',
+                            },
+                        ],
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                display: true,
+                            },
+                            title: {
+                                display: true,
+                                text: this.chartTitle,
+                            },
                         },
-                    ],
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: {
-                            display: true,
-                        },
-                        title: {
-                            display: true,
-                            text: this.chartTitle,
+                        scales: {
+                            r: {
+                                beginAtZero: true,
+                            },
                         },
                     },
-                    scales: {
-                        r: {
-                            beginAtZero: true,
-                        },
-                    },
-                },
-            });
+                });
+            })
         },
     },
 };
