@@ -3,31 +3,49 @@ const sequelize = require('../../config/db');
 
 // Crear una nueva reserva
 exports.crearReserva = async (req, res) => {
-    const { idusuario, idmesa, fecha, hora, estado } = req.body; // Extraer datos del body
+    const { idusuario, idmesa, fecha, hora, estado } = req.body;
     console.log("Datos recibidos para crear reserva:", req.body);
-    // Validar que todos los campos requeridos estén presentes
+  
     if (!idusuario || !idmesa || !fecha || !hora || estado === undefined) {
-        return res.status(400).json({ error: 'Todos los campos son obligatorios' });
+      return res.status(400).json({ error: "Todos los campos son obligatorios" });
     }
-
+  
     try {
-        // Ejecutar la consulta para crear la reserva
-        const nuevaReserva = await sequelize.query(
-            `INSERT INTO reserva (idusuario, idmesa, fecha, hora, estado)
-             VALUES (:idusuario, :idmesa, :fecha, :hora, :estado)`,
-            {
-                replacements: { idusuario, idmesa, fecha, hora, estado },
-                type: sequelize.QueryTypes.INSERT,
-            }
-        );
-
-        // Responder con éxito
-        res.status(201).json({ message: 'Reserva creada exitosamente', data: nuevaReserva });
+      // Verificar si ya existe una reserva para la misma mesa, fecha y hora
+      const reservaExistente = await sequelize.query(
+        `SELECT * 
+         FROM reserva
+         WHERE idmesa = :idmesa
+         AND fecha = :fecha
+         AND hora = :hora
+         AND estado = 1`,
+        {
+          replacements: { idmesa, fecha, hora },
+          type: sequelize.QueryTypes.SELECT,
+        }
+      );
+  
+      if (reservaExistente.length > 0) {
+        return res.status(409).json({ error: "Ya existe una reserva para esta mesa en la fecha y hora especificadas." });
+      }
+  
+      // Insertar la nueva reserva si no existe conflicto
+      const nuevaReserva = await sequelize.query(
+        `INSERT INTO reserva (idusuario, idmesa, fecha, hora, estado)
+         VALUES (:idusuario, :idmesa, :fecha, :hora, :estado)`,
+        {
+          replacements: { idusuario, idmesa, fecha, hora, estado },
+          type: sequelize.QueryTypes.INSERT,
+        }
+      );
+  
+      res.status(201).json({ message: "Reserva creada exitosamente", data: nuevaReserva });
     } catch (error) {
-        console.error("Error al crear la reserva:", error);
-        res.status(500).json({ error: 'Error al crear la reserva' });
+      console.error("Error al crear la reserva:", error);
+      res.status(500).json({ error: "Error al crear la reserva" });
     }
-};
+  };
+  
 
 
 // Obtener todas las reservas
