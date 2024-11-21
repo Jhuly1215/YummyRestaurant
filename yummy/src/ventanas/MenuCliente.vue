@@ -1,7 +1,5 @@
 <template>
   <div>
-    <NavbarComponent />
-    <CarouselComponent />
     
     <!-- Escucha el evento y almacena el ID de la categoría seleccionada -->
     <FiltroCategorias @categoriaSeleccionada="categoriaSeleccionada = $event" />
@@ -19,24 +17,17 @@
         />
       </div>
     </div>
-    <FooterComponent />
   </div>
 </template>
 
 <script>
 import axios from 'axios';
-import NavbarComponent from '@/components/Navbar.vue';
-import FooterComponent from '@/components/Footer.vue';
 import CardMenu from '@/components/CardMenu.vue';
-import CarouselComponent from '@/components/CarouselComponent.vue';
 import FiltroCategorias from '@/components/FiltroCategorias.vue';
 
 export default {
   name: 'MenuCliente',
   components: {
-    NavbarComponent,
-    FooterComponent,
-    CarouselComponent,
     CardMenu,
     FiltroCategorias,
   },
