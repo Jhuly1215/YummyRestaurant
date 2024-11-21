@@ -7,6 +7,7 @@
             <li>Usuarios</li>
             <li @click="navigate('OfertasAdminComponent')">Ofertas</li>
             <li @click="navigate('PlatillosAdminComponent')">Platillos</li>
+            <li @click="navigate('JReservasAdminComponent')">Reservas</li>
         </ul>
     </div>
 </template>

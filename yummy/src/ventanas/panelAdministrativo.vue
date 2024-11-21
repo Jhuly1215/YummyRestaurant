@@ -16,6 +16,7 @@ import Section1 from '../ventanas/Section1Page.vue';
 import Section2 from '../ventanas/Section2Page.vue';
 import OfertasAdminComponent from '../ventanas/OfertasAdminComponent.vue'
 import PlatillosAdminComponent from '@/components/PlatillosAdminComponent.vue';
+import JReservasAdminComponent from '@/ventanas/reservas/Reservas.vue';
 
 export default {
     name: "PanelAdministrativo",
@@ -25,7 +26,8 @@ export default {
         Section1,
         Section2,
         OfertasAdminComponent ,
-        PlatillosAdminComponent 
+        PlatillosAdminComponent,
+        JReservasAdminComponent, 
     },
     data() {
         return {
