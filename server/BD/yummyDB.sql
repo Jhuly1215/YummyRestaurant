@@ -21,7 +21,10 @@ CREATE TABLE detalle_pedido (
 -- Table: mesa
 CREATE TABLE mesa (
     idmesa SERIAL PRIMARY KEY,
-    capacidad int
+    capacidad int,
+    nombre varchar(255),
+    posx real,
+    posy real
 );
 
 -- Table: oferta
