@@ -7,6 +7,7 @@
             <a><router-link to="/panelAdministrativo/ofertas" active-class="active-link" class="sidebar-link">Ofertas</router-link></a>
             <a><router-link to="/panelAdministrativo/platillos" active-class="active-link" class="sidebar-link">Platillos</router-link></a>
             <a><router-link to="/panelAdministrativo/reservas" active-class="active-link" class="sidebar-link">Reservas</router-link></a>
+            <a><router-link to="/panelAdministrativo/mapa" active-class="active-link" class="sidebar-link">Mapa Interactivo</router-link></a>
         </div>
     </div>
 </template>

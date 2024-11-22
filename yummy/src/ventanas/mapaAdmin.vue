@@ -3,13 +3,6 @@
 <template>
   <div>
       <h1>Mapa Interactivo de Mesas</h1>
-      <div v-if="mostrarMesa" class="row">
-        <div class="card">
-            <h4>{{mesaSeleccionada.nombre}}</h4>
-            <p>Capacidad: {{ mesaSeleccionada.capacidad }}</p>
-            <button class="btn-reservar" @click="abrirModalReserva">Reservar</button>
-        </div>
-    </div>
       <button v-if="rol == 2" @click="mostrarFormulario('añadir')">Añadir Mesa</button>
       <svg ref="mapa" width="800" height="600"></svg>
       <div id="info-mesa">{{ infoMesa }}</div>
@@ -66,7 +59,7 @@ export default {
         return {
             mesas: [],
             infoMesa: '',
-            mostrarMesa: false,
+
             clickTimeout: null,
             mostrarModal: false,
             mostrarModalConfirmacion: false,
@@ -152,14 +145,10 @@ export default {
                 .text(d => d.nombre);  // Muestra el nombre de la mesa
         },
         abrirModalNuevaReserva(mesa) {
-            this.mostrarMesa = true;
+            this.modalNuevaReservaVisible = true;
             this.mesaSeleccionada = mesa;
             // Puedes pasar información de la mesa seleccionada al modal, si es necesario
             console.log(`Abriendo modal de reserva para la mesa: ${mesa.nombre}`);
-        },
-        abrirModalReserva() {
-            this.modalNuevaReservaVisible = true;
-
         },
 
 
@@ -332,14 +321,6 @@ body {
   min-height: 100vh;
   user-select: none;
 }
-.row {
-    display: flex; /* Activa el uso de flexbox */
-    justify-content: center; /* Centra horizontalmente */
-    align-items: center; /* Centra verticalmente */
-    height: 30dvh;
-    background-color: #f5f5f5; /* Fondo opcional */
-}
-
 
 .card {
   border-radius: 10px;
@@ -378,27 +359,6 @@ body {
 .card:hover{
     color: #ffffff;
 
-}
-.btn-reservar {
-    background-color: #c0992e; /* Color verde */
-    color: white;
-    padding: 10px 20px;
-    border: none;
-    border-radius: 5px;
-    font-size: 16px;
-    cursor: pointer;
-    transition: background-color 0.3s ease, transform 0.2s ease;
-}
-
-/* Efecto hover */
-.btn-reservar:hover {
-    background-color: #a07545; /* Verde más oscuro */
-    transform: scale(1.05); /* Aumenta ligeramente el tamaño */
-}
-
-/* Efecto de clic */
-.btn-reservar:active {
-    transform: scale(0.95); /* Reduce el tamaño ligeramente */
 }
 
 .card p{
