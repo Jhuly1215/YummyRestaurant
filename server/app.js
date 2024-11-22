@@ -18,7 +18,7 @@ const mesasRoutes = require('./src/api/mesas/mesasRoutes');
 const platillosRoutes = require('./src/api/platillos/platillo.routes');
 const categoriasRoutes = require('./src/api/categorias/categoria.routes');
 const reservaRoutes = require('./src/api/reservas/reservas.routes');
-
+const calificacionRoutes = require('./src/api/calificacion/calificacion.routes');
 
 
 
@@ -30,6 +30,8 @@ app.use('/api/auth', authRoutes);
 app.use('/api/reservas', reservaRoutes);
 app.use('/api/actividad', actividadRoutes);
 app.use('/api/mesas', mesasRoutes);
+app.use('/api/calificaciones', calificacionRoutes);
+
 
 
 sequelize.sync()
