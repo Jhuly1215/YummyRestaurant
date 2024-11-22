@@ -8,8 +8,15 @@ import Recupera from '@/ventanas/recupera.vue';
 import CambioPass from '@/ventanas/cambioPassword.vue';
 import Ofertas from '@/ventanas/ofertasPage.vue';
 import MapaInteractivo from '@/ventanas/mapaInteractivo.vue';
+import MenuCliente from '@/ventanas/MenuCliente.vue'
+import TemporalCalificacion from '@/ventanas/temporalCalificacion.vue'
 
+//para el administrador
 
+import OfertasAdminComponent from '../ventanas/OfertasAdminComponent.vue'
+import PlatillosAdminComponent from '@/components/PlatillosAdminComponent.vue';
+import JReservasAdminComponent from '@/ventanas/reservas/Reservas.vue';
+import DashboardComponent from '../ventanas/dashboardComponent.vue';
 
 const router = createRouter({
   history: createWebHistory(),
@@ -45,14 +52,14 @@ const router = createRouter({
       component: Ofertas,
     },
     {
-      path: '/panelAdministrativo',
-      name: 'PanelAdministrativo',
-      component: PanelAdministrativo,
+      path: '/menu',
+      name: 'Menu',
+      component: MenuCliente,
     },
-      {
-        path: '/recupera',
-        name: 'Recupera',
-        component: Recupera,
+    {
+      path: '/recupera',
+      name: 'Recupera',
+      component: Recupera,
     },
     {
       path: '/cambioPass/:id',
@@ -64,13 +71,48 @@ const router = createRouter({
       name: 'Mapa',
       component: MapaInteractivo,
     },
+    {
+      path: '/temporal',
+      name: 'Calificaciones',
+      component: TemporalCalificacion,
+    },
+
+    //Para el Panel Administrativo
+    {
+      path: '/panelAdministrativo',
+      name: 'PanelAdministrativo',
+      component: PanelAdministrativo,
+      //meta: { requiresAuth: true }, // Requiere autenticación
+      children: [
+        {
+          path: 'section1', // Ruta base de panel administrativo
+          name: 'Dashboard',
+          component: DashboardComponent, // Componente del Dashboard
+        },
+        {
+          path: 'ofertas',
+          name: 'AdminOfertas',
+          component: OfertasAdminComponent, // Gestión de ofertas
+        },
+        {
+          path: 'platillos',
+          name: 'AdminPlatillos',
+          component: PlatillosAdminComponent, // Gestión de platillos
+        },
+        {
+          path: 'reservas',
+          name: 'AdminReservas',
+          component: JReservasAdminComponent, // Gestión de reservas
+        },
+      ],
+    },
   ],
 });
 
 
 router.beforeEach((to, from, next) => {
   if (to.meta.requiresAuth) {
-    const token = localStorage.getItem('token'); 
+    const token = localStorage.getItem('token');
     if (!token) {
       next({ name: 'LogIn' });
     } else {

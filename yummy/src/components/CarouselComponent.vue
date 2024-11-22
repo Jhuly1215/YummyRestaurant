@@ -72,7 +72,7 @@ export default {
           description: "Experimenta los mejores sabores."
         },
         {
-          src: "https://termosyeti.com/wp-content/uploads/2023/10/bebidas-alcoholicas.jpg",
+          src: "https://i.pinimg.com/1200x/41/56/6e/41566ee1e43c46ca0db336a4b0114d73.jpg",
           alt: "Imagen 3",
           title: "La bebida perfecta para cada ocasión.",
           description: "Bebidas refrescantes, sofisticadas y siempre listas para elevar tu momento. ¡Encuentra tu favorita!"

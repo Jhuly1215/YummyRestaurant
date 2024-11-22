@@ -1,4 +1,3 @@
-
 // src/api/platillo.controller.js
 const sequelize = require('../../config/db');
 
@@ -14,7 +13,7 @@ exports.crearPlatillo = async (req, res) => {
                 replacements: { nombre, descripcion, precio, idCategoria, imagen },
                 type: sequelize.QueryTypes.INSERT,
             }
-        );        
+        );
         res.status(201).json({ message: 'Platillo creado exitosamente' });
     } catch (error) {
         console.error("Error al crear el platillo:", error);

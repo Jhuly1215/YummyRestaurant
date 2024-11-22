@@ -1,31 +1,20 @@
 /* eslint-disable */
 <template>
     <div id="app" class="dashboard">
-        <Sidebar @navigate="currentSection = $event" />
+        <Sidebar />
         <div class="main-content">
-            <component :is="currentSection" />
+            <router-view />
         </div>
     </div>
 </template>
 
 <script>
 import Sidebar from '../components/SidebarComponent.vue';
-import Topbar from '../components/TopbarComponent.vue';
-import DashboardComponent from '../ventanas/dashboardComponent.vue';
-import OfertasAdminComponent from '../ventanas/OfertasAdminComponent.vue'
 
 export default {
     name: "PanelAdministrativo",
     components: {
         Sidebar,
-        Topbar,
-        DashboardComponent,
-        OfertasAdminComponent
-    },
-    data() {
-        return {
-            currentSection: 'DashboardComponent',
-        };
     },
 };
 </script>

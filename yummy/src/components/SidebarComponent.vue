@@ -2,21 +2,16 @@
 <template>
     <div class="sidebar">
         <h2 class="logo">Yummy</h2>
-        <ul>
-            <li :class="{ active: selectedSection === 'DashboardComponent' }" @click="navigate('DashboardComponent')">
-                Dashboard
-            </li>
-            <li :class="{ active: selectedSection === 'Usuarios' }" @click="navigate('Usuarios')">
-                Usuarios
-            </li>
-            <li :class="{ active: selectedSection === 'OfertasAdminComponent' }"
-                @click="navigate('OfertasAdminComponent')">
-                Ofertas
-            </li>
-            <li :class="{ active: selectedSection === 'Platillos' }" @click="navigate('Platillos')">
-                Platillos
-            </li>
-        </ul>
+        <div class="opciones">
+            <a><router-link to="/panelAdministrativo/section1" active-class="active-link"
+                    class="sidebar-link">Dashboard</router-link></a>
+            <a><router-link to="/panelAdministrativo/ofertas" active-class="active-link"
+                    class="sidebar-link">Ofertas</router-link></a>
+            <a><router-link to="/panelAdministrativo/platillos" active-class="active-link"
+                    class="sidebar-link">Platillos</router-link></a>
+            <a><router-link to="/panelAdministrativo/reservas" active-class="active-link"
+                    class="sidebar-link">Reservas</router-link></a>
+        </div>
     </div>
 </template>
 
@@ -80,7 +75,48 @@ li:hover {
     transform: translateX(5px);
     /* Mueve ligeramente hacia la derecha */
     box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.3);
+
     /* Efecto glow */
+    .opciones {
+        display: flex;
+        flex-direction: column;
+    }
+}
+
+.sidebar-link {
+    display: flex;
+    align-items: center;
+    position: relative;
+    padding: 10px 20px;
+    color: white;
+    text-decoration: none;
+    font-size: 1rem;
+    transition: background-color 0.3s ease;
+}
+
+
+.sidebar-link:hover {
+    background-color: #a16f23;
+}
+
+.active-link {
+    background-color: #a16f23;
+    font-weight: bold;
+}
+
+/* Triángulo decorativo en la opción activa */
+.active-link::after {
+    content: '';
+    position: absolute;
+    right: -10px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 0;
+    height: 0;
+    border-style: solid;
+    border-width: 10px 0 10px 10px;
+    border-color: transparent transparent transparent #a16f23;
+    /* Triángulo marrón */
 }
 
 li.active {
