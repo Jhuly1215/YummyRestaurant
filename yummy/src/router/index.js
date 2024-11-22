@@ -7,12 +7,14 @@ import PanelAdministrativo from '@/ventanas/panelAdministrativo.vue';
 import Recupera from '@/ventanas/recupera.vue';
 import CambioPass from '@/ventanas/cambioPassword.vue';
 import Ofertas from '@/ventanas/ofertasPage.vue';
-import MapaInteractivo from '@/ventanas/mapaInteractivo.vue';
+import MapaInteractivo1 from '@/ventanas/mapaInteractivo.vue';
+
 import MenuCliente from '@/ventanas/MenuCliente.vue'
 import TemporalCalificacion from '@/ventanas/temporalCalificacion.vue'
 
 //para el administrador
 
+import MapaInteractivo2 from '@/ventanas/mapaAdmin.vue';
 import OfertasAdminComponent from '../ventanas/OfertasAdminComponent.vue'
 import PlatillosAdminComponent from '@/components/PlatillosAdminComponent.vue';
 import JReservasAdminComponent from '@/ventanas/reservas/Reservas.vue';
@@ -68,8 +70,8 @@ const router = createRouter({
     },
     {
       path: '/mapa',
-      name: 'Mapa',
-      component: MapaInteractivo,
+      name: 'MapaUsuario',
+      component: MapaInteractivo1,
     },
     {
       path: '/temporal',
@@ -77,49 +79,55 @@ const router = createRouter({
       component: TemporalCalificacion,
     },
 
-    //Para el Panel Administrativo
-    {
-      path: '/panelAdministrativo',
-      name: 'PanelAdministrativo',
-      component: PanelAdministrativo,
-      //meta: { requiresAuth: true }, // Requiere autenticación
-      children: [
-        {
-          path: 'section1', // Ruta base de panel administrativo
-          name: 'Dashboard',
-          component: DashboardComponent, // Componente del Dashboard
-        },
-        {
-          path: 'ofertas',
-          name: 'AdminOfertas',
-          component: OfertasAdminComponent, // Gestión de ofertas
-        },
-        {
-          path: 'platillos',
-          name: 'AdminPlatillos',
-          component: PlatillosAdminComponent, // Gestión de platillos
-        },
-        {
-          path: 'reservas',
-          name: 'AdminReservas',
-          component: JReservasAdminComponent, // Gestión de reservas
-        },
-      ],
-    },
+   {
+    path: '/panelAdministrativo',
+    name: 'PanelAdministrativo',
+    component: PanelAdministrativo,
+    children: [
+      {
+        path: 'section1',
+        name: 'Dashboard',
+        component: DashboardComponent,
+      },
+      {
+        path: 'ofertas',
+        name: 'AdminOfertas',
+        component: OfertasAdminComponent,
+      },
+      {
+        path: 'platillos',
+        name: 'AdminPlatillos',
+        component: PlatillosAdminComponent,
+      },
+      {
+        path: 'reservas',
+        name: 'AdminReservas',
+        component: JReservasAdminComponent,
+      },
+      {
+        path: 'mapa',
+        name: 'MapaAdmin',
+        component: MapaInteractivo2,
+      },
+    ],
+  },
   ],
 });
-
-
 router.beforeEach((to, from, next) => {
-  if (to.meta.requiresAuth) {
-    const token = localStorage.getItem('token');
-    if (!token) {
-      next({ name: 'LogIn' });
-    } else {
-      next();
-    }
-  } else {
+  const token = localStorage.getItem('token');
+  const rol = parseInt(localStorage.getItem('rol'), 10);
+
+  if (to.name === 'PanelAdministrativo' && (!token || rol !== 2)) {
+    next('/iniciarsesion'); // Redirige al inicio de sesión si no es admin
+  } else if (to.name === 'Reservas' && !token) {
+    next('/iniciarsesion'); // Redirige al inicio de sesión si no está logueado
+  } else if (to.name === 'MapaAdmin' && (!token || rol !== 2)) {
+    next('/iniciarsesion'); // Protege el mapa del admin
+  }else if (to.name === 'MapaUsuario' && (!token || rol !== 2)) {
+    next('/iniciarsesion'); // Protege el mapa del admin
+  }   else {
     next();
   }
 });
+
 export default router;
