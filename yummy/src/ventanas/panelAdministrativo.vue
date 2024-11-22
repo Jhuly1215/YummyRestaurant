@@ -1,9 +1,8 @@
-/* eslint-disable */ 
+/* eslint-disable */
 <template>
     <div id="app" class="dashboard">
         <Sidebar />
-            <div class="main-content">
-            <Topbar />
+        <div class="main-content">
             <router-view />
         </div>
     </div>
@@ -11,20 +10,11 @@
 
 <script>
 import Sidebar from '../components/SidebarComponent.vue';
-import Topbar from '../components/TopbarComponent.vue';
-
 
 export default {
     name: "PanelAdministrativo",
     components: {
         Sidebar,
-        Topbar,
-
-    },
-    data() {
-        return {
-            currentSection: 'Section1',
-        };
     },
 };
 </script>
@@ -33,10 +23,13 @@ export default {
 .dashboard {
     display: flex;
     height: 100vh;
+    padding-bottom: 0;
 }
 
 .main-content {
     flex-grow: 1;
     background-color: #f8f9fa;
+    overflow-y: auto;
+    /* Permite desplazamiento vertical si el contenido excede */
 }
 </style>

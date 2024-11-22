@@ -7,12 +7,20 @@ const Oferta = sequelize.define('Oferta', {
     primaryKey: true,
     autoIncrement: true,
   },
-  descripcion: {
+  src: {
     type: DataTypes.STRING(100),
+    allowNull: false,
+  },
+  titulo: {
+    type: DataTypes.STRING(70),
     allowNull: false,
   },
   requerimiento: {
     type: DataTypes.STRING(70),
+    allowNull: false,
+  },
+  descripcion: {
+    type: DataTypes.STRING(100),
     allowNull: false,
   },
   fecha_inicio: {
