@@ -13,7 +13,7 @@ exports.crearPlatillo = async (req, res) => {
                 replacements: { nombre, descripcion, precio, idCategoria, imagen },
                 type: sequelize.QueryTypes.INSERT,
             }
-        );        
+        );
         res.status(201).json({ message: 'Platillo creado exitosamente' });
     } catch (error) {
         console.error("Error al crear el platillo:", error);
@@ -85,4 +85,3 @@ exports.eliminarPlatillo = async (req, res) => {
         res.status(500).json({ error: 'Error al eliminar el platillo', details: error.message });
     }
 };
-

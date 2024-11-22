@@ -1,17 +1,15 @@
 <!-- CardComponent.vue -->
 <template>
     <div class="card-container">
-        <a href="/" class="hero-image-container">
-            <img class="hero-image" :src="imageSrc"
+        <img class="hero-image" :src="imageSrc"
                 alt="Spinning glass cube" />
-        </a>
         <main class="main-content">
             <h1><a href="#">{{ title }}</a></h1>
             <p>{{ requirement }}, aplicando esta oferta en tus pedidos obtendras un {{ discount }}% de descuento</p>
             <div class="flex-row">
                 <div class="coin-base">
                     <img src="https://i.postimg.cc/T1F1K0bW/Ethereum.png" alt="Ethereum" class="small-image" />
-                    <h2>Hasta {{ date }}</h2>
+                    <h2>A partir del {{ dateInit }}</h2>
                 </div>
                 <div class="time-left">
                     <img src="https://i.postimg.cc/prpyV4mH/clock-selection-no-bg.png" alt="clock"
@@ -38,18 +36,26 @@ export default {
             type: String,
             required: true
         },
+        description: {
+            type: String,
+            required: true
+        },
         discount: {
             type: Number,
             required: true
         },
-        date: {
+        dateInit: {
+            type: String,
+            required: true
+        },
+        dateEnd: {
             type: String,
             required: true
         }
     },
     computed: {
         daysLeft() {
-        const end = new Date(this.endDate);
+        const end = new Date(this.dateEnd);
         const now = new Date();
         const diffTime = end - now;
         const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
@@ -113,6 +119,7 @@ span {
 
 .main-content {
     font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+    border-radius: 10px;
 }
 
 .card-container {
@@ -122,7 +129,8 @@ span {
     background-color: var(--var-card-dark);
     border-radius: 15px;
     padding: 2rem;
-    background-color: rgb(217, 221, 206);
+    background-color: rgb(232, 232, 232);
+    box-shadow: 0 20px 40px -14px rgba(0, 0, 0, 0.25);
 }
 
 .flex-row {
@@ -147,26 +155,6 @@ span {
 .hero-image-container {
     position: relative;
     display: block;
-}
-
-/* Hover Effect */
-.hero-image-container::after {
-    content: '';
-    background-image: url('https://i.postimg.cc/9MtT4GZY/view.png');
-    background-position: center;
-    background-repeat: no-repeat;
-    background-size: 5rem;
-    background-color: hsla(178, 100%, 50%, 0.3);
-    width: 100%;
-    height: 100%;
-    border-radius: 1rem;
-    position: absolute;
-    top: 0;
-    left: 0;
-    display: block;
-    z-index: 2;
-    opacity: 0;
-    transition: opacity 0.3s ease-out;
 }
 
 .hero-image-container:hover::after {

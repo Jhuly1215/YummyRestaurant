@@ -1,4 +1,4 @@
-/* eslint-disable */ 
+/* eslint-disable */
 <template>
     <div class="sidebar">
         <h2 class="logo">Yummy</h2>
@@ -12,11 +12,18 @@
     </div>
 </template>
 
+
 <script>
 export default {
     name: "SidebarComponent",
+    data() {
+        return {
+            selectedSection: 'DashboardComponent', // Define una sección predeterminada
+        };
+    },
     methods: {
         navigate(section) {
+            this.selectedSection = section;
             this.$emit('navigate', section);
         },
     },
@@ -26,55 +33,134 @@ export default {
 <style scoped>
 .sidebar {
     width: 250px;
-    background-color: #FE9900;
+    background: linear-gradient(180deg, #ff9900, #ffcc00);
     color: white;
     padding: 20px;
     display: flex;
     flex-direction: column;
+    height: 100%;
+    animation: slideInFromLeft 1s ease-out;
 }
 
 .logo {
     font-size: 1.5rem;
     font-weight: bold;
     margin-bottom: 20px;
+    opacity: 0;
+    animation: fadeIn 1s ease-in forwards;
+    /* Aparece con un desvanecimiento */
+    animation-delay: 0.3s;
 }
-.opciones {
-  display: flex;
-  flex-direction: column;
+
+ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+li {
+    padding: 10px 0;
+    cursor: pointer;
+    transition: transform 0.3s, background-color 0.3s, box-shadow 0.3s;
+    opacity: 0;
+    animation: fadeIn 1s ease-in forwards;
+    /* Cada elemento aparece con retraso */
+}
+
+li:hover {
+    background: #A16F23;
+    transform: translateX(5px);
+    /* Mueve ligeramente hacia la derecha */
+    box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.3);
+
+    /* Efecto glow */
+    .opciones {
+        display: flex;
+        flex-direction: column;
+    }
 }
 
 .sidebar-link {
-  display: flex;
-  align-items: center;
-  position: relative;
-  padding: 10px 20px;
-  color: white;
-  text-decoration: none;
-  font-size: 1rem;
-  transition: background-color 0.3s ease;
+    display: flex;
+    align-items: center;
+    position: relative;
+    padding: 10px 20px;
+    color: white;
+    text-decoration: none;
+    font-size: 1rem;
+    transition: background-color 0.3s ease;
 }
 
 
 .sidebar-link:hover {
-  background-color: #a16f23; 
+    background-color: #a16f23;
 }
 
 .active-link {
-  background-color: #a16f23; 
-  font-weight: bold;
+    background-color: #a16f23;
+    font-weight: bold;
 }
 
 /* Triángulo decorativo en la opción activa */
 .active-link::after {
-  content: '';
-  position: absolute;
-  right: -10px;
-  top: 50%;
-  transform: translateY(-50%);
-  width: 0;
-  height: 0;
-  border-style: solid;
-  border-width: 10px 0 10px 10px;
-  border-color: transparent transparent transparent #a16f23; /* Triángulo marrón */
+    content: '';
+    position: absolute;
+    right: -10px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 0;
+    height: 0;
+    border-style: solid;
+    border-width: 10px 0 10px 10px;
+    border-color: transparent transparent transparent #a16f23;
+    /* Triángulo marrón */
+}
+
+li.active {
+    background-color: #A16F23;
+    /* Color para la opción seleccionada */
+    font-weight: bold;
+    /* Resalta el texto */
+    border-left: 4px solid white;
+    /* Indicador visual adicional */
+    transform: translateX(0);
+    /* Evita el movimiento al pasar el mouse */
+}
+
+li:nth-child(1) {
+    animation-delay: 0.5s;
+}
+
+li:nth-child(2) {
+    animation-delay: 0.7s;
+}
+
+li:nth-child(3) {
+    animation-delay: 0.9s;
+}
+
+li:nth-child(4) {
+    animation-delay: 1.1s;
+}
+
+/* Keyframes para animaciones */
+@keyframes slideInFromLeft {
+    from {
+        transform: translateX(-100%);
+    }
+
+    to {
+        transform: translateX(0);
+    }
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
 }
 </style>

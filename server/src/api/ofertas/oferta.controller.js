@@ -2,23 +2,31 @@ const sequelize = require('../../config/db');
 
 // Crear una nueva oferta
 exports.crearOferta = async (req, res) => {
-    const { descripcion, requerimiento, fecha_inicio, fecha_fin, descuento, idPlato } = req.body;
-
     try {
+        const { titulo, requerimiento, descripcion, fecha_inicio, fecha_fin, descuento, idPlato } = req.body;
+        const src = req.file ? req.file.path : null; // Ruta relativa de la imagen
+
+        // Valida los datos requeridos
+        if (!titulo || !requerimiento || !descripcion || !fecha_inicio || !fecha_fin || !descuento || !idPlato || !src) {
+            return res.status(400).json({ error: "Todos los campos son requeridos." });
+        }
+
+        // Inserta la oferta en la base de datos
         await sequelize.query(
-            `INSERT INTO oferta (descripcion, requerimiento, fecha_inicio, fecha_fin, descuento, idPlato)
-         VALUES (:descripcion, :requerimiento, :fecha_inicio, :fecha_fin, :descuento, :idPlato)`,
+            `INSERT INTO oferta (src, titulo, requerimiento, descripcion, fecha_inicio, fecha_fin, descuento, idplato)
+         VALUES (:src, :titulo, :requerimiento, :descripcion, :fecha_inicio, :fecha_fin, :descuento, :idPlato)`,
             {
-                replacements: { descripcion, requerimiento, fecha_inicio, fecha_fin, descuento, idPlato },
+                replacements: { src, titulo, requerimiento, descripcion, fecha_inicio, fecha_fin, descuento, idPlato },
                 type: sequelize.QueryTypes.INSERT,
             }
         );
-        res.status(201).json({ message: 'Oferta creada exitosamente' });
     } catch (error) {
-        console.error(error); // Esto imprimirá el error completo en la consola
-        res.status(500).json({ error: 'Error al crear la oferta', details: error.message });
+        console.error("Error al crear la oferta mensaje backend:", error);
+        res.status(500).json({ error: "Error al crear la oferta backend", details: error.message });
     }
 };
+
+
 
 // Obtener todas las ofertas
 exports.obtenerOfertas = async (req, res) => {
@@ -37,15 +45,15 @@ exports.obtenerOfertas = async (req, res) => {
 // Actualizar una oferta
 exports.actualizarOferta = async (req, res) => {
     const { id } = req.params;
-    const { descripcion, requerimiento, fecha_inicio, fecha_fin, descuento, idPlato } = req.body;
+    const { src, titulo, requerimiento, descripcion, fecha_inicio, fecha_fin, descuento, idPlato } = req.body;
 
     try {
         const [actualizado] = await sequelize.query(
-            `UPDATE oferta SET descripcion = :descripcion, requerimiento = :requerimiento, 
-         fecha_inicio = :fecha_inicio, fecha_fin = :fecha_fin, descuento = :descuento, idPlato = :idPlato
-         WHERE idOferta = :id`,
+            `UPDATE oferta SET src = :src, titulo = :titulo, requerimiento = :requerimiento, descripcion = :descripcion, 
+            fecha_inicio = :fecha_inicio, fecha_fin = :fecha_fin, descuento = :descuento, idPlato = :idPlato
+            WHERE idOferta = :id`,
             {
-                replacements: { id, descripcion, requerimiento, fecha_inicio, fecha_fin, descuento, idPlato },
+                replacements: { id, src, titulo, requerimiento, descripcion, fecha_inicio, fecha_fin, descuento, idPlato },
                 type: sequelize.QueryTypes.UPDATE,
             }
         );

@@ -4,14 +4,14 @@
 
     <div class="main">
       <ul class="cards">
-        <FlipCardComponent v-for="oferta in ofertas" :key="oferta.idOferta"
-          :imageSrc="'https://d1csarkz8obe9u.cloudfront.net/posterpreviews/fast-food-restaurant-promotion-instagram-design-template-3c57e4999f03ed938f5255b37402bd63_screen.jpg?ts=1664730283'"
-          :title="oferta.descripcion" :requirement="oferta.requerimiento" :discount="oferta.descuento"
-          :date="oferta.fecha_inicio" />
+        <FlipCardComponent v-for="(oferta, index) in ofertasConRutaCompleta" :key="index" :imageSrc="oferta.srcCompleto"
+          :title="oferta.titulo" :requirement="oferta.requerimiento" :description="oferta.descripcion"
+          :discount="oferta.descuento" :dateInit="oferta.fecha_inicio" :dateEnd="oferta.fecha_fin" />
       </ul>
     </div>
   </div>
 </template>
+
 
 <script>
 import axios from 'axios';
@@ -32,6 +32,24 @@ export default {
   },
   mounted() {
     this.obtenerOfertas();
+  },
+  computed: {
+    ofertasValidas() {
+      return this.ofertas.filter(oferta => {
+        const now = new Date();
+        const fecha_inicio = new Date(oferta.fecha_inicio);
+        const fecha_fin = new Date(oferta.fecha_fin);
+        return fecha_inicio <= now && now <= fecha_fin;
+      });
+    },
+    ofertasConRutaCompleta() {
+      return this.ofertas.map((oferta) => {
+        return {
+          ...oferta,
+          srcCompleto: `http://localhost:5000/${oferta.src}`, // Ajusta la URL base según tu servidor
+        };
+      });
+    },
   },
   methods: {
     async obtenerOfertas() {
@@ -77,7 +95,8 @@ body {
   left: 50%;
   transform: translate(-50%, -50%);
   text-align: center;
-  width: 90%; /* Reduce ancho en pantallas pequeñas */
+  width: 90%;
+  /* Reduce ancho en pantallas pequeñas */
   color: white;
   opacity: 0;
   animation: fadeIn 3s ease-in-out forwards;
@@ -89,12 +108,14 @@ body {
   margin: 0 auto;
   margin-top: 75px;
   margin-bottom: 100px;
-  padding: 0 20px; /* Padding en ambos lados para pantallas pequeñas */
+  padding: 0 20px;
+  /* Padding en ambos lados para pantallas pequeñas */
 }
 
 .title-fade h1 {
   font-family: "EB Garamond";
-  font-size: 5rem; /* Tamaño de fuente más pequeño en pantallas pequeñas */
+  font-size: 5rem;
+  /* Tamaño de fuente más pequeño en pantallas pequeñas */
   text-shadow: 3px 3px 5px rgba(0, 0, 0, 0.7);
 }
 
@@ -104,7 +125,8 @@ body {
   list-style: none;
   margin: 0;
   padding: 0;
-  justify-content: center; /* Centra las tarjetas */
+  justify-content: center;
+  /* Centra las tarjetas */
 }
 
 .cards_item {
@@ -114,20 +136,24 @@ body {
 
 @media (min-width: 40rem) {
   .cards_item {
-    width: 50%; /* 2 columnas en pantallas medianas */
+    width: 50%;
+    /* 2 columnas en pantallas medianas */
   }
 }
 
 @media (min-width: 56rem) {
   .cards_item {
-    width: 33.3333%; /* 3 columnas en pantallas grandes */
+    width: 33.3333%;
+    /* 3 columnas en pantallas grandes */
   }
 }
 
 @media (max-width: 600px) {
+
   /* Ajustes para pantallas pequeñas */
   .title-fade h1 {
-    font-size: 3.5rem; /* Reduce el tamaño del título en pantallas pequeñas */
+    font-size: 3.5rem;
+    /* Reduce el tamaño del título en pantallas pequeñas */
   }
 
   .floating-button {
@@ -141,10 +167,12 @@ body {
   .carousel-component,
   .navbar-component,
   .footer-component {
-    padding: 10px; /* Reduce el padding para componentes en pantallas pequeñas */
+    padding: 10px;
+    /* Reduce el padding para componentes en pantallas pequeñas */
   }
 
-  .offers-table th, .offers-table td {
+  .offers-table th,
+  .offers-table td {
     padding: 5px;
     font-size: 0.9rem;
   }
@@ -159,7 +187,8 @@ hr {
 @keyframes fadeIn {
   from {
     opacity: 0;
-  }
+  } 
+
   to {
     opacity: 1;
   }
