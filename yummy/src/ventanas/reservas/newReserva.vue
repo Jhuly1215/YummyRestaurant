@@ -36,7 +36,8 @@
             <input type="text" id="mesa" v-model="reservaData.idmesa" required placeholder="Ingrese número de mesa" />
           </div>
   
-          <button type="submit" class="save-button">Guardar Reserva</button>
+          <button type="submit" class="save-button" :disabled="loading">{{ loading ? "Guardando..." : "Guardar Reserva" }}</button>
+          
         </form>
       </div>
     </div>
@@ -53,7 +54,8 @@
     emits: ['onClose', 'onSave'],
     setup(props, { emit }) {
       const error = ref(null);
-  
+      const loading = ref(false);
+      
       const reservaData = reactive({
         idusuario: "", // Campo inicial para ID del usuario
         fecha: "",
@@ -68,6 +70,11 @@
   
       // Guardar reserva
       const guardarReserva = async () => {
+        
+        if (loading.value) return;
+        loading.value = true;
+        console.log("Intentando guardar reserva");
+
           try {
               error.value = null;
 
@@ -108,24 +115,23 @@
 
               // Proceder a guardar la reserva
               const nuevaReserva = {
-                  idusuario: idusuario || 1, // Usar el usuario por defecto si no se especificó
+                  idusuario: idusuario || 1, 
                   idmesa,
                   fecha,
                   hora,
                   estado: 1, // Por defecto, pendiente
               };
 
-              const responseGuardar = await axios.post('/api/reservas', nuevaReserva);
-              if (responseGuardar.status === 201) {
-                  emit('onSave', responseGuardar.data.data);
-                  emit('onClose');
-              }
+              
 
               emit('onSave', nuevaReserva);
               emit('onClose');
           } catch (err) {
               console.error("Error al guardar la reserva:", err);
               error.value = "Ocurrió un error al guardar la reserva.";
+          }
+          finally {
+            loading.value = false; // Restablece el estado de carga
           }
       };
 
@@ -134,7 +140,7 @@
         emit('onClose');
       };
   
-      return { reservaData, guardarReserva, continuarSinUsuario, error, onClose };
+      return { reservaData, guardarReserva, continuarSinUsuario, error, onClose , loading};
     },
   };
   </script>
