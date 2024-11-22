@@ -204,3 +204,4 @@ ALTER TABLE usuario ADD CONSTRAINT usuarios_roles
     INITIALLY IMMEDIATE
 ;
 
+ALTER TABLE detalle_pedido ALTER COLUMN idreserva DROP NOT NULL;
