@@ -1,14 +1,13 @@
-  <template>
-    <div class="modal-overlay">
-      <div class="modal-content success-modal">
-        <div class="icon-container">
-          <span class="check-icon">✔</span>
-        </div>
-        <p class="success-message">{{ mensaje }}</p>
-        <button @click="onClose" class="accept-button">Aceptar</button>
+<template>
+  <div class="modal-overlay">
+    <div class="modal-content confirmation-modal">
+      <p class="confirmation-message">{{ mensaje }}</p>
+      <div class="button-container">
+        <button @click="onConfirm" class="confirm-button">Ok</button>
       </div>
     </div>
-  </template>
+  </div>
+</template>
 
 <script>
 export default {
@@ -19,10 +18,13 @@ export default {
       required: true,
     },
   },
-  emits: ["onClose"],
+  emits: ["onCancel", "onConfirm"],
   methods: {
-    onClose() {
-      this.$emit("onClose");
+    onCancel() {
+      this.$emit("onCancel");
+    },
+    onConfirm() {
+      this.$emit("onConfirm");
     },
   },
 };
@@ -42,33 +44,45 @@ export default {
   z-index: 1000;
 }
 
-.success-modal {
-  background: #ffab5e;
+.confirmation-modal {
+  background: #fffedc;
   border-radius: 10px;
   padding: 20px;
   text-align: center;
   width: 300px;
 }
 
-.icon-container {
-  margin-bottom: 10px;
-}
-
-.check-icon {
-  font-size: 50px;
-  color: white;
-}
-
-.success-message {
+.confirmation-message {
   font-size: 18px;
   font-weight: bold;
-  color: white;
+  color: #724a0e;
   margin-bottom: 20px;
 }
 
-.accept-button {
+.button-container {
+  display: flex;
+  justify-content: space-between;
+}
+
+.cancel-button {
   background: white;
   color: #ffab5e;
+  border: 2px solid #ffab5e;
+  padding: 10px 20px;
+  font-size: 16px;
+  font-weight: bold;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.cancel-button:hover {
+  background: #ffe0c2;
+}
+
+.confirm-button {
+  background: #ffab5e;
+  color: white;
   border: none;
   padding: 10px 20px;
   font-size: 16px;
@@ -78,7 +92,7 @@ export default {
   transition: 0.3s;
 }
 
-.accept-button:hover {
+.confirm-button:hover {
   background: #ffc486;
 }
 </style>

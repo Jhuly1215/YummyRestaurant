@@ -1,22 +1,15 @@
 <template>
   <div>
     <h2>Platillos</h2>
+    <ConfirmationModal 
+      v-if="modalVisible" 
+      :mensaje="`¿Seguro que desea eliminar el platillo ${platilloAEliminar.nombre}?`"
+      @onCancel="cerrarModal"
+      @onConfirm="eliminarPlatillo"
+    />
     <div class="table-container">
       <table class="table">
         <thead>
-          <!-- Fila de confirmación de eliminación -->
-          <tr 
-            v-if="idPlatilloSeleccionado === platilloAEliminar.idplato" 
-            class="confirm-row"
-          >
-            <td colspan="7">
-              <ConfirmacionEliminar
-                :nombrePlatillo="platilloAEliminar.nombre"
-                @confirmarEliminacion="eliminarPlatillo"
-                @cancelar="cancelarConfirmacion"
-              />
-            </td>
-          </tr>
           <tr>
             <th>Id</th>
             <th>Nombre</th>
@@ -62,7 +55,7 @@
               <button v-if="index !== filaEnEdicion" class="action-button edit-button" @click="seleccionarPlatilloParaEditar(index, platillo)">
                 <i class="fas fa-edit"></i>
               </button>
-              <button v-if="index !== filaEnEdicion" class="action-button delete-button" @click="mostrarConfirmacion(platillo)">
+              <button v-if="index !== filaEnEdicion" class="action-button delete-button" @click="mostrarModalEliminar(platillo)">
                 <i class="fas fa-trash"></i>
               </button>
               <!-- Botones de Guardar y Cancelar solo en la fila en edición -->
@@ -84,18 +77,19 @@
 
 <script>
 import axios from 'axios';
-import ConfirmacionEliminar from './ConfirmacionEliminar.vue';
+import ConfirmationModal from './ConfirmationModal.vue';
 
 export default {
   name: "PlatillosAdminComponent",
-  components: { ConfirmacionEliminar },
+  components: { ConfirmationModal },
   data() {
     return {
       platillos: [],
       filaEnEdicion: null,
       platilloEditado: {}, // Nuevo objeto para los datos de edición
       idPlatilloSeleccionado: null,
-      platilloAEliminar: {}
+      platilloAEliminar: {},
+      modalVisible: false,  // Controla si el modal se muestra
     };
   },
   mounted() {
@@ -142,6 +136,13 @@ export default {
       this.filaEnEdicion = null;
       this.platilloEditado = {}; // Limpia los cambios sin guardarlos
     },
+    mostrarModalEliminar(platillo) {
+      this.platilloAEliminar = platillo;
+      this.modalVisible = true;
+    },
+    cerrarModal() {
+      this.modalVisible = false;
+    },
     mostrarConfirmacion(platillo) {
       this.platilloAEliminar = platillo;
       this.idPlatilloSeleccionado = platillo.idplato;
@@ -154,11 +155,13 @@ export default {
       try {
         await axios.delete(`http://localhost:5000/api/platillos/${this.platilloAEliminar.idplato}`);
         this.platillos = this.platillos.filter(p => p.idplato !== this.platilloAEliminar.idplato);
-        this.cancelarConfirmacion();
+        this.cerrarModal();  // Cierra el modal después de eliminar
+        alert('Platillo eliminado correctamente');
       } catch (error) {
         console.error("Error al eliminar el platillo:", error);
+        alert('Error al eliminar el platillo');
       }
-    }
+    },
   }
 };
 </script>

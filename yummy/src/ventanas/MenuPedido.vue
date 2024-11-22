@@ -4,6 +4,7 @@
     <ListaProductosPedidos
       :cantidadesSeleccionadas="cantidadesSeleccionadas"
       :platillos="platillos"
+      @pedidoRealizado="reiniciarCantidades"
       @reiniciarCantidades="cantidadesSeleccionadas = {}"
     />
 
@@ -84,6 +85,9 @@ export default {
         ...this.cantidadesSeleccionadas,
         [idplato]: cantidad,
       };
+    },
+    reiniciarCantidades() {
+      this.cantidadesSeleccionadas = {};
     },
   },
 };

@@ -106,7 +106,8 @@ export default {
         console.error("Error al realizar el pedido:", error);
         alert("Hubo un error al realizar el pedido. Por favor, inténtelo nuevamente.");
       }
-    },
+    }
+
   },
 };
 </script>
