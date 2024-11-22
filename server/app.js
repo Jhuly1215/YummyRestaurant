@@ -21,6 +21,7 @@ const reservaRoutes = require('./src/api/reservas/reservas.routes');
 const pedidosRoutes = require('./src/api/pedidos/pedido.routes');
 const detalle_pedidoRoutes = require('./src/api/detalle_pedido/detalle_pedido.routes');
 const pagosRoutes = require('./src/api/pagos/pago.routes');
+const calificacionRoutes = require('./src/api/calificacion/calificacion.routes');
 
 
 
@@ -35,6 +36,8 @@ app.use('/api/mesas', mesasRoutes);
 app.use('/api/pedidos', pedidosRoutes);
 app.use('/api/detalle_pedido', detalle_pedidoRoutes);
 app.use('/api/pagos', pagosRoutes);
+app.use('/api/calificaciones', calificacionRoutes);
+
 
 
 sequelize.sync()
