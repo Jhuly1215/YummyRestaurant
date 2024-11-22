@@ -3,7 +3,14 @@ const express = require('express');
 const sequelize = require('./src/config/db');
 
 const cors = require('cors');
+const path = require("path");
 const app = express();
+
+// Servir la carpeta uploads
+app.use("/uploads", express.static(path.join(__dirname, "uploads")));
+
+// Middleware para JSON
+app.use(express.json());
 
 require('dotenv').config();
 app.use(cors());
@@ -11,6 +18,7 @@ app.use(express.json());
 
 
 const ofertasRoutes = require('./src/api/ofertas/oferta.routes');
+const platillosRoutes = require('./src/api/platillos/platillo.routes');
 const usuarioRoutes = require('./src/api/usuario/usuario.routes');
 const authRoutes = require('./src/api/autenticacion/authRoutes');
 const actividadRoutes = require('./src/api/usuario/actividadRoutes');
@@ -21,6 +29,7 @@ const reservaRoutes = require('./src/api/reservas/reservas.routes');
 const pedidosRoutes = require('./src/api/pedidos/pedido.routes');
 const detalle_pedidoRoutes = require('./src/api/detalle_pedido/detalle_pedido.routes');
 const pagosRoutes = require('./src/api/pagos/pago.routes');
+const dashboardRoutes = require('./src/api/dashboard/dashboard.routes');
 const calificacionRoutes = require('./src/api/calificacion/calificacion.routes');
 
 
@@ -36,6 +45,7 @@ app.use('/api/mesas', mesasRoutes);
 app.use('/api/pedidos', pedidosRoutes);
 app.use('/api/detalle_pedido', detalle_pedidoRoutes);
 app.use('/api/pagos', pagosRoutes);
+app.use('/api/dashboard', dashboardRoutes);
 app.use('/api/calificaciones', calificacionRoutes);
 
 

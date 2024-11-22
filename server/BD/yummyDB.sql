@@ -28,6 +28,7 @@ CREATE TABLE mesa (
 CREATE TABLE oferta (
     idoferta SERIAL PRIMARY KEY,
 	src varchar(120),
+    titulo varchar(70),
     requerimiento varchar(100),
     descripcion varchar(70),
     fecha_inicio date,
@@ -69,6 +70,7 @@ CREATE TABLE platillo (
 CREATE TABLE resenia (
     idresenia SERIAL PRIMARY KEY,
     puntuacion int NOT NULL,
+	fecha date NOT NULL,
     idusuario int,
     idplato int
 );
@@ -205,3 +207,4 @@ ALTER TABLE usuario ADD CONSTRAINT usuarios_roles
 ;
 
 ALTER TABLE detalle_pedido ALTER COLUMN idreserva DROP NOT NULL;
+;

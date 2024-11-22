@@ -16,10 +16,10 @@ import TemporalCalificacion from '@/ventanas/temporalCalificacion.vue'
 
 //para el administrador
 
-import Section1 from '../ventanas/Section1Page.vue';
 import OfertasAdminComponent from '../ventanas/OfertasAdminComponent.vue'
 import PlatillosAdminComponent from '@/components/PlatillosAdminComponent.vue';
 import JReservasAdminComponent from '@/ventanas/reservas/Reservas.vue';
+import DashboardComponent from '../ventanas/dashboardComponent.vue';
 
 const router = createRouter({
   history: createWebHistory(),
@@ -59,10 +59,10 @@ const router = createRouter({
       name: 'Menu',
       component: MenuCliente,
     },
-      {
-        path: '/recupera',
-        name: 'Recupera',
-        component: Recupera,
+    {
+      path: '/recupera',
+      name: 'Recupera',
+      component: Recupera,
     },
     {
       path: '/cambioPass/:id',
@@ -105,7 +105,7 @@ const router = createRouter({
         {
           path: 'section1', // Ruta base de panel administrativo
           name: 'Dashboard',
-          component: Section1, // Componente del Dashboard
+          component: DashboardComponent, // Componente del Dashboard
         },
         {
           path: 'ofertas',
@@ -130,7 +130,7 @@ const router = createRouter({
 
 router.beforeEach((to, from, next) => {
   if (to.meta.requiresAuth) {
-    const token = localStorage.getItem('token'); 
+    const token = localStorage.getItem('token');
     if (!token) {
       next({ name: 'LogIn' });
     } else {
