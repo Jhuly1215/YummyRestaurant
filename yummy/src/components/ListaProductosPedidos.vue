@@ -6,35 +6,34 @@
     <transition name="fade">
       <div v-if="isModalOpen" class="modal-overlay" @click.self="toggleModal">
         <div class="modal-content">
-          
-            <h2>Tu Pedido</h2>
-            <div class="table-container">
-              <table class="table">
-                <thead>
-                  <tr>
-                    <th>Platillo</th>
-                    <th>Precio</th>
-                    <th>Cantidad</th>
-                    <th>Subtotal</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr v-for="platillo in platillosSeleccionados" :key="platillo.idplato">
-                    <td>{{ platillo.nombre }}</td>
-                    <td>{{ platillo.precio }} Bs.</td>
-                    <td>{{ platillo.cantidad }}</td>
-                    <td>{{ platillo.subtotal }} Bs.</td>
-                  </tr>
-                </tbody>
-              </table>
-              <tfoot>
+          <h2>Tu Pedido</h2>
+          <div class="table-container">
+            <table class="table">
+              <thead>
                 <tr>
-                  <td colspan="3" style="text-align: right;"><strong>Total</strong></td>
-                  <td><strong>{{ total }} Bs.</strong></td>
+                  <th>Platillo</th>
+                  <th>Precio</th>
+                  <th>Cantidad</th>
+                  <th>Subtotal</th>
                 </tr>
-              </tfoot>
-
-            </div>
+              </thead>
+              <tbody>
+                <tr v-for="platillo in platillosSeleccionados" :key="platillo.idplato">
+                  <td>{{ platillo.nombre }}</td>
+                  <td>{{ platillo.precio }} Bs.</td>
+                  <td>{{ platillo.cantidad }}</td>
+                  <td>{{ platillo.subtotal }} Bs.</td>
+                </tr>
+              </tbody>
+            </table>
+            <tfoot>
+              <tr>
+                <td colspan="3" style="text-align: right;"><strong>Total</strong></td>
+                <td><strong>{{ total }} Bs.</strong></td>
+              </tr>
+            </tfoot>
+          </div>
+          <button class="close-button" @click="realizarPedido">Realizar pedido</button>
           <button class="close-button" @click="toggleModal">Cerrar</button>
         </div>
       </div>
@@ -43,6 +42,8 @@
 </template>
 
 <script>
+import axios from "axios";
+
 export default {
   name: "ListaProductosPedidos",
   props: {
@@ -58,8 +59,8 @@ export default {
   computed: {
     platillosSeleccionados() {
       return this.platillos
-        .filter(p => this.cantidadesSeleccionadas[p.idplato] > 0)
-        .map(p => ({
+        .filter((p) => this.cantidadesSeleccionadas[p.idplato] > 0)
+        .map((p) => ({
           ...p,
           cantidad: this.cantidadesSeleccionadas[p.idplato],
           subtotal: this.cantidadesSeleccionadas[p.idplato] * p.precio,
@@ -77,19 +78,36 @@ export default {
   methods: {
     toggleModal() {
       this.isModalOpen = !this.isModalOpen;
-      if (this.isModalOpen) {
-        const seleccionados = this.platillosSeleccionados.map(platillo => ({
-          id: platillo.idplato,
-          nombre: platillo.nombre,
-          precio: platillo.precio,
-          cantidad: platillo.cantidad,
-          subtotal: platillo.subtotal
-        }));
-        console.log("Productos seleccionados:", seleccionados);
+    },
+    async realizarPedido() {
+      if (this.platillosSeleccionados.length === 0) {
+        alert("Debe seleccionar productos primero");
+        return;
+      }
+
+      const pedido = {
+        fecha: new Date().toISOString().slice(0, 10), // Fecha actual en formato YYYY-MM-DD
+        hora: new Date().toTimeString().slice(0, 8), // Hora actual en formato HH:mm:ss
+        estado: 0, // Pedido en espera
+        idusuario: 3, // Usuario fijo por ahora
+        precio_total: this.total, // Total calculado
+        detalles: this.platillosSeleccionados.map(p => ({
+          idplato: p.idplato,
+          cantidad: p.cantidad,
+        })), // Detalles del pedido
+      };
+
+      try {
+        const response = await axios.post('http://localhost:5000/api/pedidos', pedido);
+        alert("Pedido realizado con éxito");
+        this.$emit("pedidoRealizado"); // Notifica al componente padre para reiniciar el estado
+        this.toggleModal(); // Cierra el modal
+      } catch (error) {
+        console.error("Error al realizar el pedido:", error);
+        alert("Hubo un error al realizar el pedido. Por favor, inténtelo nuevamente.");
       }
     },
   },
-
 };
 </script>
 

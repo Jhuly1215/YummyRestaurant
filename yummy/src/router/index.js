@@ -8,6 +8,8 @@ import Recupera from '@/ventanas/recupera.vue';
 import CambioPass from '@/ventanas/cambioPassword.vue';
 import Ofertas from '@/ventanas/ofertasPage.vue';
 import MapaInteractivo from '@/ventanas/mapaInteractivo.vue';
+import MenuCliente from '@/ventanas/MenuCliente.vue';
+import MenuPedido from '@/ventanas/MenuPedido.vue';
 
 
 
@@ -63,6 +65,16 @@ const router = createRouter({
       path: '/mapa',
       name: 'Mapa',
       component: MapaInteractivo,
+    },
+    {
+      path: '/menucliente',
+      name: 'MenuCliente',
+      component: MenuCliente,
+    },
+    {
+      path: '/menupedido',
+      name: 'MenuPedido',
+      component: MenuPedido,
     },
   ],
 });

@@ -1,0 +1,104 @@
+//src/api/pedido/pedido.controller.js
+const sequelize = require('../../config/db');
+
+exports.crearPedido = async (req, res) => {
+  const { fecha, hora, estado, idusuario, precio_total, detalles } = req.body;
+
+  if (!detalles || detalles.length === 0) {
+    return res.status(400).json({ error: "Debe seleccionar al menos un platillo." });
+  }
+
+  try {
+    const [result] = await sequelize.query(
+      `INSERT INTO pedido (fecha, hora, estado, idusuario, precio_total)
+       VALUES (:fecha, :hora, :estado, :idusuario, :precio_total) RETURNING idpedido`,
+      {
+        replacements: { fecha, hora, estado, idusuario, precio_total },
+        type: sequelize.QueryTypes.INSERT,
+      }
+    );
+
+    const idpedido = result.idpedido;
+
+    for (const detalle of detalles) {
+      await sequelize.query(
+        `INSERT INTO detalle_pedido (idplato, cantidad, idpedido, idreserva)
+         VALUES (:idplato, :cantidad, :idpedido, NULL)`,
+        {
+          replacements: { ...detalle, idpedido },
+          type: sequelize.QueryTypes.INSERT,
+        }
+      );
+    }
+
+    res.status(201).json({ message: "Pedido creado exitosamente", idpedido });
+  } catch (error) {
+    console.error("Error al crear el pedido:", error);
+    res.status(500).json({ error: "Error al crear el pedido" });
+  }
+};
+
+// Obtener todos los pedidos
+exports.obtenerPedidos = async (req, res) => {
+    try {
+        const pedidos = await sequelize.query(
+            `SELECT p.idpedido, p.fecha, p.hora, p.estado, p.precio_total, u.nombre AS usuario
+             FROM pedido p
+             JOIN usuario u ON p.idusuario = u.idusuario`,
+            { type: sequelize.QueryTypes.SELECT }
+        );
+
+        res.json(pedidos);
+    } catch (error) {
+        console.error("Error al obtener los pedidos:", error);
+        res.status(500).json({ error: 'Error al obtener los pedidos' });
+    }
+};
+
+// Actualizar un pedido
+exports.actualizarPedido = async (req, res) => {
+    const { id } = req.params;
+    const { fecha, hora, estado, idusuario, precio_total } = req.body;
+
+    try {
+        const [actualizado] = await sequelize.query(
+            `UPDATE pedido 
+             SET fecha = :fecha, hora = :hora, estado = :estado, idusuario = :idusuario, precio_total = :precio_total
+             WHERE idpedido = :id`,
+            {
+                replacements: { id, fecha, hora, estado, idusuario, precio_total },
+                type: sequelize.QueryTypes.UPDATE,
+            }
+        );
+
+        if (actualizado) {
+            res.json({ message: 'Pedido actualizado exitosamente' });
+        } else {
+            res.status(404).json({ error: 'Pedido no encontrado' });
+        }
+    } catch (error) {
+        console.error("Error al actualizar el pedido:", error);
+        res.status(500).json({ error: 'Error al actualizar el pedido' });
+    }
+};
+
+// Eliminar un pedido
+exports.eliminarPedido = async (req, res) => {
+    const { id } = req.params;
+
+    try {
+        const eliminado = await sequelize.query(
+            `DELETE FROM pedido WHERE idpedido = :id`,
+            { replacements: { id }, type: sequelize.QueryTypes.DELETE }
+        );
+
+        if (eliminado) {
+            res.status(204).json();
+        } else {
+            res.status(404).json({ error: 'Pedido no encontrado' });
+        }
+    } catch (error) {
+        console.error("Error al eliminar el pedido:", error);
+        res.status(500).json({ error: 'Error al eliminar el pedido' });
+    }
+};

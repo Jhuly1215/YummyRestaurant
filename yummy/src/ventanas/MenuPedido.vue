@@ -1,7 +1,11 @@
 <template>
   <div>
     <CarouselComponent />
-    <ListaProductosPedidos :cantidadesSeleccionadas="cantidadesSeleccionadas" :platillos="platillos" />
+    <ListaProductosPedidos
+      :cantidadesSeleccionadas="cantidadesSeleccionadas"
+      :platillos="platillos"
+      @reiniciarCantidades="cantidadesSeleccionadas = {}"
+    />
 
     <FiltroCategorias @categoriaSeleccionada="categoriaSeleccionada = $event" />
 
