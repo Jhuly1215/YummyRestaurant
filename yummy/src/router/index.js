@@ -10,7 +10,7 @@ import Ofertas from '@/ventanas/ofertasPage.vue';
 import MapaInteractivo from '@/ventanas/mapaInteractivo.vue';
 import MenuCliente from '@/ventanas/MenuCliente.vue';
 import MenuPedido from '@/ventanas/MenuPedido.vue';
-
+import PedidosAdmin from '@/ventanas/PedidosAdmin.vue';
 
 
 const router = createRouter({
@@ -75,6 +75,11 @@ const router = createRouter({
       path: '/menupedido',
       name: 'MenuPedido',
       component: MenuPedido,
+    },
+    {
+      path: '/pedidosadmin',
+      name: 'PedidosAdmin',
+      component: PedidosAdmin,
     },
   ],
 });

@@ -1,25 +1,43 @@
 const sequelize = require('../../config/db');
 
-// Crear un nuevo pago
-exports.crearPago = async (req, res) => {
-    const { idpedido, idusuario, monto, fecha } = req.body;
 
+// Controlador: Crear un nuevo pago y actualizar el estado del pedido
+exports.crearPago = async (req, res) => {
+    const { idpedido, idusuario, monto } = req.body;
+    const fecha = new Date(); // Fecha actual
+
+    const transaction = await sequelize.transaction(); // Iniciar transacción
     try {
+        // Insertar pago
         await sequelize.query(
             `INSERT INTO pago (idpedido, idusuario, monto, fecha)
              VALUES (:idpedido, :idusuario, :monto, :fecha)`,
             {
                 replacements: { idpedido, idusuario, monto, fecha },
                 type: sequelize.QueryTypes.INSERT,
+                transaction,
             }
         );
 
-        res.status(201).json({ message: 'Pago creado exitosamente' });
+        // Actualizar estado del pedido a 1 (pagado)
+        await sequelize.query(
+            `UPDATE pedido SET estado = 1 WHERE idpedido = :idpedido`,
+            {
+                replacements: { idpedido },
+                type: sequelize.QueryTypes.UPDATE,
+                transaction,
+            }
+        );
+
+        await transaction.commit(); // Confirmar transacción
+        res.status(201).json({ message: 'Pago creado y pedido actualizado exitosamente' });
     } catch (error) {
-        console.error("Error al crear el pago:", error);
-        res.status(500).json({ error: 'Error al crear el pago' });
+        await transaction.rollback(); // Revertir transacción en caso de error
+        console.error("Error al crear el pago o actualizar el pedido:", error);
+        res.status(500).json({ error: 'Error al registrar el pago' });
     }
 };
+
 
 // Obtener todos los pagos
 exports.obtenerPagos = async (req, res) => {
