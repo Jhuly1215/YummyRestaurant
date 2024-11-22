@@ -9,6 +9,7 @@ export const useAuthStore = defineStore('auth', {
       user: null, // Puedes almacenar más información del usuario si es necesario
       loading: false,
       rol: null,
+      id: null,
       error: null,
     }),
     actions: {
@@ -33,13 +34,16 @@ export const useAuthStore = defineStore('auth', {
             // Decodificar el token para obtener el rol
             const decodedToken = jwtDecode(token);
             const { rol } = decodedToken;
+            const { id } = decodedToken;
 
             // Almacenar el token en el estado y en localStorage
             this.token = token;
             this.rol = rol;
+            this.id = id;
             // Almacenar el token en localStorage
             localStorage.setItem('token', token);
             localStorage.setItem('rol', rol);
+            localStorage.setItem('id', id);
             console.log("Token almacenado:", localStorage.getItem('token'));
   
             console.log('Inicio de sesión exitoso');

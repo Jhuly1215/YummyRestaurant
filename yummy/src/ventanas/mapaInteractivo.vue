@@ -3,7 +3,7 @@
 <template>
   <div>
       <h1>Mapa Interactivo de Mesas</h1>
-      <button @click="mostrarFormulario('añadir')">Añadir Mesa</button>
+      <button v-if="rol !== 1" @click="mostrarFormulario('añadir')">Añadir Mesa</button>
       <svg ref="mapa" width="800" height="600"></svg>
       <div id="info-mesa">{{ infoMesa }}</div>
 
@@ -32,7 +32,15 @@
             
         </form>
 
+        
+
       </div>
+      <NuevaReserva
+            v-if="modalNuevaReservaVisible"
+            :titulo="'Nueva Reserva'"
+            :idmesa="mesaSeleccionada.idmesa"
+            @onClose="cerrarModalNuevaReserva"
+        />
   </div>
 </template>
 
@@ -40,10 +48,13 @@
 <script>
 import * as d3 from 'd3';
 import { useMesaStore } from '@/stores/mesasStore'; // Importa tu store
+import NuevaReserva from "@/ventanas/reservas/reservaMapa.vue";
 
 export default {
     name: "ReservasPage",
-    components: {},
+    components: {
+        NuevaReserva
+    },
     data() {
         return {
             mesas: [],
@@ -51,6 +62,7 @@ export default {
             clickTimeout: null,
             mostrarModal: false,
             mostrarModalConfirmacion: false,
+            modalNuevaReservaVisible: false,
             modoFormulario: '', // Puede ser 'añadir' o 'editar'
             mesaSeleccionada: {},
             mesaForm: {
@@ -61,6 +73,9 @@ export default {
             }
         };
     },
+    created() {
+        this.rol = parseInt(localStorage.getItem("rol"), 10); // Asegúrate de convertir a número
+    },
     async mounted() {
         const mesaStore = useMesaStore(); // Usa el store de Pinia
         await mesaStore.obtenerMesas(); // Llama a la acción para obtener las mesas
@@ -68,6 +83,9 @@ export default {
         this.crearMapa();
     },
     methods: {
+        cerrarModalNuevaReserva() {
+        this.modalNuevaReservaVisible = false;
+        },
         crearMapa() {
             const svg = d3.select(this.$refs.mapa);
             const drag = d3.drag()
@@ -92,26 +110,25 @@ export default {
 
             // Crear los rectángulos de las mesas
             svg.selectAll(".mesa")
-                .data(this.mesas)
-                .enter()
-                .append("rect")
-                .attr("class", "mesa")
-                .attr("width", 80)
-                .attr("height", 40)
-                .attr("x", d => d.posx)
-                .attr("y", d => d.posy)
-                .style("fill", "#c89b3f")
-                .style("stroke", "#000")
-                .style("cursor", "pointer")
-                .call(drag)
-                .on("click", (event, d) => {
-                    clearTimeout(this.clickTimeout);
-                    this.clickTimeout = setTimeout(() => {
-                        this.mostrarInfo(d);
-                        this.mostrarOpcionesEdicion(d);
-                        this.mostrarFormulario('editar');
-                    }, 200);
-                });
+            .data(this.mesas)
+            .enter()
+            .append("rect")
+            .attr("class", "mesa")
+            .attr("width", 80)
+            .attr("height", 40)
+            .attr("x", d => d.posx)
+            .attr("y", d => d.posy)
+            .style("fill", "#c89b3f")
+            .style("stroke", "#000")
+            .style("cursor", this.rol !== 1 ? "pointer" : "default")
+            .call(this.rol !== 1 ? drag : () => {}) // Solo aplica el arrastre si rol no es 1
+            .on("click", (event, d) => {
+                clearTimeout(this.clickTimeout);
+                this.clickTimeout = setTimeout(() => {
+                    this.rol === 1 ? this.abrirModalNuevaReserva(d) : this.mostrarOpcionesEdicion(d), this.mostrarFormulario('editar');
+                }, 200);
+            });
+
 
             // Crear las etiquetas (nombres) de las mesas
             svg.selectAll(".mesa-label")
@@ -126,6 +143,13 @@ export default {
                 .attr("fill", "#000")  // Color del texto
                 .text(d => d.nombre);  // Muestra el nombre de la mesa
         },
+        abrirModalNuevaReserva(mesa) {
+            this.modalNuevaReservaVisible = true;
+            this.mesaSeleccionada = mesa;
+            // Puedes pasar información de la mesa seleccionada al modal, si es necesario
+            console.log(`Abriendo modal de reserva para la mesa: ${mesa.nombre}`);
+        },
+
 
         mostrarInfo(mesa) {
             this.infoMesa = `Mesa: ${mesa.nombre}, Capacidad: ${mesa.capacidad}`;
