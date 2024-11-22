@@ -3,7 +3,7 @@
 <template>
   <div>
       <h1>Mapa Interactivo de Mesas</h1>
-      <button v-if="rol !== 1" @click="mostrarFormulario('añadir')">Añadir Mesa</button>
+      <button v-if="rol == 1" @click="mostrarFormulario('añadir')">Añadir Mesa</button>
       <svg ref="mapa" width="800" height="600"></svg>
       <div id="info-mesa">{{ infoMesa }}</div>
 
@@ -59,6 +59,7 @@ export default {
         return {
             mesas: [],
             infoMesa: '',
+            rol: null,
             clickTimeout: null,
             mostrarModal: false,
             mostrarModalConfirmacion: false,
@@ -121,7 +122,7 @@ export default {
             .style("fill", "#c89b3f")
             .style("stroke", "#000")
             .style("cursor", this.rol !== 1 ? "pointer" : "default")
-            .call(this.rol !== 1 ? drag : () => {}) // Solo aplica el arrastre si rol no es 1
+            .call(this.rol == 1 ? drag : () => {}) // Solo aplica el arrastre si rol no es 1
             .on("click", (event, d) => {
                 clearTimeout(this.clickTimeout);
                 this.clickTimeout = setTimeout(() => {

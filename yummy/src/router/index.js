@@ -77,32 +77,40 @@ const router = createRouter({
       component: TemporalCalificacion,
     },
 
-    //Para el Panel Administrativo
     {
       path: '/panelAdministrativo',
       name: 'PanelAdministrativo',
       component: PanelAdministrativo,
-      //meta: { requiresAuth: true }, // Requiere autenticación
+      beforeEnter: (to, from, next) => {
+        const token = localStorage.getItem('token');
+        const rol = parseInt(localStorage.getItem('rol'), 10);
+  
+        if (token && rol === 2) {
+          next(); // Permitir acceso si cumple las condiciones
+        } else {
+          next('/iniciarsesion'); // Redirigir al Home o cualquier otra ruta
+        }
+      },
       children: [
         {
-          path: 'section1', // Ruta base de panel administrativo
+          path: 'section1',
           name: 'Dashboard',
-          component: Section1, // Componente del Dashboard
+          component: Section1,
         },
         {
           path: 'ofertas',
           name: 'AdminOfertas',
-          component: OfertasAdminComponent, // Gestión de ofertas
+          component: OfertasAdminComponent,
         },
         {
           path: 'platillos',
           name: 'AdminPlatillos',
-          component: PlatillosAdminComponent, // Gestión de platillos
+          component: PlatillosAdminComponent,
         },
         {
           path: 'reservas',
           name: 'AdminReservas',
-          component: JReservasAdminComponent, // Gestión de reservas
+          component: JReservasAdminComponent,
         },
       ],
     },
