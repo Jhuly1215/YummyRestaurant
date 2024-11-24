@@ -1,6 +1,12 @@
 <template>
   <div>
-    <h2>Platillos</h2>
+    <header class="offers-header">
+      <h2>
+        <i class="fa fa-cutlery" aria-hidden="true"></i>
+        Platillos
+      </h2>
+      <p>Administra y crea nuevos platillos para tus clientes</p>
+    </header>
     <ConfirmationModal 
       v-if="modalVisible" 
       :mensaje="`¿Seguro que desea eliminar el platillo ${platilloAEliminar.nombre}?`"
@@ -24,7 +30,6 @@
           <tr v-for="(platillo, index) in platillos" :key="index">
             <td>{{ platillo.idplato }}</td>
             
-            <!-- Si la fila está en edición, muestra campos de entrada -->
             <td v-if="index === filaEnEdicion">
               <input v-model="platilloEditado.nombre" />
             </td>
@@ -51,14 +56,12 @@
             <td v-else>{{ platillo.imagen }}</td>
             
             <td class="botones">
-              <!-- Botones de acción -->
               <button v-if="index !== filaEnEdicion" class="action-button edit-button" @click="seleccionarPlatilloParaEditar(index, platillo)">
                 <i class="fas fa-edit"></i>
               </button>
               <button v-if="index !== filaEnEdicion" class="action-button delete-button" @click="mostrarModalEliminar(platillo)">
                 <i class="fas fa-trash"></i>
               </button>
-              <!-- Botones de Guardar y Cancelar solo en la fila en edición -->
               <button v-if="index === filaEnEdicion" class="action-button button-save" @click="guardarCambios">
                 <i class="fa-solid fa-floppy-disk"></i>
               </button>
@@ -69,27 +72,32 @@
           </tr>
         </tbody>
       </table>
+
+      <FormNewPlatillo />
     </div>
-    <button class="button-new">Nuevo platillo</button>
+
+    
   </div>
 </template>
-
 
 <script>
 import axios from 'axios';
 import ConfirmationModal from './ConfirmationModal.vue';
+import FormNewPlatillo from './FormNewPlatillo.vue';
 
 export default {
   name: "PlatillosAdminComponent",
-  components: { ConfirmationModal },
+  components: { 
+    ConfirmationModal,
+    FormNewPlatillo
+  },
   data() {
     return {
       platillos: [],
       filaEnEdicion: null,
-      platilloEditado: {}, // Nuevo objeto para los datos de edición
-      idPlatilloSeleccionado: null,
+      platilloEditado: {},
       platilloAEliminar: {},
-      modalVisible: false,  // Controla si el modal se muestra
+      modalVisible: false,
     };
   },
   mounted() {
@@ -99,42 +107,37 @@ export default {
     async obtenerPlatillos() {
       try {
         const response = await axios.get('http://localhost:5000/api/platillos');
-        this.platillos = Array.isArray(response.data) ? response.data : [response.data];
+        this.platillos = response.data;
       } catch (error) {
         console.error("Error al obtener los platillos:", error);
       }
     },
     seleccionarPlatilloParaEditar(index, platillo) {
       this.filaEnEdicion = index;
-      this.platilloEditado = { ...platillo }; // Copia los datos del platillo para editarlos
+      this.platilloEditado = { ...platillo }; // Copia el platillo a editar
     },
-    
     async guardarCambios() {
       try {
-          // Ajustar los datos enviados al backend
-          const payload = {
-              idplato: this.platilloEditado.idplato,
-              nombre: this.platilloEditado.nombre,
-              descripcion: this.platilloEditado.descripcion,
-              precio: this.platilloEditado.precio,
-              idcategoria: this.platilloEditado.idCategoria, // Mapea correctamente idCategoria
-              imagen: this.platilloEditado.imagen || null, // Permitir null en caso de que esté vacío
-          };
+        const payload = {
+          nombre: this.platilloEditado.nombre,
+          descripcion: this.platilloEditado.descripcion,
+          precio: this.platilloEditado.precio,
+          idCategoria: this.platilloEditado.idcategoria,
+          imagen: this.platilloEditado.imagen || null,
+        };
 
-          // Realizar la petición PUT
-          const response = await axios.put(`http://localhost:5000/api/platillos/${this.platilloEditado.idplato}`, payload);
-          console.log('Respuesta del servidor:', response.data);
-
-          alert('Platillo actualizado correctamente');
+        await axios.put(`http://localhost:5000/api/platillos/${this.platilloEditado.idplato}`, payload);
+        this.platillos.splice(this.filaEnEdicion, 1, { ...this.platilloEditado }); // Actualiza localmente
+        this.filaEnEdicion = null; // Salir del modo edición
+        alert('Platillo actualizado correctamente');
       } catch (error) {
-          console.error('Error al guardar los cambios del platillo:', error);
-          alert('Ocurrió un error al intentar guardar los cambios.');
+        console.error("Error al guardar cambios:", error);
+        alert('Error al actualizar el platillo');
       }
-  },
-
+    },
     cancelarCambios() {
       this.filaEnEdicion = null;
-      this.platilloEditado = {}; // Limpia los cambios sin guardarlos
+      this.platilloEditado = {};
     },
     mostrarModalEliminar(platillo) {
       this.platilloAEliminar = platillo;
@@ -143,53 +146,89 @@ export default {
     cerrarModal() {
       this.modalVisible = false;
     },
-    mostrarConfirmacion(platillo) {
-      this.platilloAEliminar = platillo;
-      this.idPlatilloSeleccionado = platillo.idplato;
-    },
-    cancelarConfirmacion() {
-      this.idPlatilloSeleccionado = null;
-      this.platilloAEliminar = {};
-    },
     async eliminarPlatillo() {
       try {
         await axios.delete(`http://localhost:5000/api/platillos/${this.platilloAEliminar.idplato}`);
         this.platillos = this.platillos.filter(p => p.idplato !== this.platilloAEliminar.idplato);
-        this.cerrarModal();  // Cierra el modal después de eliminar
+        this.cerrarModal();
         alert('Platillo eliminado correctamente');
       } catch (error) {
         console.error("Error al eliminar el platillo:", error);
         alert('Error al eliminar el platillo');
       }
     },
+    /*
+    nuevoPlatillo() {
+      // Lógica para añadir un nuevo platillo (puedes expandirlo más adelante)
+      alert('Funcionalidad para crear un nuevo platillo aún no implementada.');
+    }*/
   }
 };
 </script>
 
 <style scoped>
 /* Encabezado principal */
-h2 {
-  color: #322209;
+.offers-header {
   text-align: center;
+  background: linear-gradient(180deg, #ff9900, #ffcc00);
+  color: white;
+  padding: 20px 10px;
+  border-radius: 0 0 15px 15px;
+  /* Redondeo en las esquinas inferiores */
+  box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.2);
+  /* Sombra para dar profundidad */
   margin-bottom: 20px;
+}
+
+/* Título principal */
+.offers-header h2 {
+  font-size: 2.5em;
+  font-weight: bold;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  /* Espacio entre el texto y el icono */
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+  /* Sombra del texto */
+}
+
+/* Icono decorativo */
+.offers-header h2 i {
+  font-size: 0.8em;
+  color: #ffd700;
+  /* Color dorado para el icono */
+  animation: bounce 1s infinite;
+  /* Animación de rebote */
+}
+
+/* Subtítulo */
+.offers-header p {
+  font-size: 1.2em;
+  margin-top: 10px;
+  color: #fff8e7;
+  /* Color claro para contraste */
+  font-style: italic;
 }
 
 /* Contenedor de la tabla */
 .table-container {
   overflow-x: auto;
   margin: 20px 0;
+  
 }
 
 /* Estilos generales de la tabla */
 .table {
-  width: 100%;
+  width: 95%;
   border-collapse: collapse;
   table-layout: fixed; /* Asegura que las columnas tengan el mismo ancho */
 }
 
 /* Encabezado de la tabla */
 .table th {
-  width: 40px; /* Ancho fijo para las columnas */
+  width: 30px; /* Ancho fijo para las columnas */
   background-color: #FFFDA4;
   color: #322209;
   text-align: center;
@@ -200,7 +239,7 @@ h2 {
 
 /* Celdas del cuerpo de la tabla */
 .table td {
-  width: 40px; /* Ancho fijo para las columnas */
+  width: 30px; /* Ancho fijo para las columnas */
   text-align: center;
   padding: 5px;
   border: 1px solid #ddd;

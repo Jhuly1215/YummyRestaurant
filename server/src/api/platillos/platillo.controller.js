@@ -1,4 +1,4 @@
-// src/api/platillo.controller.js
+// src/api/platillos/platillo.controller.js
 const sequelize = require('../../config/db');
 
 // Crear un nuevo platillo
