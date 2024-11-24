@@ -5,51 +5,40 @@
         <p><strong>Usuario:</strong> {{ pedido.usuario }}</p>
         <p><strong>Monto Total:</strong> {{ pedido.monto }} Bs.</p>
         <p><strong>Fecha:</strong> {{ pedido.fecha }}</p>
-        <p><strong>Estado:</strong> {{ pedido.estado }}</p>
+        <p><strong>Estado:</strong> {{ estadoTexto }}</p>
       </div>
-      <div class="acciones">
-        <button @click="registrarPago">Registrar Pago</button>
-        <button @click="actualizarEstado">Actualizar Estado</button>
+      <div class="acciones" v-if="pedido.estado === 0">
+        <button @click="entregar">Entregar</button>
+        <button @click="cancelar">Cancelar</button>
       </div>
     </div>
 </template>
 
 <script>
-import axios from 'axios';
 export default {
 name: 'CardPedido',
 props: {
     pedido: {
     type: Object,
-    required: true
-    }
+    required: true,
+    },
+},
+computed: {
+    estadoTexto() {
+    return ['En espera', 'Entregado', 'Cancelado'][this.pedido.estado] || 'Desconocido';
+    },
 },
 methods: {
-    methods: {
-    async registrarPago(pedido) {
-        try {
-            const { idpedido, idusuario, precio_total } = pedido;
-            
-            // Enviar datos a la API de creación de pagos
-            await axios.post('http://localhost:5000/api/pagos', {
-                idpedido,
-                idusuario,
-                monto: precio_total, // Usa el total del pedido
-            });
-
-            // Actualizar estado local del pedido (opcional)
-            this.$set(pedido, 'estado', 1);
-            alert('Pago registrado exitosamente');
-        } catch (error) {
-            console.error('Error al registrar el pago:', error);
-            alert('No se pudo registrar el pago');
-        }
+    entregar() {
+    this.$emit('actualizarEstado', this.pedido.idpedido, 1);
     },
-}
-
-}
+    cancelar() {
+    this.$emit('actualizarEstado', this.pedido.idpedido, 2);
+    },
+},
 };
 </script>
+  
 
 <style scoped>
 .pedido-card {
