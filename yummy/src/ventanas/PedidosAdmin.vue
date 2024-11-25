@@ -6,30 +6,37 @@
     <div v-if="cargando">Cargando pedidos...</div>
     <div v-if="error" class="error">{{ error }}</div>
     <div class="lista-pedidos">
-      <CardPedido
-        v-for="pedido in pedidosEnEspera"
-        :key="pedido.idpedido"
-        :pedido="pedido"
-        @actualizarEstado="handleActualizarEstado"
-      />
+      <!-- Aplica estilos para organizar los cards -->
+      <div class="cards">
+        <CardPedido
+          v-for="pedido in pedidosEnEspera"
+          :key="pedido.idpedido"
+          :pedido="pedido"
+          @actualizarEstado="handleActualizarEstado"
+        />
+      </div>
     </div>
 
     <h2>Pedidos entregados</h2>
     <div class="lista-pedidos">
-      <CardPedido
-        v-for="pedido in pedidosEntregados"
-        :key="pedido.idpedido"
-        :pedido="pedido"
-      />
+      <div class="cards">
+        <CardPedido
+          v-for="pedido in pedidosEntregados"
+          :key="pedido.idpedido"
+          :pedido="pedido"
+        />
+      </div>
     </div>
 
     <h2>Pedidos cancelados</h2>
     <div class="lista-pedidos">
-      <CardPedido
-        v-for="pedido in pedidosCancelados"
-        :key="pedido.idpedido"
-        :pedido="pedido"
-      />
+      <div class="cards">
+        <CardPedido
+          v-for="pedido in pedidosCancelados"
+          :key="pedido.idpedido"
+          :pedido="pedido"
+        />
+      </div>
     </div>
 
     <ConfirmationModal
@@ -83,6 +90,7 @@ export default {
       try {
         const response = await axios.get('http://localhost:5000/api/pedidos');
         this.pedidos = response.data;
+        console.log(response.data);
       } catch (error) {
         console.error("Error al obtener los pedidos:", error);
         this.error = "No se pudieron cargar los pedidos.";
@@ -139,16 +147,31 @@ export default {
 
 <style scoped>
 .pedidos-admin {
-  max-width: 800px;
+  max-width: 1200px;
   margin: 0 auto;
   padding: 20px;
 }
-.lista-pedidos {
+
+.cards {
   display: flex;
-  flex-direction: column;
-  gap: 15px;
+  flex-wrap: wrap;
+  gap: 20px;
+  justify-content: center;
 }
+
+.cards > * {
+  flex: 1 1 calc(33.33% - 20px); /* 3 tarjetas por fila */
+  max-width: calc(33.33% - 20px);
+}
+
+@media (max-width: 768px) {
+  .cards > * {
+    flex: 1 1 100%; /* 1 tarjeta por fila en móviles */
+    max-width: 90%; /* Margen horizontal */
+  }
+}
+
 .error {
-  color: red; 
+  color: red;
 }
 </style>

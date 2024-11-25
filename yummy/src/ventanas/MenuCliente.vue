@@ -19,12 +19,11 @@
       </div>
     </div>
   </div>
-  <FooterComponent />
+
 </template>
 
 <script>
 import axios from 'axios';
-import FooterComponent from '@/components/Footer.vue';
 import CardMenu from '@/components/CardMenu.vue';
 import FiltroCategorias from '@/components/FiltroCategorias.vue';
 import CarouselComponent from '@/components/CarouselComponent.vue';
@@ -32,7 +31,6 @@ import CarouselComponent from '@/components/CarouselComponent.vue';
 export default {
   name: 'MenuCliente',
   components: {
-    FooterComponent,
     CarouselComponent,
     CardMenu,
     FiltroCategorias,

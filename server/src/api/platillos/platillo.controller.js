@@ -4,22 +4,24 @@ const sequelize = require('../../config/db');
 // Crear un nuevo platillo
 exports.crearPlatillo = async (req, res) => {
     const { nombre, descripcion, precio, idCategoria } = req.body;
-
+    const imagen = req.file ? req.file.path : null; // Guarda la ruta de la imagen si existe
+  
     try {
-        await sequelize.query(
-            `INSERT INTO platillo (nombre, descripcion, precio, idCategoria, imagen)
-             VALUES (:nombre, :descripcion, :precio, :idCategoria, :imagen)`,
-            {
-                replacements: { nombre, descripcion, precio, idCategoria, imagen },
-                type: sequelize.QueryTypes.INSERT,
-            }
-        );
-        res.status(201).json({ message: 'Platillo creado exitosamente' });
+      await sequelize.query(
+        `INSERT INTO platillo (nombre, descripcion, precio, idCategoria, imagen)
+         VALUES (:nombre, :descripcion, :precio, :idCategoria, :imagen)`,
+        {
+          replacements: { nombre, descripcion, precio, idCategoria, imagen },
+          type: sequelize.QueryTypes.INSERT,
+        }
+      );
+      res.status(201).json({ message: 'Platillo creado exitosamente' });
     } catch (error) {
-        console.error("Error al crear el platillo:", error);
-        res.status(500).json({ error: 'Error al crear el platillo', details: error.message });
+      console.error("Error al crear el platillo:", error);
+      res.status(500).json({ error: 'Error al crear el platillo', details: error.message });
     }
-};
+  };
+  
 
 // Obtener todos los platillos
 exports.obtenerPlatillos = async (req, res) => {
