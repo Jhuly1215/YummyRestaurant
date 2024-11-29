@@ -137,9 +137,9 @@ router.beforeEach((to, from, next) => {
   const token = localStorage.getItem('token');
   const rol = parseInt(localStorage.getItem('rol'), 10);
 
-  /*if (to.name === 'PanelAdministrativo' && (!token || rol !== 2)) {
+  if (to.name === 'PanelAdministrativo' && (!token || rol !== 2)) {
     next('/iniciarsesion'); // Redirige al inicio de sesión si no es admin
-  } else */if (to.name === 'Reservas' && !token) {
+  } else if (to.name === 'Reservas' && !token) {
     next('/iniciarsesion'); // Redirige al inicio de sesión si no está logueado
   } else if (to.name === 'MapaAdmin' && (!token || rol !== 2)) {
     next('/iniciarsesion'); // Protege el mapa del admin
