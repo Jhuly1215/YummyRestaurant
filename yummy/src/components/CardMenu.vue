@@ -8,9 +8,17 @@
         </div>
         <div class="info">
           <h3>{{ nombre }}</h3>
-          <p>{{ precio }} Bs.</p>
+          <p v-if="descuento">
+            <span class="precio-original">{{ precio }} Bs.</span>
+            <span class="precio-descuento">{{ precioConDescuento }} Bs.</span>
+          </p>
+          <p v-else>{{ precio }} Bs.</p>
+          <p v-if="descuento" class="descuento">
+            {{ descuento }}% de descuento
+          </p>
         </div>
       </div>
+
       <!-- Cara trasera -->
       <div class="card-back">
         <p>{{ descripcion }}</p>
@@ -36,14 +44,25 @@ export default {
       required: true
     },
     precio: {
-      type: String,
+      type: Number, // Cambiado a Number para cálculos
       required: true
+    },
+    descuento: { // Nueva prop para el descuento
+      type: Number,
+      default: null
     }
   },
   data() {
     return {
       hover: false
     };
+  },
+  computed: {
+    precioConDescuento() {
+      return this.descuento 
+        ? (this.precio * (1 - this.descuento / 100)).toFixed(2) 
+        : this.precio;
+    }
   }
 };
 </script>
@@ -74,7 +93,7 @@ export default {
   height: 100%;
   backface-visibility: hidden;
   border-radius: 15px;
-  box-shadow: 0  4px 8px #322209;
+  box-shadow: 0 4px 8px #322209;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -97,10 +116,9 @@ export default {
 .imagen {
   width: 100%; 
   aspect-ratio: 1 / 1; 
-  object-fit: cover; /* Recorta la imagen para llenar el contenedor */
+  object-fit: cover; 
   border-radius: 10px;
 }
-
 
 .info {
   width: 50%;
@@ -111,15 +129,27 @@ export default {
   text-align: center;
 }
 
-@media (max-width: 768px) {
-  .card-inner.rotated {
-  transform: rotateY(180deg);
-  }
-  .menu-card {
-    perspective: 1000px;
-    width: 45%;
+/* Estilo para mostrar el precio original tachado */
+.precio-original {
+  text-decoration: line-through;
+  color: #888;
+  margin-right: 10px;
+}
 
+.precio-descuento {
+  color: #E53935; /* Color llamativo para el precio con descuento */
+  font-weight: bold;
+}
+
+.descuento {
+  color: #FE9900;
+  font-size: 14px;
+  font-weight: bold;
+}
+
+@media (max-width: 768px) {
+  .menu-card {
+    width: 90%;
   }
-  
 }
 </style>
