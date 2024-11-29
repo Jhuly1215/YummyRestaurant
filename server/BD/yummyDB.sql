@@ -67,7 +67,7 @@ CREATE TABLE platillo (
     precio real,
     idcategoria int,
     imagen varchar(100),
-    estado int,
+    estado int
 );
 
 -- Table: resenia

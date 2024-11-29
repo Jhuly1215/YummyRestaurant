@@ -75,7 +75,11 @@
 
       <FormNewPlatillo />
     </div>
-
+    <SuccessModal
+      v-if="successModalVisible"
+      :mensaje="successMensaje"
+      @onClose="closeSuccessModal"
+    />
     
   </div>
 </template>
@@ -84,12 +88,14 @@
 import axios from 'axios';
 import ConfirmationModal from './ConfirmationModal.vue';
 import FormNewPlatillo from './FormNewPlatillo.vue';
+import SuccessModal from './SuccessModal.vue';
 
 export default {
   name: "PlatillosAdminComponent",
   components: { 
     ConfirmationModal,
-    FormNewPlatillo
+    FormNewPlatillo,
+    SuccessModal,
   },
   data() {
     return {
@@ -98,6 +104,8 @@ export default {
       platilloEditado: {},
       platilloAEliminar: {},
       modalVisible: false,
+      successModalVisible: false,
+      successMensaje: '',
     };
   },
   mounted() {
@@ -129,10 +137,10 @@ export default {
         await axios.put(`http://localhost:5000/api/platillos/${this.platilloEditado.idplato}`, payload);
         this.platillos.splice(this.filaEnEdicion, 1, { ...this.platilloEditado }); // Actualiza localmente
         this.filaEnEdicion = null; // Salir del modo edición
-        alert('Platillo actualizado correctamente');
+        this.mostrarSuccessModal('Platillo actualizado correctamente');
       } catch (error) {
         console.error("Error al guardar cambios:", error);
-        alert('Error al actualizar el platillo');
+        this.mostrarSuccessModal('Error al actualizar el platillo');
       }
     },
     cancelarCambios() {
@@ -148,20 +156,22 @@ export default {
     },
     async eliminarPlatillo() {
       try {
-        await axios.delete(`http://localhost:5000/api/platillos/${this.platilloAEliminar.idplato}`);
+        await axios.put(`http://localhost:5000/api/platillos/desactivar/${this.platilloAEliminar.idplato}`);
         this.platillos = this.platillos.filter(p => p.idplato !== this.platilloAEliminar.idplato);
         this.cerrarModal();
-        alert('Platillo eliminado correctamente');
+        this.mostrarSuccessModal('Platillo eliminado correctamente');
       } catch (error) {
         console.error("Error al eliminar el platillo:", error);
-        alert('Error al eliminar el platillo');
+        this.mostrarSuccessModal('Error al eliminar el platillo');
       }
     },
-    /*
-    nuevoPlatillo() {
-      // Lógica para añadir un nuevo platillo (puedes expandirlo más adelante)
-      alert('Funcionalidad para crear un nuevo platillo aún no implementada.');
-    }*/
+    mostrarSuccessModal(mensaje) {
+      this.successMensaje = mensaje;
+      this.successModalVisible = true;
+    },
+    closeSuccessModal() {
+      this.successModalVisible = false;
+    },
   }
 };
 </script>

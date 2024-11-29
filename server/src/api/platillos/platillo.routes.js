@@ -8,4 +8,6 @@ router.post('/', upload.single("imagen"), platilloController.crearPlatillo);
 router.put('/:id', platilloController.actualizarPlatillo);
 router.delete('/:id', platilloController.eliminarPlatillo);
 
+router.put('/desactivar/:id', platilloController.cambiarDesactivado);
+
 module.exports = router;
