@@ -24,7 +24,8 @@ CREATE TABLE mesa (
     capacidad int,
     nombre varchar(255),
     posx real,
-    posy real
+    posy real,
+    visible boolean
 );
 
 -- Table: oferta
@@ -102,7 +103,8 @@ CREATE TABLE usuario (
     apellidos varchar(255) NOT NULL,
     correo varchar(255) NOT NULL,
     password varchar(255) NOT NULL,
-    idrol int NOT NULL
+    idrol int NOT NULL,
+    activo boolean,
 );
 
 -- foreign keys
