@@ -199,28 +199,51 @@ export default {
     guardarCoordenadas() {
         if (this.actualizarMesas.length > 0) {
             const mesaStore = useMesaStore();
+            const promesas = []; // Array para guardar las promesas de las actualizaciones
 
-            // Itera sobre las mesas que han sido actualizadas
             this.actualizarMesas.forEach(mesa => {
                 const mesaActualizada = {
                     idmesa: mesa.idmesa,
                     posx: mesa.posx,
                     posy: mesa.posy
                 };
-                // Realiza el PUT para actualizar la mesa en el servidor
-                mesaStore.actualizarMesa(mesa.idmesa, mesaActualizada)
-                    .then(() => {
-                        console.log(`Mesa ${mesa.idmesa} actualizada correctamente.`);
-                    })
-                    .catch((error) => {
-                        console.error('Error al guardar las coordenadas de la mesa:', error);
-                    });
+
+                // Guardar las promesas de cada actualización
+                promesas.push(
+                    mesaStore.actualizarMesa(mesa.idmesa, mesaActualizada)
+                        .then(() => {
+                            console.log(`Mesa ${mesa.idmesa} actualizada correctamente.`);
+                        })
+                        .catch((error) => {
+                            console.error('Error al guardar las coordenadas de la mesa:', error);
+                        })
+                );
             });
-             mesaStore.obtenerMesas();
-            // Limpiar el array después de guardar
-            this.actualizarMesas = [];
+
+            // Esperar a que todas las actualizaciones se completen
+            Promise.all(promesas)
+                .then(() => {
+                    mesaStore.obtenerMesas(); // Recargar las mesas desde el backend
+                    this.actualizarMesas = []; // Limpiar el array después de guardar
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Guardado exitoso',
+                        text: 'Las coordenadas de las mesas se han actualizado correctamente.',
+                        timer: 2000,
+                        showConfirmButton: false
+                    });
+                })
+                .catch((error) => {
+                    console.error('Error al guardar las mesas:', error);
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'Ocurrió un error al guardar las mesas.',
+                    });
+                });
         }
     },
+
         abrirModalNuevaReserva(mesa) {
             this.modalNuevaReservaVisible = true;
             this.mesaSeleccionada = mesa;
@@ -275,23 +298,35 @@ export default {
             const mesaActualizada = {
                 nombre: this.mesaForm.nombre,
                 capacidad: this.mesaForm.capacidad,
-                posx: this.mesaForm.posx,  // Asegúrate de mantener las posiciones
+                posx: this.mesaForm.posx,
                 posy: this.mesaForm.posy
             };
 
-            // Usamos el store para actualizar la mesa
             const mesaStore = useMesaStore();
-            mesaStore.actualizarMesa(this.mesaSeleccionada.idmesa, mesaActualizada) // Llamamos al store para actualizar la mesa
+
+            mesaStore.actualizarMesa(this.mesaSeleccionada.idmesa, mesaActualizada)
                 .then(() => {
-                    this.cerrarModal();
-                    this.actualizarMapa();
-                    // Vuelve a obtener las mesas actualizadas desde el backend
-                    mesaStore.obtenerMesas(); // Recarga los datos
+                    this.cerrarModal(); // Cierra el modal de edición
+                    this.actualizarMapa(); // Actualiza el mapa
+                    mesaStore.obtenerMesas(); // Recarga las mesas desde el backend
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Actualización exitosa',
+                        text: `La mesa "${mesaActualizada.nombre}" se ha actualizado correctamente.`,
+                        timer: 2000,
+                        showConfirmButton: false
+                    });
                 })
                 .catch((error) => {
                     console.error('Error al actualizar la mesa:', error);
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'Ocurrió un error al actualizar la mesa.',
+                    });
                 });
         },
+
 
         mostrarModalBorrar() {
             if (this.mesaSeleccionada) {
