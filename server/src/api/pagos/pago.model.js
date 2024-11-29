@@ -8,7 +8,7 @@ const Pago = sequelize.define('Pago', {
     autoIncrement: true,
   },
   fecha: {
-    type: DataTypes.INTEGER, // Cambiar si la fecha es tipo `DATE`
+    type: DataTypes.DATE, // Cambiado a DATE
     allowNull: false,
   },
   monto: {

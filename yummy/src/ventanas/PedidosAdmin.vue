@@ -29,6 +29,7 @@
           v-for="pedido in pedidosEntregados"
           :key="pedido.idpedido"
           :pedido="pedido"
+          @actualizarEstado="handleActualizarEstado"
         />
       </div>
     </div>
@@ -132,11 +133,13 @@ export default {
         this.cargando = false;
       }
     },
+
     handleActualizarEstado(idpedido, nuevoEstado) {
+      console.log(`Evento recibido: Pedido ID ${idpedido}, Nuevo Estado: ${nuevoEstado}`);
       this.pedidoSeleccionado = this.pedidos.find((p) => p.idpedido === idpedido);
       this.action = nuevoEstado;
+
       if (nuevoEstado === 3) {
-        // Si la acción es "Pagar", mostramos un mensaje diferente
         this.modalMensaje = `¿Desea registrar el pago del pedido #${idpedido}?`;
       } else if (nuevoEstado === 1) {
         this.modalMensaje = `¿Desea marcar el pedido #${idpedido} como entregado?`;
@@ -145,10 +148,12 @@ export default {
       }
       this.modalVisible = true;
     },
+
     closeModal() {
       this.modalVisible = false;
       this.pedidoSeleccionado = null;
     },
+
     async confirmAction() {
       if (!this.pedidoSeleccionado) return;
 

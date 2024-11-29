@@ -212,3 +212,5 @@ ALTER TABLE usuario ADD CONSTRAINT usuarios_roles
 
 ALTER TABLE detalle_pedido ALTER COLUMN idreserva DROP NOT NULL;
 ;
+ALTER TABLE pago ALTER COLUMN fecha TYPE DATE USING to_date(fecha::text, 'YYYYMMDD');
+
