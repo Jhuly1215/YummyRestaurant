@@ -22,6 +22,11 @@ const Mesa = sequelize.define('Mesa', {
   posy: {
     type: DataTypes.FLOAT,
     allowNull: false, // Opcional, se puede dejar `allowNull: true` para que permita valores nulos
+  },
+  visible: {
+    type: DataTypes.BOOLEAN,
+    allowNull: false,
+    defaultValue: true,
   }
 }, 
 {

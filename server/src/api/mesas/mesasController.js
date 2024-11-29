@@ -4,8 +4,10 @@ const Mesa = require('./mesasModel'); // Asegúrate de que la ruta al modelo sea
 // Función para obtener todas las actividades
 const obtenerMesa = async (req, res) => {
   try {
-    const actividades = await Mesa.findAll();
-    res.status(200).json(actividades);
+    const mesas = await Mesa.findAll({
+      where: { visible: true },
+    });
+    res.status(200).json(mesas);
   } catch (error) {
     console.error('Error al obtener actividades:', error);
     res.status(500).json({ error: 'Error al obtener las actividades' });
@@ -67,6 +69,29 @@ const borrarMesa = async (req, res) => {
       res.status(500).json({ error: 'Error al borrar la mesa' });
     }
   };
+  const actualizarEstadoMesa = async (req, res) => {
+    try {
+      const { id } = req.params; // ID de la mesa
+      const { visible } = req.body; // Estado visible desde el cuerpo de la solicitud
+  
+      // Buscar la mesa por ID
+      const mesa = await Mesa.findByPk(id);
+  
+      if (!mesa) {
+        return res.status(404).json({ error: 'Mesa no encontrada' });
+      }
+  
+      // Actualizar el estado de visibilidad
+      mesa.visible = visible;
+      await mesa.save();
+  
+      res.status(200).json({ message: 'Estado de la mesa actualizado con éxito', mesa });
+    } catch (error) {
+      console.error('Error al actualizar el estado de la mesa:', error);
+      res.status(500).json({ error: 'Error al actualizar el estado de la mesa' });
+    }
+  };
+  
   
   
 
@@ -74,5 +99,6 @@ module.exports = {
   obtenerMesa,
   crearMesa,
   actualizarMesa,
-  borrarMesa
+  borrarMesa,
+  actualizarEstadoMesa
 };
