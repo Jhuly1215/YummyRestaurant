@@ -18,7 +18,6 @@ app.use(express.json());
 
 
 const ofertasRoutes = require('./src/api/ofertas/oferta.routes');
-const platillosRoutes = require('./src/api/platillos/platillo.routes');
 const usuarioRoutes = require('./src/api/usuario/usuario.routes');
 const authRoutes = require('./src/api/autenticacion/authRoutes');
 const actividadRoutes = require('./src/api/usuario/actividadRoutes');
