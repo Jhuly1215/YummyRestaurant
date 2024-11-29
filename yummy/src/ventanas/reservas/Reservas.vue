@@ -48,7 +48,7 @@
       <ReservaCard
         v-for="reserva in reservasFiltradas"
         :key="reserva.idreserva"
-        :mesa="String(reserva.idmesa)"
+        :mesa="reserva.nombremesa"
         :fecha="reserva.fecha"
         :hora="reserva.hora"
         :nombre="reserva.nombre"
@@ -85,6 +85,7 @@ export default {
   data() {
     return {
       reservas: [],
+      mesas: [],
       modalVisible: false,
       reservaSeleccionada: null,
       filtroFechaDesde: "",
@@ -126,12 +127,49 @@ export default {
 
     async cargarReservas() {
       try {
-        const response = await axios.get("/api/reservas");
-        this.reservas = response.data;
+        const reservasResponse = await axios.get("/api/reservas");
+        this.reservas = reservasResponse.data;
+
+        // Solo combinar datos si las mesas ya han sido cargadas
+        if (this.mesas.length > 0) {
+          this.asociarReservasConMesas();
+        }
+
+        console.log("Reservas cargadas: ", this.reservas);
       } catch (error) {
         console.error("Error al cargar reservas:", error);
       }
     },
+
+    async cargarMesas() {
+      try {
+        const mesasResponse = await axios.get("/api/mesas");
+        this.mesas = mesasResponse.data;
+
+        // Solo combinar datos si las reservas ya han sido cargadas
+        if (this.reservas.length > 0) {
+          this.asociarReservasConMesas();
+        }
+
+        console.log("Mesas cargadas:", this.mesas);
+      } catch (error) {
+        console.error("Error al cargar mesas:", error);
+      }
+    },
+
+    asociarReservasConMesas() {
+      // Añadir el campo nombremesa a las reservas
+      this.reservas = this.reservas.map((reserva) => {
+        const mesa = this.mesas.find((m) => m.idmesa === reserva.idmesa);
+        return {
+          ...reserva,
+          nombremesa: mesa ? mesa.nombre : "Mesa desconocida",
+        };
+      });
+
+      console.log("Reservas con nombres de mesa: ", this.reservas);
+    },
+
     limpiarFiltro(campo) {
       this[campo] = ""; // Limpia el filtro especificado
     },
@@ -181,30 +219,34 @@ export default {
       }
     },
 
-
     //anadir reserva
     async guardarNuevaReserva(nuevaReserva) {
       try {
         // Llamar al backend para guardar la nueva reserva
-        const response = await axios.post('/api/reservas', nuevaReserva);
+        const response = await axios.post("/api/reservas", nuevaReserva);
 
         // Agregar la nueva reserva a la lista localmente
         this.reservas.push(response.data);
 
-        alert('Reserva creada exitosamente.');
+        // Volver a asociar las reservas con las mesas
+        this.asociarReservasConMesas();
+
+        alert("Reserva creada exitosamente.");
 
         this.cerrarModalNuevaReserva();
       } catch (error) {
-        console.error('Error al guardar la nueva reserva:', error);
-        alert('Ocurrió un error al guardar la nueva reserva.');
+        console.error("Error al guardar la nueva reserva:", error);
+        alert("Ocurrió un error al guardar la nueva reserva.");
       }
     },
   },
   mounted() {
     this.cargarReservas();
+    this.cargarMesas();
   },
 };
 </script>
+
 
 <style scoped>
 /* Estilo de la sección de filtros */

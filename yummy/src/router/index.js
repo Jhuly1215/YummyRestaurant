@@ -123,9 +123,7 @@ router.beforeEach((to, from, next) => {
     next('/iniciarsesion'); // Redirige al inicio de sesión si no está logueado
   } else if (to.name === 'MapaAdmin' && (!token || rol !== 2)) {
     next('/iniciarsesion'); // Protege el mapa del admin
-  }else if (to.name === 'MapaUsuario' && (!token || rol !== 2)) {
-    next('/iniciarsesion'); // Protege el mapa del admin
-  }   else {
+  } else {
     next();
   }
 });
