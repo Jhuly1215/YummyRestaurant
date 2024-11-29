@@ -34,13 +34,22 @@
       </div>
     </transition>
   </div>
+  <SuccessModal
+      v-if="successModalVisible"
+      :mensaje="successMensaje"
+      @onClose="closeSuccessModal"
+    />
 </template>
 
 <script>
 import axios from "axios";
+import SuccessModal from "./SuccessModal.vue";
 
 export default {
   name: "ListaProductosPedidos",
+  components:{
+    SuccessModal
+  },
   props: {
     cantidadesSeleccionadas: {
       type: Object,
@@ -68,6 +77,8 @@ export default {
   data() {
     return {
       isModalOpen: false,
+      successModalVisible: false,
+      successMensaje: '',
     };
   },
   methods: {
@@ -94,14 +105,22 @@ export default {
 
       try {
         const response = await axios.post('http://localhost:5000/api/pedidos', pedido);
-        alert("Pedido realizado con éxito");
+        this.mostrarSuccessModal('Pedido realizado con éxito');
         this.$emit("pedidoRealizado"); // Notifica al componente padre para reiniciar el estado
         this.toggleModal(); // Cierra el modal
       } catch (error) {
         console.error("Error al realizar el pedido:", error);
         alert("Hubo un error al realizar el pedido. Por favor, inténtelo nuevamente.");
       }
-    }
+    },
+
+    mostrarSuccessModal(mensaje) {
+      this.successMensaje = mensaje;
+      this.successModalVisible = true;
+    },
+    closeSuccessModal() {
+      this.successModalVisible = false;
+    },
 
   },
 };
@@ -193,14 +212,16 @@ h2 {
 }
 
 .close-button {
-  background-color: #ccc;
-  color: black;
+  background-color: #322209;
+  color: #FFFDA4;
   border: none;
   padding: 10px;
-  width: 100%;
+  width: 40%;
   margin-top: 20px;
   cursor: pointer;
   font-size: 16px;
+  border-radius: 50px;
+  align-self: center;
 }
 
 .close-button:hover {

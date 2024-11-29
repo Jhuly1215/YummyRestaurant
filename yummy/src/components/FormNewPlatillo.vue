@@ -69,13 +69,22 @@
       <button type="submit" class="submit-button">Crear Platillo</button>
     </form>
   </div>
+  <SuccessModal
+    v-if="successModalVisible"
+    :mensaje="successMensaje"
+    @onClose="closeSuccessModal"
+  />
 </template>
 
 <script>
 import axios from 'axios';
+import SuccessModal from './SuccessModal.vue';
 
 export default {
   name: "FormNewPlatillo",
+  components: { 
+    SuccessModal,
+  },
   data() {
     return {
       nuevoPlatillo: {
@@ -89,6 +98,8 @@ export default {
       categorias: [],
       filtroCategoria: "",
       comboBoxAbierto: false,
+      successModalVisible: false,
+      successMensaje: '',
     };
   },
   mounted() {
@@ -142,7 +153,7 @@ export default {
         await axios.post("http://localhost:5000/api/platillos", formData, {
           headers: { "Content-Type": "multipart/form-data" },
         });
-        alert("Platillo creado con éxito");
+        this.mostrarSuccessModal('Platillo creado correctamente');
         this.resetForm();
       } catch (error) {
         console.error("Error al crear el platillo:", error);
@@ -171,6 +182,13 @@ export default {
         src: null,
         srcPreview: null,
       };
+    },
+    mostrarSuccessModal(mensaje) {
+      this.successMensaje = mensaje;
+      this.successModalVisible = true;
+    },
+    closeSuccessModal() {
+      this.successModalVisible = false;
     },
   },
 };

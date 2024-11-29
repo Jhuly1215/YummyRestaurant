@@ -27,6 +27,11 @@
     </div>
     <FooterComponent />
   </div>
+  <SuccessModal
+      v-if="successModalVisible"
+      :mensaje="successMensaje"
+      @onClose="closeSuccessModal"
+    />
 </template>
 
 <script>
@@ -36,6 +41,7 @@ import CarouselComponent from '@/components/CarouselComponent.vue';
 import FiltroCategorias from '@/components/FiltroCategorias.vue';
 import CardMenuPedido from '@/components/CardMenuPedido.vue';
 import ListaProductosPedidos from '@/components/ListaProductosPedidos.vue';
+import SuccessModal from '@/components/SuccessModal.vue';
 
 export default {
   name: 'MenuPedido',
@@ -45,6 +51,7 @@ export default {
     CardMenuPedido,
     FiltroCategorias,
     ListaProductosPedidos,
+    SuccessModal,
   },
   data() {
     return {
@@ -53,6 +60,8 @@ export default {
       cargando: false,
       error: null,
       cantidadesSeleccionadas: {}, // Almacena las cantidades seleccionadas por ID de platillo
+      successModalVisible: false,
+      successMensaje: '',
     };
   },
   computed: {
