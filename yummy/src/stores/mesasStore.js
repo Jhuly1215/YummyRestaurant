@@ -51,14 +51,13 @@ export const useMesaStore = defineStore('mesaStore', {
       }
     },
 
-    // Función para borrar una mesa
     async borrarMesa(id) {
       try {
-        await axios.delete(`${RutaApi.baseURL}mesas/${id}`);
-        this.mesas = this.mesas.filter(mesa => mesa.id !== id); // Elimina la mesa de la lista
+        await axios.put(`${RutaApi.baseURL}mesas/${id}/estado`, { visible: false });
+        this.mesas = this.mesas.filter(mesa => mesa.id !== id); // Actualizar la lista local
       } catch (error) {
-        console.error('Error al borrar la mesa:', error);
-        this.error = 'Error al borrar la mesa';
+        console.error('Error al ocultar la mesa:', error);
+        this.error = 'Error al ocultar la mesa';
       }
     }
   }
