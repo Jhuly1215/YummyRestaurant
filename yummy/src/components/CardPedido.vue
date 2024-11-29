@@ -10,8 +10,12 @@
       </div>
       <div class="acciones" v-if="pedido.estado === 0">
         <button @click="entregar">Entregar</button>
-        <!--<button @click="cancelar">Cancelar</button> -->
+        <button @click="cancelar">Cancelar</button> 
       </div>
+      <div class="acciones" v-if="pedido.estado === 1">
+        <button @click="registrarPago">Registrar Pago</button>
+      </div>
+
     </div>
 </template>
 
@@ -25,18 +29,38 @@ props: {
     },
 },
 computed: {
-    estadoTexto() {
-    return ['En espera', 'Entregado', 'Cancelado'][this.pedido.estado] || 'Desconocido';
-    },
+  // Computed existente
+  pedidosEnEspera() {
+    return this.pedidos.filter((pedido) => pedido.estado === 0);
+  },
+  pedidosEntregados() {
+    return this.pedidos.filter((pedido) => pedido.estado === 1);
+  },
+  pedidosCancelados() {
+    return this.pedidos.filter((pedido) => pedido.estado === 2);
+  },
+  // Nueva sección
+  pedidosPagados() {
+    return this.pedidos.filter((pedido) => pedido.estado === 3);
+  },
 },
+
 methods: {
-    entregar() {
+  // Método existente para entregar
+  entregar() {
     this.$emit('actualizarEstado', this.pedido.idpedido, 1);
-    },
-    cancelar() {
+  },
+  // Método existente para cancelar
+  cancelar() {
     this.$emit('actualizarEstado', this.pedido.idpedido, 2);
-    },
+  },
+  // Nuevo método para registrar pago
+  registrarPago() {
+    console.log("Registrando pago para el pedido:", this.pedido.idpedido);
+    this.$emit('actualizarEstado', this.pedido.idpedido, 2);
+  }
 },
+
 };
 </script>
   

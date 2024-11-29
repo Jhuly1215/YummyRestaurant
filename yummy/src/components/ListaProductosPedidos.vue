@@ -26,12 +26,7 @@
                 </tr>
               </tbody>
             </table>
-            <tfoot>
-              <tr>
-                <td colspan="3" style="text-align: right;"><strong>Total</strong></td>
-                <td><strong>{{ total }} Bs.</strong></td>
-              </tr>
-            </tfoot>
+                <h2><strong>Total: {{ total }} Bs. </strong></h2>                
           </div>
           <button class="close-button" @click="realizarPedido">Realizar pedido</button>
           <button class="close-button" @click="toggleModal">Cerrar</button>

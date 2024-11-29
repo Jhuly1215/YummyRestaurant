@@ -11,5 +11,6 @@ router.delete('/:id', pedidoController.eliminarPedido);
 // Nuevas rutas para entregar y cancelar pedidos
 router.put('/entregar/:id', pedidoController.entregarPedido); // Ruta para entregar un pedido
 router.put('/cancelar/:id', pedidoController.cancelarPedido); // Ruta para cancelar un pedido
+router.put('/pagar/:id', pedidoController.registrarPagoPedido); // ruta para registrar pago
 
 module.exports = router;

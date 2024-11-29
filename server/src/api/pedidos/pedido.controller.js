@@ -160,3 +160,30 @@ exports.cancelarPedido = async (req, res) => {
     res.status(500).json({ error: 'Error al cancelar el pedido' });
   }
 };
+
+// Cambia el estado de un pedido a pagado (3)
+exports.registrarPagoPedido = async (req, res) => {
+  const { id } = req.params;
+  console.log("Registrando pago para el pedido ID:", id);
+
+  try {
+    const [actualizado] = await sequelize.query(
+      `UPDATE pedido 
+       SET estado = 3
+       WHERE idpedido = :id`,
+      {
+        replacements: { id },
+        type: sequelize.QueryTypes.UPDATE,
+      }
+    );
+
+    if (actualizado) {
+      res.json({ message: 'Pedido pagado exitosamente' });
+    } else {
+      res.status(404).json({ error: 'Pedido no encontrado' });
+    }
+  } catch (error) {
+    console.error("Error al pagar el pedido:", error);
+    res.status(500).json({ error: 'Error al pagar el pedido' });
+  }
+};
