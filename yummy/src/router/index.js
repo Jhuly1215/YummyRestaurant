@@ -9,7 +9,7 @@ import CambioPass from '@/ventanas/cambioPassword.vue';
 import Ofertas from '@/ventanas/ofertasPage.vue';
 
 import MenuPedido from '@/ventanas/MenuPedido.vue';
-import PedidosAdmin from '@/ventanas/PedidosAdmin.vue';
+import PedidosAdmin from '@/components/PedidosAdminComponent.vue';
 
 import MapaInteractivo1 from '@/ventanas/mapaInteractivo.vue';
 
