@@ -68,6 +68,10 @@
               <button v-if="index === filaEnEdicion" class="action-button button-cancel" @click="cancelarCambios">
                 <i class="fa-solid fa-xmark"></i>
               </button>
+              <button @click="toggleDestacado(platillo)" class="action-button star-button">
+                <i :class="platillo.estado === 2 ? 'fas fa-star' : 'far fa-star'"></i>
+              </button>
+
             </td>
           </tr>
         </tbody>
@@ -172,6 +176,34 @@ export default {
     closeSuccessModal() {
       this.successModalVisible = false;
     },
+    async toggleDestacado(platillo) {
+      try {
+        // Llamada al backend para alternar el estado
+        const response = await axios.put(`http://localhost:5000/api/platillos/toggle-destacado/${platillo.idplato}`);
+
+        const nuevoEstado = response.data.nuevoEstado;
+
+        // Encuentra el índice del platillo en el array
+        const index = this.platillos.findIndex(p => p.idplato === platillo.idplato);
+
+        // Actualiza el estado del platillo en el array
+        if (index !== -1) {
+          this.$set(this.platillos, index, {
+            ...platillo,
+            estado: nuevoEstado, // Actualiza el estado al nuevo valor
+          });
+        }
+
+        // Mostrar un mensaje de éxito
+        this.mostrarSuccessModal(
+          `El platillo "${platillo.nombre}" ahora está ${nuevoEstado === 2 ? 'destacado' : 'no destacado'}.`
+        );
+      } catch (error) {
+        console.error("Error al cambiar el estado del platillo:", error);
+        this.mostrarSuccessModal('Error al cambiar el estado del platillo.');
+      }
+    }
+
   }
 };
 </script>
@@ -291,6 +323,10 @@ export default {
 
 .button-cancel {
   color: #f44336;
+}
+
+.star-button {
+  color: #FE9900;
 }
 
 /* Botón para agregar nuevo platillo */
