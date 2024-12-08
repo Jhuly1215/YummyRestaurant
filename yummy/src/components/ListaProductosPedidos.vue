@@ -6,6 +6,9 @@
     <transition name="fade">
       <div v-if="isModalOpen" class="modal-overlay" @click.self="toggleModal">
         <div class="modal-content">
+          <button class="close-icon" @click="toggleModal">
+            <i class="fa-solid fa-x"></i>
+          </button>
           <h2>Tu Pedido</h2>
           <div class="table-container">
             <table class="table">
@@ -28,8 +31,7 @@
             </table>
                 <h2><strong>Total: {{ total }} Bs. </strong></h2>                
           </div>
-          <button class="close-button" @click="realizarPedido">Realizar pedido</button>
-          <button class="close-button" @click="toggleModal">Cerrar</button>
+          <button class="order-button" @click="realizarPedido">Realizar pedido</button>
         </div>
       </div>
     </transition>
@@ -91,11 +93,19 @@ export default {
         return;
       }
 
+      // Obtener el ID del usuario logueado desde localStorage
+      const idUsuario = localStorage.getItem('id');
+      if (!idUsuario) {
+        alert("Debe iniciar sesión antes de realizar un pedido.");
+        return;
+      }
+
+      // Construir el objeto del pedido
       const pedido = {
         fecha: new Date().toISOString().slice(0, 10), // Fecha actual en formato YYYY-MM-DD
         hora: new Date().toTimeString().slice(0, 8), // Hora actual en formato HH:mm:ss
         estado: 0, // Pedido en espera
-        idusuario: 3, // Usuario fijo por ahora
+        idusuario: parseInt(idUsuario, 10), // ID del usuario logueado
         precio_total: this.total, // Total calculado
         detalles: this.platillosSeleccionados.map(p => ({
           idplato: p.idplato,
@@ -211,9 +221,9 @@ h2 {
 
 }
 
-.close-button {
+.order-button {
   background-color: #322209;
-  color: #FFFDA4;
+  color: #FFFEDC;
   border: none;
   padding: 10px;
   width: 40%;
@@ -224,8 +234,29 @@ h2 {
   align-self: center;
 }
 
-.close-button:hover {
+.order-button:hover {
   background-color: #807f7f;
+}
+
+.close-icon {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: none;
+  border: none;
+  background-color: #322209;
+  color: #FFFEDC;
+  font-size: 24px;
+  cursor: pointer;
+  z-index: 1001;
+  border-radius: 50px;
+  padding: 5px;
+  padding-left: 15px;
+  padding-right: 15px;
+}
+
+.close-icon:hover {
+  color: #807f7f;
 }
 
 </style>
