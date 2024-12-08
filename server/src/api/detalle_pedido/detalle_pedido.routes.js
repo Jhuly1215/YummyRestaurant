@@ -7,5 +7,6 @@ router.get('/', detallePedidoController.obtenerDetallesPedido);
 router.post('/', detallePedidoController.crearDetallePedido);
 router.put('/:id', detallePedidoController.actualizarDetallePedido);
 router.delete('/:id', detallePedidoController.eliminarDetallePedido);
+router.get('/pedido', detallePedidoController.obtenerDetallesPedidoPorPedido);
 
 module.exports = router;
