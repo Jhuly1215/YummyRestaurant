@@ -25,21 +25,25 @@ const actividadRoutes = require('./src/api/usuario/actividadRoutes');
 const mesasRoutes = require('./src/api/mesas/mesasRoutes');
 const categoriasRoutes = require('./src/api/categorias/categoria.routes');
 const reservaRoutes = require('./src/api/reservas/reservas.routes');
+const pedidosRoutes = require('./src/api/pedidos/pedido.routes');
+const detalle_pedidoRoutes = require('./src/api/detalle_pedido/detalle_pedido.routes');
+const pagosRoutes = require('./src/api/pagos/pago.routes');
 const dashboardRoutes = require('./src/api/dashboard/dashboard.routes');
-
-app.use('/api/platillos', platillosRoutes);
 const calificacionRoutes = require('./src/api/calificacion/calificacion.routes');
 
 
 
 app.use('/api/ofertas', ofertasRoutes);
-app.use('/api', platillosRoutes);
-app.use('/api', categoriasRoutes);
+app.use('/api/platillos', platillosRoutes);
+app.use('/api/categorias', categoriasRoutes);
 app.use('/api/usuario', usuarioRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/reservas', reservaRoutes);
 app.use('/api/actividad', actividadRoutes);
 app.use('/api/mesas', mesasRoutes);
+app.use('/api/pedidos', pedidosRoutes);
+app.use('/api/detalle_pedido', detalle_pedidoRoutes);
+app.use('/api/pagos', pagosRoutes);
 app.use('/api/dashboard', dashboardRoutes);
 app.use('/api/calificaciones', calificacionRoutes);
 

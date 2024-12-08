@@ -7,6 +7,10 @@ import PanelAdministrativo from '@/ventanas/panelAdministrativo.vue';
 import Recupera from '@/ventanas/recupera.vue';
 import CambioPass from '@/ventanas/cambioPassword.vue';
 import Ofertas from '@/ventanas/ofertasPage.vue';
+
+import MenuPedido from '@/ventanas/MenuPedido.vue';
+import PedidosAdmin from '@/ventanas/PedidosAdmin.vue';
+
 import MapaInteractivo1 from '@/ventanas/mapaInteractivo.vue';
 
 import MenuCliente from '@/ventanas/MenuCliente.vue'
@@ -74,6 +78,17 @@ const router = createRouter({
       component: MapaInteractivo1,
     },
     {
+      path: '/menucliente',
+      name: 'MenuCliente',
+      component: MenuCliente,
+    },
+    {
+      path: '/menupedido',
+      name: 'MenuPedido',
+      component: MenuPedido,
+    },
+    
+    {
       path: '/temporal',
       name: 'Calificaciones',
       component: TemporalCalificacion,
@@ -108,6 +123,11 @@ const router = createRouter({
         path: 'mapa',
         name: 'MapaAdmin',
         component: MapaInteractivo2,
+      },
+      {
+        path: 'pedidosadmin',
+        name: 'PedidosAdmin',
+        component: PedidosAdmin,
       },
     ],
   },

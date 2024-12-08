@@ -1,5 +1,6 @@
 <template>
   <div>
+    <CarouselComponent />
     
     <!-- Escucha el evento y almacena el ID de la categoría seleccionada -->
     <FiltroCategorias @categoriaSeleccionada="categoriaSeleccionada = $event" />
@@ -14,6 +15,7 @@
           :nombre="platillo.nombre"
           :descripcion="platillo.descripcion"
           :precio="platillo.precio"
+          :descuento="platillo.descuento" 
         />
       </div>
     </div>
@@ -24,16 +26,19 @@
 import axios from 'axios';
 import CardMenu from '@/components/CardMenu.vue';
 import FiltroCategorias from '@/components/FiltroCategorias.vue';
+import CarouselComponent from '@/components/CarouselComponent.vue';
 
 export default {
   name: 'MenuCliente',
   components: {
+    CarouselComponent,
     CardMenu,
     FiltroCategorias,
   },
   data() {
     return {
       platillos: [],
+      ofertas: [],
       categoriaSeleccionada: null,
       cargando: false,
       error: null
@@ -51,29 +56,47 @@ export default {
     this.obtenerPlatillos();
   },
   methods: {
+    async obtenerOfertas() {
+      try {
+        const response = await axios.get('http://localhost:5000/api/ofertas');
+        this.ofertas = response.data;
+      } catch (error) {
+        console.error("Error al obtener las ofertas:", error);
+      }
+    },
+
     async obtenerPlatillos() {
-    this.cargando = true; // Inicia el estado de carga
-    this.error = null; // Limpia errores anteriores
-    try {
-      const response = await axios.get('http://localhost:5000/api/platillos');
-      this.platillos = response.data;
-    } catch (error) {
-      console.error("Error al obtener los platillos:", error);
-      this.error = "No se pudieron cargar los platillos. Por favor, intenta más tarde.";
-    } finally {
-      this.cargando = false; // Finaliza el estado de carga
+      try {
+        const response = await axios.get('http://localhost:5000/api/platillos');
+        this.platillos = response.data;
+        await this.obtenerOfertas(); // Cargar ofertas después de los platillos
+
+        // Relaciona ofertas con platillos
+        this.platillos = this.platillos.map(platillo => {
+          const oferta = this.ofertas.find(of => of.idPlato === platillo.idplato);
+          if (oferta) {
+            platillo.descuento = oferta.descuento; // Asegúrate de que se asigne el descuento
+          } else {
+            platillo.descuento = null;
+          }
+          return platillo;
+        });
+        console.log('Platillos con descuentos:', this.platillos); // Verifica los platillos
+      } catch (error) {
+        console.error("Error al obtener los platillos:", error);
+      }
     }
-  }
+
   }
 };
 </script>
 
 <style scoped>
 .main {
-max-width: 1200px;
-margin: 0 auto;
-margin-top: 20px;
-margin-bottom: 100px;
+  max-width: 1200px;
+  margin: 0 auto;
+  margin-top: 20px;
+  margin-bottom: 100px;
 }
 
 .cards {
@@ -84,8 +107,8 @@ margin-bottom: 100px;
 }
 
 .cards > * {
-  flex: 1 1 calc(33.33% - 20px); /* 33.33% para tres tarjetas por fila, menos el espacio de gap */
-  max-width: calc(33.33% - 20px); /* Para asegurar que no exceda el ancho */
+  flex: 1 1 calc(33.33% - 20px); /* Tres tarjetas por fila */
+  max-width: calc(33.33% - 20px);
 }
 
 @media (max-width: 768px) {
@@ -94,5 +117,4 @@ margin-bottom: 100px;
     max-width: 90%;
   }
 }
-
 </style>
