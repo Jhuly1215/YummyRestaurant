@@ -16,6 +16,7 @@ router.put('/actualizar-contrasena/:id', usuarioController.actualizarContrasena)
 // Rutas para verificación de correo
 router.post('/enviar-codigo', usuarioController.enviarCodigo); // Ruta para enviar código de verificación
 router.post('/verificar-codigo', usuarioController.verificarCodigo); // Ruta para verificar el código de verificación
+router.post('/enviar-reserva', usuarioController.enviarReserva); // Ruta para verificar el código de verificación
 
 
 

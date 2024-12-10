@@ -1,10 +1,22 @@
 // src/api/reserva.controller.js
 const sequelize = require('../../config/db');
+const nodemailer = require('nodemailer');
+const Mesa = require('../mesas/mesasModel');
+const Usuario = require('../usuario/usuario.model')
 
-// Crear una nueva reserva
+// Configurar transporter de nodemailer (ajústalo con tu configuración)
+const transporter = nodemailer.createTransport({
+    service: 'gmail',
+    auth: {
+        user: process.env.EMAIL_USER, // Tu correo
+        pass: process.env.EMAIL_PASS, // Tu contraseña o app password
+    },
+});
+
 exports.crearReserva = async (req, res) => {
     const { idusuario, idmesa, fecha, hora, estado } = req.body; // Extraer datos del body
     console.log("Datos recibidos para crear reserva:", req.body);
+
     // Validar que todos los campos requeridos estén presentes
     if (!idusuario || !idmesa || !fecha || !hora || estado === undefined) {
         return res.status(400).json({ error: 'Todos los campos son obligatorios' });
@@ -21,14 +33,51 @@ exports.crearReserva = async (req, res) => {
             }
         );
 
+        // Obtener información del usuario
+        const usuario = await Usuario.findOne({ where: { idusuario: idusuario } });
+        if (!usuario) {
+            return res.status(404).json({ error: 'Usuario no encontrado.' });
+        }
+
+        // Obtener información de la mesa
+        const mesa = await Mesa.findOne({ where: { idmesa: idmesa, visible: true } });
+        if (!mesa) {
+            return res.status(404).json({ error: 'Mesa no encontrada o no está visible.' });
+        }
+
+        // Configurar contenido del correo
+        const mailOptions = {
+            from: process.env.EMAIL_USER,
+            to: usuario.correo, // Correo del usuario
+            subject: 'Reserva Confirmada',
+            html: `
+                <div style="font-family: Arial, sans-serif; text-align: center; padding: 20px; border: 1px solid #ccc; border-radius: 5px;">
+                    <h2>¡Gracias por tu reserva!</h2>
+                    <p>Tu reserva ha sido realizada con éxito.</p>
+                    <p><strong>Detalles de la Reserva:</strong></p>
+                    <ul style="list-style: none; padding: 0; text-align: left;">
+                        <li><strong>Fecha:</strong> ${fecha}</li>
+                        <li><strong>Hora:</strong> ${hora}</li>
+                        <li><strong>Mesa:</strong> ${mesa.nombre}</li>
+                    </ul>
+                    <p>Gracias por elegirnos. ¡Te esperamos!</p>
+                </div>
+            `,
+        };
+
+        // Enviar correo
+        await transporter.sendMail(mailOptions);
+
         // Responder con éxito
-        res.status(201).json({ message: 'Reserva creada exitosamente', data: nuevaReserva });
+        res.status(201).json({ 
+            message: 'Reserva creada y correo enviado exitosamente', 
+            data: nuevaReserva 
+        });
     } catch (error) {
         console.error("Error al crear la reserva:", error);
         res.status(500).json({ error: 'Error al crear la reserva' });
     }
 };
-
 
 // Obtener todas las reservas
 exports.obtenerReservas = async (req, res) => {
