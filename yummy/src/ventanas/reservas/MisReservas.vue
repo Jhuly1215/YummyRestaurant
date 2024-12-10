@@ -1,7 +1,6 @@
 <template>
     <div class="reservas-container">
       <h1>Mis Reservas</h1>
-  
       <!-- Mostrar error si existe -->
       <div v-if="error" class="error-card">
         <p>{{ error }}</p>

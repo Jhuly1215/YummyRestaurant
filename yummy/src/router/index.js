@@ -11,7 +11,7 @@ import MapaInteractivo from '@/ventanas/mapaInteractivo.vue';
 import MenuCliente from '@/ventanas/MenuCliente.vue'
 import TemporalCalificacion from '@/ventanas/temporalCalificacion.vue'
 import MisReservas from '@/ventanas/reservas/MisReservas.vue';
-import MisPedidos from '@/ventanas/pedidos.vue/MisPedidos.vue';
+import MisPedidos from '@/ventanas/MisPedidos.vue';
 
 //para el administrador
 

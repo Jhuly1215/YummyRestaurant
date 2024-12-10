@@ -25,7 +25,7 @@
   <script>
   import axios from "axios";
   export default {
-    name: "StarRatingModal",
+    name: "StarRatingModalPlatillo",
     props: {
       show: {
         type: Boolean,
@@ -39,34 +39,20 @@
     emits: ["close", "submitted"],
     data() {
       return {
-        rating: 0, // Calificación seleccionada
+        rating: 0, 
       };
     },
     methods: {
       setRating(star) {
-        this.rating = star; // Actualiza la calificación seleccionada
+        this.rating = star; 
       },
-      async submitRating() {
+      submitRating() {
+    
         this.$emit("submitted", { platillo: this.platillo, rating: this.rating });
         this.close();
-        try {
-          const idusuario = 1; 
-          await axios.post("/api/calificaciones", {
-            puntuacion: this.rating,
-            idusuario: idusuario,
-            idplato: 2,//CAMBIAR PARA EL BACKEND CON LOS PLATILLOS
-          });
-  
-          alert("¡Gracias por tu calificación!");
-          this.$emit("submitted", this.rating);
-          this.close(); 
-        } catch (error) {
-          console.error("Error al enviar la calificación:", error);
-          alert("Hubo un problema al guardar tu calificación.");
-        }
       },
       close() {
-        // Emite el evento para cerrar el modal
+       
         this.$emit("close");
       },
     },

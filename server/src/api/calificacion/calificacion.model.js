@@ -1,5 +1,5 @@
 const { DataTypes } = require('sequelize');
-const sequelize = require('../config/db');
+const sequelize = require('../../config/db');
 
 const Calificacion = sequelize.define('Resenia', {
   idresenia: {
@@ -9,7 +9,16 @@ const Calificacion = sequelize.define('Resenia', {
   },
   puntuacion: {
     type: DataTypes.INTEGER,
-    allowNull: true, // Permitimos NULL
+    allowNull: false, // Calificación no puede ser nula
+    validate: {
+      min: 1, // Puntuación mínima
+      max: 5, // Puntuación máxima
+    },
+  },
+  fecha: {
+    type: DataTypes.DATEONLY,
+    allowNull: false,
+    defaultValue: DataTypes.NOW, // Fecha por defecto
   },
   idusuario: {
     type: DataTypes.INTEGER,

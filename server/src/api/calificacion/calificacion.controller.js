@@ -3,11 +3,12 @@ const sequelize = require('../../config/db');
 // Crear una nueva calificación
 exports.crearCalificacion = async (req, res) => {
   const { puntuacion, idusuario, idplato } = req.body;
+  console.log('Solicitud recibida para guardar calificación:', req.body);
 
   try {
     const nuevaCalificacion = await sequelize.query(
-      `INSERT INTO resenia (puntuacion, idusuario, idplato)
-       VALUES (:puntuacion, :idusuario, :idplato)`,
+      `INSERT INTO resenia (puntuacion, fecha, idusuario, idplato)
+       VALUES (:puntuacion, NOW(), :idusuario, :idplato) RETURNING *`,
       {
         replacements: { puntuacion, idusuario, idplato },
         type: sequelize.QueryTypes.INSERT,
@@ -16,7 +17,7 @@ exports.crearCalificacion = async (req, res) => {
 
     res.status(201).json({
       message: 'Calificación creada exitosamente',
-      data: nuevaCalificacion,
+      data: nuevaCalificacion[0],
     });
   } catch (error) {
     console.error('Error al crear la calificación:', error);
@@ -28,7 +29,7 @@ exports.crearCalificacion = async (req, res) => {
 exports.obtenerCalificaciones = async (req, res) => {
   try {
     const calificaciones = await sequelize.query(
-      `SELECT r.idresenia, r.puntuacion, r.idusuario, r.idplato,
+      `SELECT r.idresenia, r.puntuacion, r.fecha, r.idusuario, r.idplato,
               u.nombre AS usuario, p.nombre AS platillo
        FROM resenia r
        LEFT JOIN usuario u ON r.idusuario = u.idusuario
@@ -46,15 +47,15 @@ exports.obtenerCalificaciones = async (req, res) => {
 // Actualizar una calificación
 exports.actualizarCalificacion = async (req, res) => {
   const { id } = req.params;
-  const { puntuacion, idusuario, idplato } = req.body;
+  const { puntuacion } = req.body;
 
   try {
     const [actualizado] = await sequelize.query(
       `UPDATE resenia
-       SET puntuacion = :puntuacion, idusuario = :idusuario, idplato = :idplato
+       SET puntuacion = :puntuacion
        WHERE idresenia = :id`,
       {
-        replacements: { id, puntuacion, idusuario, idplato },
+        replacements: { id, puntuacion },
         type: sequelize.QueryTypes.UPDATE,
       }
     );
