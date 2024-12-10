@@ -44,13 +44,14 @@
 </template>
 
 <script>
+import { jsPDF } from "jspdf";
 import axios from "axios";
 import SuccessModal from "./SuccessModal.vue";
 
 export default {
   name: "ListaProductosPedidos",
-  components:{
-    SuccessModal
+  components: {
+    SuccessModal,
   },
   props: {
     cantidadesSeleccionadas: {
@@ -80,7 +81,7 @@ export default {
     return {
       isModalOpen: false,
       successModalVisible: false,
-      successMensaje: '',
+      successMensaje: "",
     };
   },
   methods: {
@@ -93,31 +94,30 @@ export default {
         return;
       }
 
-      // Obtener el ID del usuario logueado desde localStorage
-      const idUsuario = localStorage.getItem('id');
+      const idUsuario = localStorage.getItem("id");
       if (!idUsuario) {
         alert("Debe iniciar sesión antes de realizar un pedido.");
         return;
       }
 
-      // Construir el objeto del pedido
       const pedido = {
-        fecha: new Date().toISOString().slice(0, 10), // Fecha actual en formato YYYY-MM-DD
-        hora: new Date().toTimeString().slice(0, 8), // Hora actual en formato HH:mm:ss
-        estado: 0, // Pedido en espera
-        idusuario: parseInt(idUsuario, 10), // ID del usuario logueado
-        precio_total: this.total, // Total calculado
-        detalles: this.platillosSeleccionados.map(p => ({
+        fecha: new Date().toISOString().slice(0, 10),
+        hora: new Date().toTimeString().slice(0, 8),
+        estado: 0,
+        idusuario: parseInt(idUsuario, 10),
+        precio_total: this.total,
+        detalles: this.platillosSeleccionados.map((p) => ({
           idplato: p.idplato,
           cantidad: p.cantidad,
-        })), // Detalles del pedido
+        })),
       };
 
       try {
-        const response = await axios.post('http://localhost:5000/api/pedidos', pedido);
-        this.mostrarSuccessModal('Pedido realizado con éxito');
-        this.$emit("pedidoRealizado"); // Notifica al componente padre para reiniciar el estado
-        this.toggleModal(); // Cierra el modal
+        await axios.post("http://localhost:5000/api/pedidos", pedido);
+        this.mostrarSuccessModal("Pedido realizado con éxito");
+        this.$emit("pedidoRealizado");
+        this.toggleModal();
+        this.generarPDF(); // Llamada a la función para generar el PDF
       } catch (error) {
         console.error("Error al realizar el pedido:", error);
         alert("Hubo un error al realizar el pedido. Por favor, inténtelo nuevamente.");
@@ -132,6 +132,28 @@ export default {
       this.successModalVisible = false;
     },
 
+    generarPDF() {
+      const doc = new jsPDF();
+
+      doc.text("Resumen de tu pedido", 10, 10);
+      doc.text("Fecha: " + new Date().toISOString().slice(0, 10), 10, 20);
+
+      // Agregar detalles del pedido
+      let yOffset = 30;
+      this.platillosSeleccionados.forEach((platillo) => {
+        doc.text(
+          `${platillo.nombre} - Cantidad: ${platillo.cantidad} - Subtotal: ${platillo.subtotal} Bs.`,
+          10,
+          yOffset
+        );
+        yOffset += 10;
+      });
+
+      doc.text(`Total: ${this.total} Bs.`, 10, yOffset + 10);
+
+      // Descargar el PDF
+      doc.save("pedido.pdf");
+    },
   },
 };
 </script>
