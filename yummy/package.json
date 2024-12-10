@@ -22,6 +22,7 @@
     "express": "^4.21.1",
     "fontawesome-free": "^1.0.4",
     "jspdf": "^2.5.2",
+    "jspdf-autotable": "^3.8.4",
     "jwt-decode": "^4.0.0",
     "pinia": "^2.2.6",
     "sweetalert2": "^11.14.5",

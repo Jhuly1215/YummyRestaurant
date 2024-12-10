@@ -45,6 +45,7 @@
 
 <script>
 import { jsPDF } from "jspdf";
+import "jspdf-autotable";
 import axios from "axios";
 import SuccessModal from "./SuccessModal.vue";
 
@@ -135,21 +136,51 @@ export default {
     generarPDF() {
       const doc = new jsPDF();
 
-      doc.text("Resumen de tu pedido", 10, 10);
-      doc.text("Fecha: " + new Date().toISOString().slice(0, 10), 10, 20);
+      // Título
+      doc.setFontSize(18);
+      doc.setFont("helvetica", "bold");
+      doc.text("DETALLE DEL PEDIDO", 10, 20);
 
-      // Agregar detalles del pedido
-      let yOffset = 30;
-      this.platillosSeleccionados.forEach((platillo) => {
-        doc.text(
-          `${platillo.nombre} - Cantidad: ${platillo.cantidad} - Subtotal: ${platillo.subtotal} Bs.`,
-          10,
-          yOffset
-        );
-        yOffset += 10;
+      // Fecha y Hora
+      const fecha = new Date().toISOString().slice(0, 10);
+      const hora = new Date().toTimeString().slice(0, 8);
+      doc.setFontSize(12);
+      doc.setFont("helvetica", "normal");
+      doc.text(`Fecha: ${fecha}`, 10, 30);
+      doc.text(`Hora: ${hora}`, 10, 36);
+
+      // Tabla de productos
+      const productos = this.platillosSeleccionados.map((platillo) => [
+        platillo.nombre,
+        `${platillo.precio} Bs.`,
+        platillo.cantidad,
+        `${platillo.subtotal} Bs.`,
+      ]);
+
+      doc.autoTable({
+        startY: 50,
+        head: [["Platillo", "Precio", "Cantidad", "Subtotal"]],
+        body: productos,
+        theme: "grid",
+        styles: {
+          font: "helvetica",
+          fontSize: 12,
+          halign: "center",
+        },
+        headStyles: {
+          fillColor: [255, 223, 102],
+          textColor: [50, 34, 9],
+        },
+        bodyStyles: {
+          textColor: [50, 34, 9],
+        },
       });
 
-      doc.text(`Total: ${this.total} Bs.`, 10, yOffset + 10);
+      // Total
+      const finalY = doc.lastAutoTable.finalY + 10;
+      doc.setFontSize(16);
+      doc.setFont("helvetica", "bold");
+      doc.text(`Total: ${this.total} Bs.`, 10, finalY);
 
       // Descargar el PDF
       doc.save("pedido.pdf");
