@@ -16,6 +16,7 @@ import TemporalCalificacion from '@/ventanas/temporalCalificacion.vue'
 import OfertasAdminComponent from '../ventanas/OfertasAdminComponent.vue'
 import PlatillosAdminComponent from '@/components/PlatillosAdminComponent.vue';
 import JReservasAdminComponent from '@/ventanas/reservas/Reservas.vue';
+import UsuariosAdminComponent from '../ventanas/UsuariosAdminComponent.vue';
 import DashboardComponent from '../ventanas/dashboardComponent.vue';
 
 const router = createRouter({
@@ -85,7 +86,7 @@ const router = createRouter({
       //meta: { requiresAuth: true }, // Requiere autenticación
       children: [
         {
-          path: 'section1', // Ruta base de panel administrativo
+          path: 'dashboard', // Ruta base de panel administrativo
           name: 'Dashboard',
           component: DashboardComponent, // Componente del Dashboard
         },
@@ -93,6 +94,11 @@ const router = createRouter({
           path: 'ofertas',
           name: 'AdminOfertas',
           component: OfertasAdminComponent, // Gestión de ofertas
+        },
+        {
+          path: 'usuarios',
+          name: 'AdminUsuarios',
+          component: UsuariosAdminComponent, // Gestión de ofertas
         },
         {
           path: 'platillos',

@@ -26,6 +26,7 @@ const platillosRoutes = require('./src/api/platillos/platillo.routes');
 const categoriasRoutes = require('./src/api/categorias/categoria.routes');
 const reservaRoutes = require('./src/api/reservas/reservas.routes');
 const dashboardRoutes = require('./src/api/dashboard/dashboard.routes');
+const rolRoutes = require('./src/api/rol/rol.routes')
 
 app.use('/api/platillos', platillosRoutes);
 const calificacionRoutes = require('./src/api/calificacion/calificacion.routes');
@@ -33,6 +34,7 @@ const calificacionRoutes = require('./src/api/calificacion/calificacion.routes')
 
 
 app.use('/api/ofertas', ofertasRoutes);
+app.use('/api/rol', rolRoutes);
 app.use('/api', platillosRoutes);
 app.use('/api', categoriasRoutes);
 app.use('/api/usuario', usuarioRoutes);

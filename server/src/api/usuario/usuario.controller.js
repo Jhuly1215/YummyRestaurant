@@ -49,6 +49,33 @@ exports.registrarUsuario = async (req, res) => {
     res.status(500).json({ message: 'Error al registrar el usuario', error: error.message });
   }
 };
+
+// Actualizar solo el rol de un usuario
+exports.actualizarRolUsuario = async (req, res) => {
+  const { id } = req.params;
+  const { idRol } = req.body;
+
+  try {
+    // Ejecutar la consulta para actualizar solo el campo de rol
+    const [actualizado] = await sequelize.query(
+      `UPDATE usuario SET idrol = :idRol WHERE idUsuario = :id`,
+      {
+        replacements: { id, idRol },
+        type: sequelize.QueryTypes.UPDATE,
+      }
+    );
+
+    if (actualizado) {
+      res.json({ message: 'Rol del usuario actualizado exitosamente' });
+    } else {
+      res.status(404).json({ error: 'Usuario no encontrado' });
+    }
+  } catch (error) {
+    console.error("Error al actualizar el rol del usuario:", error);
+    res.status(500).json({ error: 'Error al actualizar el rol del usuario' });
+  }
+};
+
 // Obtener todos los usuarios
 exports.obtenerUsuarios = async (req, res) => {
   try {
