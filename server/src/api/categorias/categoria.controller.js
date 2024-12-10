@@ -1,4 +1,4 @@
-// src/api/categoria.controller.js
+// src/api/categorias/categoria.controller.js
 const sequelize = require('../../config/db');
 
 // Crear una nueva categoría

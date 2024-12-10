@@ -5,9 +5,11 @@
       <h1>Tu lugar para compartir y disfrutar</h1>
       <div class="opciones">
         <a><router-link to="/ofertas">Ofertas</router-link></a>
-        <a><router-link to="/mapa">Mapa Interactivo</router-link></a>
+        <a v-if="isLoggedIn && isAdmin != 2"><router-link to="/mapa">Mapa Interactivo</router-link></a>
         <a><router-link to="/menu">Menu</router-link></a>
-        <a><router-link to="/panelAdministrativo">Panel Administrativo</router-link></a>
+        <a v-if="isLoggedIn && isAdmin === 2">
+          <router-link to="/panelAdministrativo">Panel Administrativo</router-link>
+        </a>
         <a @click="handleAuthAction">
           <router-link v-if="!isLoggedIn" to="/iniciarsesion">Login</router-link>
           <span v-else>Cerrar sesión</span>
@@ -23,11 +25,13 @@ export default {
   data() {
     return {
       isLoggedIn: false, // Estado de autenticación
+      isAdmin: '', // Estado de autenticación
     };
   },
   mounted() {
     // Verifica si hay un token al cargar el componente
     this.isLoggedIn = !!localStorage.getItem('token');
+    this.isAdmin = parseInt(localStorage.getItem("rol"), 10);
   },
   methods: {
     goToHome() {
@@ -36,7 +40,9 @@ export default {
     handleAuthAction() {
       if (this.isLoggedIn) {
         // Si el usuario está logueado, cerrar sesión
-        localStorage.removeItem('token'); // Elimina el token del almacenamiento local
+        localStorage.removeItem('token');
+        localStorage.removeItem('id');
+        localStorage.removeItem('rol'); // Elimina el token del almacenamiento local
         this.isLoggedIn = false;
         this.$router.push('/'); // Redirige al Home después de cerrar sesión
       } else {

@@ -1,16 +1,11 @@
 /* eslint-disable */
 
 <template>
-  <div class="contenedorP">
+  <div>
       <h1>Mapa Interactivo de Mesas</h1>
-      <div v-if="mostrarMesa" class="row">
-        <div class="card">
-            <h4>{{mesaSeleccionada.nombre}}</h4>
-            <p>Capacidad: {{ mesaSeleccionada.capacidad }}</p>
-            <button class="btn-reservar" @click="abrirModalReserva">Reservar</button>
-        </div>
-    </div>
       <button v-if="rol == 2" @click="mostrarFormulario('añadir')">Añadir Mesa</button>
+
+      <button v-if="rol == 2" @click="guardarCoordenadas()">Guardar Mesas</button>
       <svg ref="mapa" width="800" height="400"></svg>
       <div id="info-mesa">{{ infoMesa }}</div>
 
@@ -27,11 +22,6 @@
             <label for="capacidad">Capacidad:</label>
             <input type="number" v-model="mesaForm.capacidad" min="1" required />
 
-            <label for="capacidad">PosX:</label>
-            <input type="number" v-model="mesaForm.posx" />
-
-            <label for="capacidad">PosY:</label>
-            <input type="number" v-model="mesaForm.posy"/>
 
             <button type="submit" style="grid-column: span 2;">Aceptar</button>
             <button type="button" @click="borrarMesaConfirmada" style="grid-column: span 2;">Eliminar</button>
@@ -56,6 +46,7 @@
 import * as d3 from 'd3';
 import { useMesaStore } from '@/stores/mesasStore'; // Importa tu store
 import NuevaReserva from "@/ventanas/reservas/reservaMapa.vue";
+import Swal from 'sweetalert2';
 
 export default {
     name: "ReservasPage",
@@ -66,13 +57,14 @@ export default {
         return {
             mesas: [],
             infoMesa: '',
-            mostrarMesa: false,
+
             clickTimeout: null,
             mostrarModal: false,
             mostrarModalConfirmacion: false,
             modalNuevaReservaVisible: false,
             modoFormulario: '', // Puede ser 'añadir' o 'editar'
             mesaSeleccionada: {},
+            actualizarMesas: [],
             mesaForm: {
                 nombre: '',
                 capacidad: 1,
@@ -95,69 +87,76 @@ export default {
         this.modalNuevaReservaVisible = false;
         },
         crearMapa() {
-            const svg = d3.select(this.$refs.mapa);
+    const svg = d3.select(this.$refs.mapa);
 
-            // Crear un fondo de color (un rectángulo que cubre todo el área del mapa)
-            svg.append("rect")
-                .attr("class", "fondo")
-                .attr("width", "100%")  // Esto cubre todo el ancho del contenedor
-                .attr("height", "100%")  // Esto cubre todo el alto del contenedor
-                .attr("fill", "#A16F23");  // Color de fondo diferente para asegurar que se vea
+    // Crear un fondo de color
+    svg.append("rect")
+        .attr("class", "fondo")
+        .attr("width", "100%")
+        .attr("height", "100%")
+        .attr("fill", "#A16F23");
 
-            const drag = d3.drag()
-                .on("start", function (event, d) {
-                    d3.select(this).raise().classed("active", true);
-                })
-                .on("drag", function (event, d) {
-                    d.x = event.x;
-                    d.y = event.y;
-                    d3.select(this).attr("cx", d.x).attr("cy", d.y);  // Actualiza las coordenadas del círculo
+    const drag = d3.drag()
+        .on("start", function (event, d) {
+            d3.select(this).raise().classed("active", true);
+        })
+        .on("drag", (event, d) => {
+            // Usamos d3.select para asegurar que estamos trabajando con el elemento SVG correcto
+            d.x = event.x;
+            d.y = event.y;
 
-                    // Mover el texto con el círculo
-                    d3.select(this.parentNode).select(".mesa-label")
-                        .attr("x", d.x)  // Ajuste para mantener el texto centrado
-                        .attr("y", d.y + 5); // Ajuste para mantener el texto centrado verticalmente
-                    console.log(`Posición X: ${d.x}, Posición Y: ${d.y}`);
-                })
-                .on("end", function () {
-                    d3.select(this).classed("active", false);
-                });
+            // Actualiza el círculo de la mesa
+            d3.select(event.sourceEvent.target)  // Usar el evento fuente para el target (el círculo)
+                .attr("cx", d.x)
+                .attr("cy", d.y);
 
-            // Crear los círculos para las mesas
-            svg.selectAll(".mesa")
-                .data(this.mesas)
-                .enter()
-                .append("circle")
-                .attr("class", "mesa")
-                .attr("r", 35)  // Radio del círculo (ajusta según necesites)
-                .attr("cx", d => d.posx)  // Coordenada X del centro
-                .attr("cy", d => d.posy)  // Coordenada Y del centro
-                .style("fill", "#FFFEDC")
-                .style("stroke", "#000")
-                .style("cursor", this.rol !== 1 ? "pointer" : "pointer")
-                .call(this.rol == 2 ? drag : () => {}) // Solo aplica el arrastre si rol no es 1
-                .on("click", (event, d) => {
-                    clearTimeout(this.clickTimeout);
-                    this.clickTimeout = setTimeout(() => {
-                        this.rol === 1 ? this.abrirModalNuevaReserva(d) :  this.mostrarFormulario('editar',d);
-                    }, 200);
-                });
+            // Actualiza la posición del texto de la mesa
+            d3.select(event.sourceEvent.target.parentNode)
+                .select(".mesa-label")
+                .attr("x", d.x)
+                .attr("y", d.y + 5);
 
-            // Crear las etiquetas (nombres) de las mesas
-            svg.selectAll(".mesa-label")
-                .data(this.mesas)
-                .enter()
-                .append("text")
-                .attr("class", "mesa-label")
-                .attr("x", d => d.posx)  // Centrado horizontalmente sobre el círculo
-                .attr("y", d => d.posy + 5)  // Ajuste vertical (para centrar el texto dentro del círculo)
-                .attr("text-anchor", "middle")  // Centrado del texto
-                .attr("font-size", "16px")
-                .attr("font-weight", "bold")  // Texto en negrita
-                .attr("fill", "#322209")  // Color del texto
-                .text(d => d.nombre);  // Muestra el nombre de la mesa
+            // Actualizar el array de mesas a actualizar
+            this.actualizarMesaCor(d);
+        })
+        .on("end", function () {
+            d3.select(this).classed("active", false);
+        });
 
-                svg.append("rect")
+    // Crear las mesas
+    svg.selectAll(".mesa")
+        .data(this.mesas)
+        .enter()
+        .append("circle")
+        .attr("class", "mesa")
+        .attr("r", 35)
+        .attr("cx", d => d.posx)
+        .attr("cy", d => d.posy)
+        .style("fill", "#FFFEDC")
+        .style("stroke", "#000")
+        .style("cursor", this.rol !== 1 ? "pointer" : "pointer")
+        .call(this.rol == 2 ? drag : () => {})
+        .on("click", (event, d) => {
+            clearTimeout(this.clickTimeout);
+            this.clickTimeout = setTimeout(() => {
+                this.rol === 1 ? this.abrirModalNuevaReserva(d) : this.mostrarFormulario('editar', d);
+            }, 200);
+        });
+
+    // Crear las etiquetas de las mesas
+    svg.selectAll(".mesa-label")
+        .data(this.mesas)
+        .enter()
+        .append("text")
+        .attr("class", "mesa-label")
+        .attr("x", d => d.posx)
+        .attr("y", d => d.posy + 5)
+        .attr("text-anchor", "middle")
+        .attr("font-size", "16px")
+        .attr("font-weight", "bold")
+        .attr("fill", "#322209")
+        .text(d => d.nombre);
+        svg.append("rect")
                     .attr("x", 50)  // Posición horizontal del rectángulo
                     .attr("y", 350)  // Posición vertical del rectángulo
                     .attr("width", 100)  // Ancho del rectángulo
@@ -173,6 +172,7 @@ export default {
                     .attr("font-size", "16px")
                     .attr("fill", "#ffffff")  // Color del texto
                     .text("Entrada");  // El texto que aparecerá dentro del rectángulo
+
                     svg.append("rect")
                     .attr("x", 540)  // Posición horizontal del rectángulo
                     .attr("y", 80)  // Posición vertical del rectángulo
@@ -180,17 +180,75 @@ export default {
                     .attr("height", 250)  // Alto del rectángulo
                     .attr("fill", "#ffffff")  // Color de fondo del rectángulo
                     .attr("stroke", "#fff")  // Color del borde
-        },
+},
+
+    // Actualiza las coordenadas de la mesa en el array 'actualizarMesas'
+    actualizarMesaCor(mesa) {
+        const index = this.actualizarMesas.findIndex(item => item.idmesa === mesa.idmesa);
+        if (index !== -1) {
+            // Si la mesa ya está en el array, actualiza las coordenadas
+            this.actualizarMesas[index].posx = mesa.x;
+            this.actualizarMesas[index].posy = mesa.y;
+        } else {
+            // Si no está, agrega la nueva mesa con sus coordenadas
+            this.actualizarMesas.push({ ...mesa });
+        }
+    },
+
+    // Función para guardar las mesas actualizadas en la base de datos
+    guardarCoordenadas() {
+        if (this.actualizarMesas.length > 0) {
+            const mesaStore = useMesaStore();
+            const promesas = []; // Array para guardar las promesas de las actualizaciones
+
+            this.actualizarMesas.forEach(mesa => {
+                const mesaActualizada = {
+                    idmesa: mesa.idmesa,
+                    posx: mesa.posx,
+                    posy: mesa.posy
+                };
+
+                // Guardar las promesas de cada actualización
+                promesas.push(
+                    mesaStore.actualizarMesa(mesa.idmesa, mesaActualizada)
+                        .then(() => {
+                            console.log(`Mesa ${mesa.idmesa} actualizada correctamente.`);
+                        })
+                        .catch((error) => {
+                            console.error('Error al guardar las coordenadas de la mesa:', error);
+                        })
+                );
+            });
+
+            // Esperar a que todas las actualizaciones se completen
+            Promise.all(promesas)
+                .then(() => {
+                    mesaStore.obtenerMesas(); // Recargar las mesas desde el backend
+                    this.actualizarMesas = []; // Limpiar el array después de guardar
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Guardado exitoso',
+                        text: 'Las coordenadas de las mesas se han actualizado correctamente.',
+                        timer: 2000,
+                        showConfirmButton: false
+                    });
+                })
+                .catch((error) => {
+                    console.error('Error al guardar las mesas:', error);
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'Ocurrió un error al guardar las mesas.',
+                    });
+                });
+        }
+    },
 
         abrirModalNuevaReserva(mesa) {
-            this.mostrarMesa = true;
+            this.modalNuevaReservaVisible = true;
             this.mesaSeleccionada = mesa;
             // Puedes pasar información de la mesa seleccionada al modal, si es necesario
             console.log(`Abriendo modal de reserva para la mesa: ${mesa.nombre}`);
-        },
-        abrirModalReserva() {
-            this.modalNuevaReservaVisible = true;
-
         },
 
 
@@ -213,6 +271,9 @@ export default {
         cerrarModal() {
             this.mostrarModal = false;
             this.mostrarModalConfirmacion = false;
+        },
+        mostrarArray(){
+                console.log("array de mesas para actualizar: ", this.actualizarMesas)
         },
         agregarMesa() {
             const nuevaMesa = { 
@@ -237,23 +298,35 @@ export default {
             const mesaActualizada = {
                 nombre: this.mesaForm.nombre,
                 capacidad: this.mesaForm.capacidad,
-                posx: this.mesaForm.posx,  // Asegúrate de mantener las posiciones
+                posx: this.mesaForm.posx,
                 posy: this.mesaForm.posy
             };
 
-            // Usamos el store para actualizar la mesa
             const mesaStore = useMesaStore();
-            mesaStore.actualizarMesa(this.mesaSeleccionada.idmesa, mesaActualizada) // Llamamos al store para actualizar la mesa
+
+            mesaStore.actualizarMesa(this.mesaSeleccionada.idmesa, mesaActualizada)
                 .then(() => {
-                    this.cerrarModal();
-                    this.actualizarMapa();
-                    // Vuelve a obtener las mesas actualizadas desde el backend
-                    mesaStore.obtenerMesas(); // Recarga los datos
+                    this.cerrarModal(); // Cierra el modal de edición
+                    this.actualizarMapa(); // Actualiza el mapa
+                    mesaStore.obtenerMesas(); // Recarga las mesas desde el backend
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Actualización exitosa',
+                        text: `La mesa "${mesaActualizada.nombre}" se ha actualizado correctamente.`,
+                        timer: 2000,
+                        showConfirmButton: false
+                    });
                 })
                 .catch((error) => {
                     console.error('Error al actualizar la mesa:', error);
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'Ocurrió un error al actualizar la mesa.',
+                    });
                 });
         },
+
 
         mostrarModalBorrar() {
             if (this.mesaSeleccionada) {
@@ -263,22 +336,47 @@ export default {
         borrarMesaConfirmada() {
             // Verificar si hay una mesa seleccionada
             if (this.mesaSeleccionada && this.mesaSeleccionada.idmesa) {
-                // Confirmar eliminación
-                const confirmar = confirm("¿Estás seguro de que deseas eliminar esta mesa?");
-                if (confirmar) {
-                    // Usamos el store para borrar la mesa
-                    const mesaStore = useMesaStore();
-                    mesaStore.borrarMesa(this.mesaSeleccionada.idmesa) // Llamamos al store para eliminar la mesa
-                        .then(() => {
-                            this.cerrarModal();  // Cierra el modal después de eliminar
-                            this.actualizarMapa();  // Vuelve a actualizar el mapa
-                            mesaStore.obtenerMesas(); // Recarga los datos
-                        })
-                        .catch((error) => {
-                            console.error('Error al borrar la mesa desde el store:', error);
-                        });
-                }
+                // Mostrar el cuadro de confirmación con SweetAlert
+                Swal.fire({
+                    title: '¿Estás seguro?',
+                    text: "Esta acción no se puede deshacer. Se eliminará la mesa seleccionada.",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#d33',
+                    cancelButtonColor: '#3085d6',
+                    confirmButtonText: 'Sí, eliminar',
+                    cancelButtonText: 'Cancelar'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        // Usamos el store para borrar la mesa
+                        const mesaStore = useMesaStore();
+                        mesaStore.borrarMesa(this.mesaSeleccionada.idmesa) // Llamamos al store para eliminar la mesa
+                            .then(() => {
+                                Swal.fire(
+                                    '¡Eliminada!',
+                                    'La mesa ha sido eliminada con éxito.',
+                                    'success'
+                                );
+                                this.cerrarModal();  // Cierra el modal después de eliminar
+                                this.actualizarMapa();  // Vuelve a actualizar el mapa
+                                mesaStore.obtenerMesas(); // Recarga los datos
+                            })
+                            .catch((error) => {
+                                console.error('Error al borrar la mesa desde el store:', error);
+                                Swal.fire(
+                                    'Error',
+                                    'Ocurrió un error al intentar eliminar la mesa.',
+                                    'error'
+                                );
+                            });
+                    }
+                });
             } else {
+                Swal.fire(
+                    'No hay mesa seleccionada',
+                    'Por favor, selecciona una mesa para eliminar.',
+                    'info'
+                );
                 console.error("No hay mesa seleccionada para eliminar.");
             }
         },
@@ -363,17 +461,7 @@ body {
   min-height: 100vh;
   user-select: none;
 }
-.row {
-    display: flex; /* Activa el uso de flexbox */
-    justify-content: center; /* Centra horizontalmente */
-    align-items: center; /* Centra verticalmente */
-    height: 30dvh;
-    background-color: #f5f5f5; /* Fondo opcional */
-}
 
-.contenedorP{
-    margin-bottom: 50px;
-}
 .card {
   border-radius: 10px;
   filter: drop-shadow(0 5px 10px 0 #ffffff);
@@ -411,27 +499,6 @@ body {
 .card:hover{
     color: #ffffff;
 
-}
-.btn-reservar {
-    background-color: #c0992e; /* Color verde */
-    color: white;
-    padding: 10px 20px;
-    border: none;
-    border-radius: 5px;
-    font-size: 16px;
-    cursor: pointer;
-    transition: background-color 0.3s ease, transform 0.2s ease;
-}
-
-/* Efecto hover */
-.btn-reservar:hover {
-    background-color: #a07545; /* Verde más oscuro */
-    transform: scale(1.05); /* Aumenta ligeramente el tamaño */
-}
-
-/* Efecto de clic */
-.btn-reservar:active {
-    transform: scale(0.95); /* Reduce el tamaño ligeramente */
 }
 
 .card p{

@@ -3,7 +3,7 @@
     <div class="sidebar">
         <h2 class="logo">Yummy</h2>
         <div class="opciones">
-            <a><router-link to="/panelAdministrativo/dashboard" active-class="active-link"
+            <a><router-link to="/panelAdministrativo/section1" active-class="active-link"
                     class="sidebar-link">Dashboard</router-link></a>
             <a><router-link to="/panelAdministrativo/ofertas" active-class="active-link"
                     class="sidebar-link">Ofertas</router-link></a>
@@ -11,8 +11,12 @@
                     class="sidebar-link">Usuarios</router-link></a>
             <a><router-link to="/panelAdministrativo/platillos" active-class="active-link"
                     class="sidebar-link">Platillos</router-link></a>
+            <a><router-link to="/panelAdministrativo/pedidosadmin" active-class="active-link"
+                    class="sidebar-link">Pedidos</router-link></a>
             <a><router-link to="/panelAdministrativo/reservas" active-class="active-link"
                     class="sidebar-link">Reservas</router-link></a>
+            <a><router-link to="/panelAdministrativo/mapa" active-class="active-link" class="sidebar-link">Mapa
+                    Interactivo</router-link></a>
         </div>
     </div>
 </template>
