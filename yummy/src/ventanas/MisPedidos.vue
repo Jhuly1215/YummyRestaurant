@@ -114,32 +114,50 @@
   
       const manejarCalificacion = async ({ rating }) => {
         try {
-            const idusuario = localStorage.getItem('id');
+            const idusuario = localStorage.getItem("id");
             if (!idusuario) {
             alert("Usuario no autenticado. No se puede guardar la calificación.");
             return;
             }
 
-            await axios.post('/api/calificaciones', {
-            puntuacion: rating,
-            idusuario: parseInt(idusuario, 10),
-            idplato: platilloSeleccionado.value.idplato,
-            });
-            console.log('Guardando calificación:', {
-            puntuacion: rating,
-            idusuario,
-            idplato: platilloSeleccionado.value.idplato,
+            // Verificar si ya existe una reseña para este usuario y platillo
+            const existeResenia = await axios.get(`/api/calificaciones/existe`, {
+            params: {
+                idusuario: parseInt(idusuario, 10),
+                idplato: platilloSeleccionado.value.idplato,
+            },
             });
 
-            mensajeSuccess.value = `¡Gracias por calificar ${platilloSeleccionado.value.nombre} con ${rating} estrellas!`;
+            if (existeResenia.data.existe) {
+            
+                await axios.put(`/api/calificaciones/actualizar`, {
+                    puntuacion: rating,
+                    idusuario: parseInt(idusuario, 10),
+                    idplato: platilloSeleccionado.value.idplato,
+                });
+
+
+                mensajeSuccess.value = `¡Gracias por actualizar tu calificación de ${platilloSeleccionado.value.nombre} a ${rating} estrellas!`;
+            } else {
+                // Crear una nueva reseña
+                await axios.post(`/api/calificaciones`, {
+                    puntuacion: rating,
+                    idusuario: parseInt(idusuario, 10),
+                    idplato: platilloSeleccionado.value.idplato,
+                });
+
+                mensajeSuccess.value = `¡Gracias por calificar ${platilloSeleccionado.value.nombre} con ${rating} estrellas!`;
+            }
+
             mostrarSuccessModal.value = true;
         } catch (error) {
-            console.error('Error al enviar la calificación:', error);
-            alert('Hubo un problema al guardar tu calificación.');
+            console.error("Error al manejar la calificación:", error);
+            alert("Hubo un problema al guardar tu calificación.");
         } finally {
             mostrarCalificacionModal.value = false;
         }
         };
+
 
   
       const cargarPedidos = async () => {
