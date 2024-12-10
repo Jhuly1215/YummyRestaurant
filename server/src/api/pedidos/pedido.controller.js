@@ -187,3 +187,28 @@ exports.registrarPagoPedido = async (req, res) => {
     res.status(500).json({ error: 'Error al pagar el pedido' });
   }
 };
+
+exports.obtenerPedidosPorUsuario = async (req, res) => {
+  const { idUsuario } = req.params;
+
+  if (!idUsuario) {
+    return res.status(400).json({ error: 'El idUsuario es obligatorio.' });
+  }
+
+  try {
+    const pedidos = await sequelize.query(
+      `SELECT p.idpedido, p.fecha, p.hora, p.estado, p.precio_total
+       FROM pedido p
+       WHERE p.idusuario = :idUsuario`,
+      {
+        replacements: { idUsuario },
+        type: sequelize.QueryTypes.SELECT,
+      }
+    );
+
+    res.json(pedidos);
+  } catch (error) {
+    console.error('Error al obtener los pedidos por usuario:', error);
+    res.status(500).json({ error: 'Error al obtener los pedidos.' });
+  }
+};
