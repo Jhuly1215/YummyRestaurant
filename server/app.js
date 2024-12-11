@@ -49,4 +49,6 @@ sequelize.sync()
   .then(() => console.log("Base de datos conectada"))
   .catch((error) => console.error("Error al conectar a la base de datos:", error));
 
+require('./src/cron');
+
 module.exports = app;

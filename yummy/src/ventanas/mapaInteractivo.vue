@@ -65,6 +65,7 @@ export default {
     data() {
         return {
             mesas: [],
+            reservas: [],
             infoMesa: '',
             mostrarMesa: false,
             clickTimeout: null,

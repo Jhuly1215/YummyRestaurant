@@ -219,4 +219,56 @@ exports.verificarUsuario = async (req, res) => {
     }
 };
 
+exports.enviarRecordatorios = async () => {
+    try {
+        const ahora = new Date();
+        const seisHorasDespues = new Date(ahora.getTime() + 6 * 60 * 60 * 1000);
+
+        // Buscar reservas con estado activo que ocurran en las próximas 6 horas
+        const reservas = await sequelize.query(
+            `SELECT r.*, u.correo
+             FROM reserva r
+             JOIN usuario u ON r.idusuario = u.idusuario
+             WHERE r.estado = 1 AND r.fecha = :fecha AND r.hora BETWEEN :horaInicio AND :horaFin`,
+            {
+                replacements: {
+                    fecha: seisHorasDespues.toISOString().split('T')[0], // Fecha en formato YYYY-MM-DD
+                    horaInicio: ahora.toTimeString().split(' ')[0],     // Hora actual en HH:MM:SS
+                    horaFin: seisHorasDespues.toTimeString().split(' ')[0], // Hora + 6 horas
+                },
+                type: sequelize.QueryTypes.SELECT,
+            }
+        );
+
+        // Enviar correo por cada reserva encontrada
+        for (const reserva of reservas) {
+            const mailOptions = {
+                from: process.env.EMAIL_USER,
+                to: reserva.correo,
+                subject: 'Recordatorio de tu reserva',
+                html: `
+                    <div style="font-family: Arial, sans-serif; text-align: center; padding: 20px; border: 1px solid #ccc; border-radius: 5px;">
+                        <h2>¡Recordatorio de tu reserva!</h2>
+                        <p>Te recordamos que tienes una reserva próxima en nuestro restaurante.</p>
+                        <p><strong>Detalles de la Reserva:</strong></p>
+                        <ul style="list-style: none; padding: 0; text-align: left;">
+                            <li><strong>Fecha:</strong> ${reserva.fecha}</li>
+                            <li><strong>Hora:</strong> ${reserva.hora}</li>
+                        </ul>
+                        <p>Por favor, no dudes en contactarnos si necesitas modificar o cancelar tu reserva.</p>
+                        <p>¡Te esperamos!</p>
+                    </div>
+                `,
+            };
+
+            await transporter.sendMail(mailOptions);
+            console.log(`Recordatorio enviado a ${reserva.email}`);
+        }
+
+        console.log('Todos los recordatorios han sido enviados.');
+    } catch (error) {
+        console.error('Error al enviar recordatorios:', error);
+    }
+};
+
 
