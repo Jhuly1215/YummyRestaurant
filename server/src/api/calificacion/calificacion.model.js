@@ -9,20 +9,20 @@ const Calificacion = sequelize.define('Resenia', {
   },
   puntuacion: {
     type: DataTypes.INTEGER,
-    allowNull: false, // Calificación no puede ser nula
+    allowNull: false,
     validate: {
-      min: 1, // Puntuación mínima
-      max: 5, // Puntuación máxima
+      min: 1,
+      max: 5,
     },
   },
   fecha: {
     type: DataTypes.DATEONLY,
     allowNull: false,
-    defaultValue: DataTypes.NOW, // Fecha por defecto
+    defaultValue: DataTypes.NOW, 
   },
   idusuario: {
     type: DataTypes.INTEGER,
-    allowNull: true, // Permitimos NULL
+    allowNull: true,
     references: {
       model: 'usuario',
       key: 'idusuario',
@@ -30,7 +30,7 @@ const Calificacion = sequelize.define('Resenia', {
   },
   idplato: {
     type: DataTypes.INTEGER,
-    allowNull: true, // Permitimos NULL
+    allowNull: true,
     references: {
       model: 'platillo',
       key: 'idplato',

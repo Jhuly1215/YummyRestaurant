@@ -44,30 +44,28 @@ exports.obtenerCalificaciones = async (req, res) => {
   }
 };
 
-// Actualizar una calificación
 exports.actualizarCalificacion = async (req, res) => {
-  const { id } = req.params;
-  const { puntuacion } = req.body;
-
+  const { puntuacion, idusuario, idplato } = req.body;
+  console.log("Datos recibidos:", req.body); 
   try {
     const [actualizado] = await sequelize.query(
       `UPDATE resenia
-       SET puntuacion = :puntuacion
-       WHERE idresenia = :id`,
+       SET puntuacion = :puntuacion, fecha = NOW()
+       WHERE idusuario = :idusuario AND idplato = :idplato`,
       {
-        replacements: { id, puntuacion },
+        replacements: { puntuacion, idusuario, idplato },
         type: sequelize.QueryTypes.UPDATE,
       }
     );
 
     if (actualizado) {
-      res.json({ message: 'Calificación actualizada exitosamente' });
+      res.json({ message: "Calificación actualizada exitosamente" });
     } else {
-      res.status(404).json({ error: 'Calificación no encontrada' });
+      res.status(404).json({ error: "No se encontró la calificación para actualizar" });
     }
   } catch (error) {
-    console.error('Error al actualizar la calificación:', error);
-    res.status(500).json({ error: 'Error al actualizar la calificación' });
+    console.error("Error al actualizar la calificación:", error);
+    res.status(500).json({ error: "Error al actualizar la calificación" });
   }
 };
 
@@ -92,5 +90,54 @@ exports.eliminarCalificacion = async (req, res) => {
   } catch (error) {
     console.error('Error al eliminar la calificación:', error);
     res.status(500).json({ error: 'Error al eliminar la calificación' });
+  }
+};
+
+exports.existeResenia = async (req, res) => {
+  const { idusuario, idplato } = req.query;
+  console.log("Parámetros recibidos:", { idusuario, idplato });
+
+  try {
+    if (!idusuario || !idplato) {
+      return res.status(400).json({ error: "Faltan parámetros: idusuario o idplato." });
+    }
+    const reseña = await sequelize.query(
+      `SELECT * FROM resenia WHERE idusuario = :idusuario AND idplato = :idplato`,
+      {
+        replacements: { idusuario, idplato },
+        type: sequelize.QueryTypes.SELECT,
+      }
+    );
+
+    res.json({ existe: reseña.length > 0 });
+  } catch (error) {
+    console.error("Error al verificar existencia de la reseña:", error);
+    res.status(500).json({ error: "Error al verificar la reseña" });
+  }
+};
+
+exports.obtenerCalificacionesPorUsuario = async (req, res) => {
+  const { idusuario } = req.params;
+
+  try {
+    const calificaciones = await sequelize.query(
+      `SELECT r.idresenia, r.puntuacion, r.fecha, 
+              r.idusuario, r.idplato,
+              p.nombre AS platillo, 
+              p.descripcion, 
+              p.imagen 
+       FROM resenia r
+       JOIN platillo p ON r.idplato = p.idplato
+       WHERE r.idusuario = :idusuario`,
+      {
+        replacements: { idusuario },
+        type: sequelize.QueryTypes.SELECT,
+      }
+    );
+
+    res.json(calificaciones);
+  } catch (error) {
+    console.error("Error al obtener las calificaciones del usuario:", error);
+    res.status(500).json({ error: "Error al obtener las calificaciones del usuario." });
   }
 };

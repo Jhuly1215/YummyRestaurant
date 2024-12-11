@@ -11,6 +11,7 @@ router.get('/', mesaController.obtenerMesa); // Ruta para obtener todas las mesa
 router.put('/:id', mesaController.actualizarMesa); // Ruta para actualizar una mesa por ID
 router.delete('/:id', mesaController.borrarMesa); // Ruta para borrar una mesa por ID
 router.put('/:id/estado', mesaController.actualizarEstadoMesa);
+router.get('/:id', mesaController.obtenerMesaPorId);
 
 
 module.exports = router;

@@ -65,6 +65,7 @@ export default {
     data() {
         return {
             mesas: [],
+            reservas: [],
             infoMesa: '',
             mostrarMesa: false,
             clickTimeout: null,
@@ -86,8 +87,10 @@ export default {
     },
     async mounted() {
         const mesaStore = useMesaStore(); // Usa el store de Pinia
-        await mesaStore.obtenerMesas(); // Llama a la acción para obtener las mesas
-        this.mesas = mesaStore.mesas; // Asigna las mesas del store al array local
+        await mesaStore.obtenerMesas();
+        await mesaStore.obtenerReservas(); // Llama a la acción para obtener las mesas
+        this.mesas = mesaStore.mesas;
+        this.reservas = mesaStore.reservas; // Asigna las mesas del store al array local
         this.crearMapa();
     },
     methods: {
@@ -97,12 +100,12 @@ export default {
         crearMapa() {
             const svg = d3.select(this.$refs.mapa);
 
-            // Crear un fondo de color (un rectángulo que cubre todo el área del mapa)
+            // Crear un fondo de color
             svg.append("rect")
                 .attr("class", "fondo")
-                .attr("width", "100%")  // Esto cubre todo el ancho del contenedor
-                .attr("height", "100%")  // Esto cubre todo el alto del contenedor
-                .attr("fill", "#A16F23");  // Color de fondo diferente para asegurar que se vea
+                .attr("width", "100%")
+                .attr("height", "100%")
+                .attr("fill", "#A16F23");
 
             const drag = d3.drag()
                 .on("start", function (event, d) {
@@ -111,17 +114,17 @@ export default {
                 .on("drag", function (event, d) {
                     d.x = event.x;
                     d.y = event.y;
-                    d3.select(this).attr("cx", d.x).attr("cy", d.y);  // Actualiza las coordenadas del círculo
-
-                    // Mover el texto con el círculo
+                    d3.select(this).attr("cx", d.x).attr("cy", d.y);
                     d3.select(this.parentNode).select(".mesa-label")
-                        .attr("x", d.x)  // Ajuste para mantener el texto centrado
-                        .attr("y", d.y + 5); // Ajuste para mantener el texto centrado verticalmente
-                    console.log(`Posición X: ${d.x}, Posición Y: ${d.y}`);
+                        .attr("x", d.x)
+                        .attr("y", d.y + 5);
                 })
                 .on("end", function () {
                     d3.select(this).classed("active", false);
                 });
+
+            // Obtener la hora actual
+            const ahora = new Date();
 
             // Crear los círculos para las mesas
             svg.selectAll(".mesa")
@@ -129,17 +132,31 @@ export default {
                 .enter()
                 .append("circle")
                 .attr("class", "mesa")
-                .attr("r", 35)  // Radio del círculo (ajusta según necesites)
-                .attr("cx", d => d.posx)  // Coordenada X del centro
-                .attr("cy", d => d.posy)  // Coordenada Y del centro
-                .style("fill", "#FFFEDC")
+                .attr("r", 35)
+                .attr("cx", d => d.posx)
+                .attr("cy", d => d.posy)
+                .style("fill", d => {
+                    // Verificar si la mesa está reservada dentro del intervalo de tiempo
+                    const reserva = this.reservas.find(r => r.idmesa === d.idmesa);
+                    console.log("reserva",reserva)
+                    console.log("d:",d)
+                    if (reserva) {
+                        const horaReserva = new Date(`${reserva.fecha}T${reserva.hora}`);
+                        console.log("hora reserva", horaReserva)
+                        const diferencia = Math.abs(ahora - horaReserva) / (1000 * 60); // Diferencia en minutos
+                        if (diferencia <= 60) {
+                            return "blue"; // Mesa ocupada
+                        }
+                    }
+                    return "#FFFEDC"; // Mesa disponible
+                })
                 .style("stroke", "#000")
                 .style("cursor", this.rol !== 1 ? "pointer" : "pointer")
-                .call(this.rol == 2 ? drag : () => {}) // Solo aplica el arrastre si rol no es 1
+                .call(this.rol == 2 ? drag : () => {})
                 .on("click", (event, d) => {
                     clearTimeout(this.clickTimeout);
                     this.clickTimeout = setTimeout(() => {
-                        this.rol === 1 ? this.abrirModalNuevaReserva(d) :  this.mostrarFormulario('editar',d);
+                        this.rol === 1 ? this.abrirModalNuevaReserva(d) : this.mostrarFormulario('editar', d);
                     }, 200);
                 });
 
@@ -149,38 +166,40 @@ export default {
                 .enter()
                 .append("text")
                 .attr("class", "mesa-label")
-                .attr("x", d => d.posx)  // Centrado horizontalmente sobre el círculo
-                .attr("y", d => d.posy + 5)  // Ajuste vertical (para centrar el texto dentro del círculo)
-                .attr("text-anchor", "middle")  // Centrado del texto
+                .attr("x", d => d.posx)
+                .attr("y", d => d.posy + 5)
+                .attr("text-anchor", "middle")
                 .attr("font-size", "16px")
-                .attr("font-weight", "bold")  // Texto en negrita
-                .attr("fill", "#322209")  // Color del texto
-                .text(d => d.nombre);  // Muestra el nombre de la mesa
+                .attr("font-weight", "bold")
+                .attr("fill", "#322209")
+                .text(d => d.nombre);
 
-                svg.append("rect")
-                    .attr("x", 50)  // Posición horizontal del rectángulo
-                    .attr("y", 350)  // Posición vertical del rectángulo
-                    .attr("width", 100)  // Ancho del rectángulo
-                    .attr("height", 40)  // Alto del rectángulo
-                    .attr("fill", "#724A0E")  // Color de fondo del rectángulo
-                    .attr("stroke", "#000")  // Color del borde
+            // Crear otros elementos del mapa
+            svg.append("rect")
+                .attr("x", 50)
+                .attr("y", 350)
+                .attr("width", 100)
+                .attr("height", 40)
+                .attr("fill", "#724A0E")
+                .attr("stroke", "#000");
 
-                // Crear el texto "Entrada" dentro del rectángulo
-                svg.append("text")
-                    .attr("x", 100)  // Centrado horizontalmente dentro del rectángulo
-                    .attr("y", 375)   // Centrado verticalmente dentro del rectángulo
-                    .attr("text-anchor", "middle")  // Centrado del texto
-                    .attr("font-size", "16px")
-                    .attr("fill", "#ffffff")  // Color del texto
-                    .text("Entrada");  // El texto que aparecerá dentro del rectángulo
-                    svg.append("rect")
-                    .attr("x", 540)  // Posición horizontal del rectángulo
-                    .attr("y", 80)  // Posición vertical del rectángulo
-                    .attr("width", 2)  // Ancho del rectángulo
-                    .attr("height", 250)  // Alto del rectángulo
-                    .attr("fill", "#ffffff")  // Color de fondo del rectángulo
-                    .attr("stroke", "#fff")  // Color del borde
+            svg.append("text")
+                .attr("x", 100)
+                .attr("y", 375)
+                .attr("text-anchor", "middle")
+                .attr("font-size", "16px")
+                .attr("fill", "#ffffff")
+                .text("Entrada");
+
+            svg.append("rect")
+                .attr("x", 540)
+                .attr("y", 80)
+                .attr("width", 2)
+                .attr("height", 250)
+                .attr("fill", "#ffffff")
+                .attr("stroke", "#fff");
         },
+
 
         abrirModalNuevaReserva(mesa) {
             this.mostrarMesa = true;
