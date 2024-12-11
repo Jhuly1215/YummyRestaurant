@@ -298,19 +298,17 @@ export default {
 .table-container {
   overflow-x: auto;
   margin: 20px 0;
-  
 }
 
 /* Estilos generales de la tabla */
 .table {
-  width: 95%;
-  border-collapse: collapse;
+  margin-left: 10px;
+  width: 90%;
   table-layout: fixed; /* Asegura que las columnas tengan el mismo ancho */
 }
 
 /* Encabezado de la tabla */
 .table th {
-  width: 30px; /* Ancho fijo para las columnas */
   background-color: #FFFDA4;
   color: #322209;
   text-align: center;
@@ -321,7 +319,6 @@ export default {
 
 /* Celdas del cuerpo de la tabla */
 .table td {
-  width: 30px; /* Ancho fijo para las columnas */
   text-align: center;
   padding: 5px;
   border: 1px solid #ddd;
