@@ -13,7 +13,23 @@ const obtenerMesa = async (req, res) => {
     res.status(500).json({ error: 'Error al obtener las actividades' });
   }
 };
+const obtenerMesaPorId = async (req, res) => {
+  try {
+    const { id } = req.params; // Obtener el id de la mesa desde los parámetros de la ruta
+    const mesa = await Mesa.findOne({
+      where: { idmesa: id, visible: true }, // Verificar que la mesa es visible y coincide con el id
+    });
 
+    if (!mesa) {
+      return res.status(404).json({ error: 'Mesa no encontrada o no está visible.' });
+    }
+
+    res.status(200).json(mesa);
+  } catch (error) {
+    console.error('Error al obtener la mesa:', error);
+    res.status(500).json({ error: 'Error al obtener la mesa.' });
+  }
+};
 // Función para crear una nueva actividad
 const crearMesa = async (req, res) => {
   try {
@@ -100,5 +116,6 @@ module.exports = {
   crearMesa,
   actualizarMesa,
   borrarMesa,
-  actualizarEstadoMesa
+  actualizarEstadoMesa,
+  obtenerMesaPorId
 };
