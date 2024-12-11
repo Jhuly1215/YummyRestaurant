@@ -8,9 +8,9 @@
   
       <!-- Mostrar tarjetas de reservas -->
       <div v-if="reservas.length > 0" class="reservas-list">
-        <div 
-          v-for="reserva in reservas" 
-          :key="reserva.idreserva" 
+        <div
+          v-for="reserva in reservas"
+          :key="reserva.idreserva"
           :class="['reserva-card', reserva.estado === 1 ? 'pendiente' : 'finalizada']"
         >
           <h3>{{ reserva.estado === 1 ? 'Reserva pendiente' : 'Reserva finalizada' }}</h3>
@@ -18,78 +18,114 @@
           <p>Fecha: {{ formatFecha(reserva.fecha) }}</p>
           <p>Hora: {{ reserva.hora }}</p>
           <div v-if="reserva.estado === 1" class="acciones">
-            <button @click="cancelarReserva(reserva.idreserva)" class="cancelar-btn">Cancelar</button>
+            <button @click="mostrarConfirmacion(reserva)" class="cancelar-btn">
+              Cancelar
+            </button>
           </div>
         </div>
       </div>
   
       <!-- Si no hay reservas -->
       <p v-else>No tienes reservas en este momento.</p>
+      <ConfirmationModal
+        v-if="mostrarModalConfirmacion"
+        mensaje="¿Estás seguro de que deseas cancelar esta reserva?"
+        @onCancel="cancelarCancelacion"
+        @onConfirm="confirmarCancelacion"
+      />
+      <SuccessModal
+        v-if="mostrarSuccessModal"
+        :mensaje="mensajeSuccess"
+        @onClose="mostrarSuccessModal = false"
+      />
+
     </div>
 </template>
   
 <script>
   import axios from 'axios';
   import { onMounted, ref } from 'vue';
+  import ConfirmationModal from '@/components/ConfirmationModal.vue';
+  import SuccessModal from '@/components/SuccessModal.vue';
   
   export default {
-    name: 'MisReservas',
-    setup() {
-      const reservas = ref([]);
-      const error = ref(null);
-  
-      const cargarReservas = async () => {
-        try {
-          const idUsuario = localStorage.getItem('id');
-          if (!idUsuario) {
-            error.value = 'No se encontró un usuario logueado.';
-            return;
-          }
-  
-          const response = await axios.get(`/api/reservas/usuario/${idUsuario}`);
-          reservas.value = response.data;
-        } catch (err) {
-          console.error('Error al cargar reservas:', err);
-          error.value = 'Ocurrió un error al cargar tus reservas.';
+  name: "MisReservas",
+  components: { ConfirmationModal, SuccessModal },
+  setup() {
+    const reservas = ref([]);
+    const error = ref(null);
+    const mostrarModalConfirmacion = ref(false); 
+    const reservaSeleccionada = ref(null); 
+
+    const mostrarSuccessModal = ref(false); 
+    const mensajeSuccess = ref("");
+
+
+    const cargarReservas = async () => {
+      try {
+        const idUsuario = localStorage.getItem("id");
+        if (!idUsuario) {
+          error.value = "No se encontró un usuario logueado.";
+          return;
         }
-      };
-  
-      const modificarReserva = (reserva) => {
-        alert(`Modificar reserva: ${JSON.stringify(reserva)}`);
-      };
-  
-      const cancelarReserva = async (idReserva) => {
-        try {
-          if (!confirm('¿Estás seguro de que deseas cancelar esta reserva?')) return;
-  
-          await axios.delete(`/api/reservas/${idReserva}`);
-          reservas.value = reservas.value.filter(r => r.idreserva !== idReserva);
-          alert('Reserva cancelada exitosamente.');
-        } catch (err) {
-          console.error('Error al cancelar reserva:', err);
-          error.value = 'Ocurrió un error al cancelar la reserva.';
-        }
-      };
-  
-      const formatFecha = (fecha) => {
-        const date = new Date(fecha + 'T00:00:00');
-        return date.toLocaleDateString('es-ES', {
-          year: 'numeric',
-          month: 'long',
-          day: 'numeric',
-        });
-      };
-  
-      onMounted(cargarReservas);
-  
-      return {
-        reservas,
-        error,
-        modificarReserva,
-        cancelarReserva,
-        formatFecha,
-      };
-    },
+
+        const response = await axios.get(`/api/reservas/usuario/${idUsuario}`);
+        reservas.value = response.data;
+      } catch (err) {
+        console.error("Error al cargar reservas:", err);
+        error.value = "Ocurrió un error al cargar tus reservas.";
+      }
+    };
+
+    const mostrarConfirmacion = (reserva) => {
+      reservaSeleccionada.value = reserva; // Guardamos la reserva seleccionada
+      mostrarModalConfirmacion.value = true; // Mostramos el modal
+    };
+
+    const confirmarCancelacion = async () => {
+      try {
+        await axios.delete(`/api/reservas/${reservaSeleccionada.value.idreserva}`);
+        reservas.value = reservas.value.filter(
+          (r) => r.idreserva !== reservaSeleccionada.value.idreserva
+        );
+        mensajeSuccess.value = "Reserva cancelada exitosamente."; 
+        mostrarSuccessModal.value = true; 
+      } catch (err) {
+        console.error("Error al cancelar reserva:", err);
+        error.value = "Ocurrió un error al cancelar la reserva.";
+      } finally {
+        mostrarModalConfirmacion.value = false; // Cerrar el modal de confirmación
+        reservaSeleccionada.value = null; // Limpiar la reserva seleccionada
+      }
+    };
+
+
+    const cancelarCancelacion = () => {
+      mostrarModalConfirmacion.value = false; // Cerramos el modal sin hacer nada
+      reservaSeleccionada.value = null; // Reseteamos la reserva seleccionada
+    };
+
+    const formatFecha = (fecha) => {
+      const date = new Date(fecha + "T00:00:00");
+      return date.toLocaleDateString("es-ES", {
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+      });
+    };
+
+    onMounted(cargarReservas);
+
+    return {
+      reservas,
+      error,
+      mostrarConfirmacion,
+      confirmarCancelacion,
+      cancelarCancelacion,
+      formatFecha,
+      mostrarModalConfirmacion,
+    };
+  },
   };
 </script>
   
