@@ -26,7 +26,7 @@
                 </tr>
               </tbody>
             </table>
-                <h2><strong>Total: {{ total }} Bs. </strong></h2>                
+            <h2><strong>Total: {{ total }} Bs. </strong></h2>
           </div>
           <button class="close-button" @click="realizarPedido">Realizar pedido</button>
           <button class="close-button" @click="toggleModal">Cerrar</button>
@@ -34,11 +34,7 @@
       </div>
     </transition>
   </div>
-  <SuccessModal
-      v-if="successModalVisible"
-      :mensaje="successMensaje"
-      @onClose="closeSuccessModal"
-    />
+  <SuccessModal v-if="successModalVisible" :mensaje="successMensaje" @onClose="closeSuccessModal" />
 </template>
 
 <script>
@@ -47,7 +43,7 @@ import SuccessModal from "./SuccessModal.vue";
 
 export default {
   name: "ListaProductosPedidos",
-  components:{
+  components: {
     SuccessModal
   },
   props: {
@@ -95,17 +91,20 @@ export default {
         fecha: new Date().toISOString().slice(0, 10), // Fecha actual en formato YYYY-MM-DD
         hora: new Date().toTimeString().slice(0, 8), // Hora actual en formato HH:mm:ss
         estado: 0, // Pedido en espera
-        idusuario: 3, // Usuario fijo por ahora
+        idUsuario: localStorage.getItem('id'), // Obtén el ID del usuario logueado
         precio_total: this.total, // Total calculado
-        detalles: this.platillosSeleccionados.map(p => ({
+        detalles: this.platillosSeleccionados.map((p) => ({
           idplato: p.idplato,
           cantidad: p.cantidad,
+          nombre: p.nombre, // Incluye el nombre del platillo
+          precio: p.precio, // Incluye el precio del platillo
         })), // Detalles del pedido
       };
 
       try {
+        // Realizar el pedido y enviar el correo
         const response = await axios.post('http://localhost:5000/api/pedidos', pedido);
-        this.mostrarSuccessModal('Pedido realizado con éxito');
+        this.mostrarSuccessModal('Pedido realizado con éxito. Revisa tu correo electrónico.');
         this.$emit("pedidoRealizado"); // Notifica al componente padre para reiniciar el estado
         this.toggleModal(); // Cierra el modal
       } catch (error) {
@@ -113,7 +112,6 @@ export default {
         alert("Hubo un error al realizar el pedido. Por favor, inténtelo nuevamente.");
       }
     },
-
     mostrarSuccessModal(mensaje) {
       this.successMensaje = mensaje;
       this.successModalVisible = true;
@@ -181,7 +179,8 @@ export default {
   text-align: left;
 }
 
-.table th, .table td {
+.table th,
+.table td {
   border: 1px solid #ddd;
   padding: 12px;
 }
@@ -227,5 +226,4 @@ h2 {
 .close-button:hover {
   background-color: #807f7f;
 }
-
 </style>
