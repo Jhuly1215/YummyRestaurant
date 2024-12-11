@@ -7,7 +7,9 @@ import PanelAdministrativo from '@/ventanas/panelAdministrativo.vue';
 import Recupera from '@/ventanas/recupera.vue';
 import CambioPass from '@/ventanas/cambioPassword.vue';
 import Ofertas from '@/ventanas/ofertasPage.vue';
-import MapaInteractivo from '@/ventanas/mapaInteractivo.vue';
+import MenuPedido from '@/ventanas/MenuPedido.vue';
+import PedidosAdmin from '@/components/PedidosAdminComponent.vue';
+import MapaInteractivo1 from '@/ventanas/mapaInteractivo.vue';
 import MenuCliente from '@/ventanas/MenuCliente.vue'
 import TemporalCalificacion from '@/ventanas/temporalCalificacion.vue'
 import MisReservas from '@/ventanas/reservas/MisReservas.vue';
@@ -15,11 +17,11 @@ import MisPedidos from '@/ventanas/MisPedidos.vue';
 import MisCalificaciones from '@/ventanas/MisCalificaciones.vue';
 
 //para el administrador
-
-import Section1 from '../ventanas/Section2Page.vue';
+import MapaInteractivo2 from '@/ventanas/mapaAdmin.vue';
 import OfertasAdminComponent from '../ventanas/OfertasAdminComponent.vue'
 import PlatillosAdminComponent from '@/components/PlatillosAdminComponent.vue';
 import JReservasAdminComponent from '@/ventanas/reservas/Reservas.vue';
+import DashboardComponent from '../ventanas/dashboardComponent.vue';
 
 const router = createRouter({
   history: createWebHistory(),
@@ -71,8 +73,18 @@ const router = createRouter({
     },
     {
       path: '/mapa',
-      name: 'Mapa',
-      component: MapaInteractivo,
+      name: 'MapaUsuario',
+      component: MapaInteractivo1,
+    },
+    {
+      path: '/menucliente',
+      name: 'MenuCliente',
+      component: MenuCliente,
+    },
+    {
+      path: '/menupedido',
+      name: 'MenuPedido',
+      component: MenuPedido,
     },
     {
       path: '/temporal',
@@ -102,24 +114,34 @@ const router = createRouter({
       //meta: { requiresAuth: true }, // Requiere autenticación
       children: [
         {
-          path: 'section1', // Ruta base de panel administrativo
+          path: 'section1',
           name: 'Dashboard',
-          component: Section1, // Componente del Dashboard
+          component: DashboardComponent,
         },
         {
           path: 'ofertas',
           name: 'AdminOfertas',
-          component: OfertasAdminComponent, // Gestión de ofertas
+          component: OfertasAdminComponent,
         },
         {
           path: 'platillos',
           name: 'AdminPlatillos',
-          component: PlatillosAdminComponent, // Gestión de platillos
+          component: PlatillosAdminComponent, 
         },
         {
           path: 'reservas',
           name: 'AdminReservas',
           component: JReservasAdminComponent, // Gestión de reservas
+        },
+        {
+          path: 'mapa',
+          name: 'MapaAdmin',
+          component: MapaInteractivo2,
+        },
+        {
+          path: 'pedidosadmin',
+          name: 'PedidosAdmin',
+          component: PedidosAdmin,
         },
       ],
     },

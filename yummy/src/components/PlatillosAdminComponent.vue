@@ -7,12 +7,23 @@
       </h2>
       <p>Administra y crea nuevos platillos para tus clientes</p>
     </header>
-    <ConfirmationModal 
-      v-if="modalVisible" 
+
+    <!-- Modal para eliminar -->
+    <ConfirmationModal
+      v-if="modalVisible"
       :mensaje="`¿Seguro que desea eliminar el platillo ${platilloAEliminar.nombre}?`"
       @onCancel="cerrarModal"
       @onConfirm="eliminarPlatillo"
     />
+
+    <!-- Modal para destacar -->
+    <ConfirmationModal
+      v-if="modalParaDestacarVisible"
+      :mensaje="modalMensaje"
+      @onCancel="cerrarModalDestacar"
+      @onConfirm="toggleDestacadoConfirmado"
+    />
+
     <div class="table-container">
       <table class="table">
         <thead>
@@ -56,6 +67,7 @@
             <td v-else>{{ platillo.imagen }}</td>
             
             <td class="botones">
+              <!-- Botones de edición -->
               <button v-if="index !== filaEnEdicion" class="action-button edit-button" @click="seleccionarPlatilloParaEditar(index, platillo)">
                 <i class="fas fa-edit"></i>
               </button>
@@ -68,6 +80,14 @@
               <button v-if="index === filaEnEdicion" class="action-button button-cancel" @click="cancelarCambios">
                 <i class="fa-solid fa-xmark"></i>
               </button>
+
+              <!-- Botón para destacar -->
+              <button
+                @click="mostrarModalDestacar(platillo)"
+                class="action-button star-button"
+              >
+                <i :class="platillo.estado === 2 ? 'fas fa-star' : 'far fa-star'"></i>
+              </button>
             </td>
           </tr>
         </tbody>
@@ -75,12 +95,12 @@
 
       <FormNewPlatillo />
     </div>
+
     <SuccessModal
       v-if="successModalVisible"
       :mensaje="successMensaje"
       @onClose="closeSuccessModal"
     />
-    
   </div>
 </template>
 
@@ -102,9 +122,12 @@ export default {
       platillos: [],
       filaEnEdicion: null,
       platilloEditado: {},
-      platilloAEliminar: {},
-      modalVisible: false,
+      platilloAEliminar: {}, // Platillo que se desea eliminar
+      platilloADestacar: {}, // Platillo que se desea destacar
+      modalVisible: false, // Modal para eliminar
+      modalParaDestacarVisible: false, // Modal para destacar
       successModalVisible: false,
+      modalMensaje: '', // Mensaje del modal para destacar/desdestacar
       successMensaje: '',
     };
   },
@@ -115,7 +138,10 @@ export default {
     async obtenerPlatillos() {
       try {
         const response = await axios.get('http://localhost:5000/api/platillos');
-        this.platillos = response.data;
+        this.platillos = response.data.map(platillo => ({
+          ...platillo,
+          estado: platillo.estado || 0, // Asegúrate de que el estado esté definido
+        }));
       } catch (error) {
         console.error("Error al obtener los platillos:", error);
       }
@@ -136,7 +162,7 @@ export default {
 
         await axios.put(`http://localhost:5000/api/platillos/${this.platilloEditado.idplato}`, payload);
         this.platillos.splice(this.filaEnEdicion, 1, { ...this.platilloEditado }); // Actualiza localmente
-        this.filaEnEdicion = null; // Salir del modo edición
+        this.filaEnEdicion = null;
         this.mostrarSuccessModal('Platillo actualizado correctamente');
       } catch (error) {
         console.error("Error al guardar cambios:", error);
@@ -165,6 +191,52 @@ export default {
         this.mostrarSuccessModal('Error al eliminar el platillo');
       }
     },
+    mostrarModalDestacar(platillo) {
+      this.platilloADestacar = platillo;
+      this.modalMensaje = `¿Quieres ${platillo.estado === 2 ? 'quitar el destaque' : 'destacar'} el platillo "${platillo.nombre}"?`;
+      this.modalParaDestacarVisible = true;
+    },
+    cerrarModalDestacar() {
+      this.modalParaDestacarVisible = false;
+    },
+    async toggleDestacadoConfirmado() {
+  try {
+    // Realiza la solicitud para cambiar el estado
+    const response = await axios.put(
+      `http://localhost:5000/api/platillos/toggle-destacado/${this.platilloADestacar.idplato}`
+    );
+
+    // Verifica si la respuesta tiene un nuevo estado válido
+    if (response.data && typeof response.data.nuevoEstado === 'number') {
+      // Encuentra el índice del platillo en el array local
+      const index = this.platillos.findIndex(
+        (p) => p.idplato === this.platilloADestacar.idplato
+      );
+
+      if (index !== -1) {
+        // Actualiza el estado del platillo en el array local
+        this.platillos[index].estado = response.data.nuevoEstado;
+        this.$forceUpdate(); // Forzar renderizado si es necesario
+
+        // Opcional: Muestra un mensaje de éxito
+        this.mostrarSuccessModal(
+          `El platillo "${this.platilloADestacar.nombre}" ahora está ${
+            response.data.nuevoEstado === 2 ? 'destacado' : 'no destacado'
+          }.`
+        );
+      }
+    } else {
+      this.mostrarSuccessModal('Error en la respuesta del servidor.');
+    }
+  } catch (error) {
+    console.error('Error al cambiar el estado del platillo:', error);
+    this.mostrarSuccessModal('Error al cambiar el estado del platillo.');
+  } finally {
+    // Cierra el modal para destacar
+    this.cerrarModalDestacar();
+  }
+},
+
     mostrarSuccessModal(mensaje) {
       this.successMensaje = mensaje;
       this.successModalVisible = true;
@@ -172,7 +244,7 @@ export default {
     closeSuccessModal() {
       this.successModalVisible = false;
     },
-  }
+  },
 };
 </script>
 
@@ -226,19 +298,17 @@ export default {
 .table-container {
   overflow-x: auto;
   margin: 20px 0;
-  
 }
 
 /* Estilos generales de la tabla */
 .table {
-  width: 95%;
-  border-collapse: collapse;
+  margin-left: 10px;
+  width: 90%;
   table-layout: fixed; /* Asegura que las columnas tengan el mismo ancho */
 }
 
 /* Encabezado de la tabla */
 .table th {
-  width: 30px; /* Ancho fijo para las columnas */
   background-color: #FFFDA4;
   color: #322209;
   text-align: center;
@@ -249,7 +319,6 @@ export default {
 
 /* Celdas del cuerpo de la tabla */
 .table td {
-  width: 30px; /* Ancho fijo para las columnas */
   text-align: center;
   padding: 5px;
   border: 1px solid #ddd;
@@ -291,6 +360,10 @@ export default {
 
 .button-cancel {
   color: #f44336;
+}
+
+.star-button {
+  color: #FE9900;
 }
 
 /* Botón para agregar nuevo platillo */

@@ -7,6 +7,7 @@
       
       <div class="opciones">
         <a><router-link to="/ofertas">Ofertas</router-link></a>
+        <a><router-link to="/menupedido">Realizar Pedido</router-link></a>
         <a v-if="isLoggedIn && isAdmin != 2"><router-link to="/mapa">Mapa Interactivo</router-link></a>
         <a><router-link to="/menu">Menu</router-link></a>
         <a v-if="isLoggedIn && isAdmin === 2">

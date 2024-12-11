@@ -9,5 +9,6 @@ router.put('/:id', platilloController.actualizarPlatillo);
 router.delete('/:id', platilloController.eliminarPlatillo);
 
 router.put('/desactivar/:id', platilloController.cambiarDesactivado);
+router.put('/toggle-destacado/:id', platilloController.toggleDestacado);
 
 module.exports = router;

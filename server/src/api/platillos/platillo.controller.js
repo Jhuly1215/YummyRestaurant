@@ -119,3 +119,44 @@ exports.cambiarDesactivado = async (req, res) => {
     }
   };
   
+// Cambiar el estado de un platillo entre destacado (2) y no destacado (1)
+exports.toggleDestacado = async (req, res) => {
+  const { id } = req.params;
+  
+  try {
+    // Obtén el estado actual del platillo
+    const [platillo] = await sequelize.query(
+      `SELECT estado FROM platillo WHERE idplato = :id`,
+      {
+        replacements: { id },
+        type: sequelize.QueryTypes.SELECT,
+      }
+    );
+
+    if (!platillo) {
+      return res.status(404).json({ error: 'Platillo no encontrado' });
+    }
+
+    // Alterna el estado: si es 1 -> 2, si es 2 -> 1
+    const nuevoEstado = platillo.estado === 2 ? 1 : 2;
+
+    // Actualiza el estado en la base de datos
+    const [actualizado] = await sequelize.query(
+      `UPDATE platillo SET estado = :nuevoEstado WHERE idplato = :id`,
+      {
+        replacements: { id, nuevoEstado },
+        type: sequelize.QueryTypes.UPDATE,
+      }
+    );
+
+    if (actualizado) {
+      res.json({ message: 'Estado del platillo actualizado', nuevoEstado });
+    } else {
+      res.status(404).json({ error: 'Error al actualizar el estado del platillo' });
+    }
+  } catch (error) {
+    console.error("Error al cambiar el estado del platillo:", error);
+    res.status(500).json({ error: 'Error al cambiar el estado del platillo', details: error.message });
+  }
+};
+  
