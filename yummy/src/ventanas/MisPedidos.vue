@@ -77,9 +77,9 @@
 
   
     </div>
-  </template>
+</template>
   
-  <script>
+<script>
   import axios from 'axios';
   import { onMounted, ref } from 'vue';
   import StarRatingModalPlatillo from '../components/PlatilloCalificacion.vue';
@@ -258,9 +258,9 @@
       };
     },
   };
-  </script>
+</script>
   
-  <style scoped>
+<style scoped>
   
     .pedidos-container {
       padding: 20px;
@@ -383,5 +383,5 @@
       background-color: #e69a4c;
     }
   
-  </style>
+</style>
     

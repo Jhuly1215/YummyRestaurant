@@ -12,6 +12,7 @@ import MenuCliente from '@/ventanas/MenuCliente.vue'
 import TemporalCalificacion from '@/ventanas/temporalCalificacion.vue'
 import MisReservas from '@/ventanas/reservas/MisReservas.vue';
 import MisPedidos from '@/ventanas/MisPedidos.vue';
+import MisCalificaciones from '@/ventanas/MisCalificaciones.vue';
 
 //para el administrador
 
@@ -87,6 +88,11 @@ const router = createRouter({
       path: '/mispedidos',
       name: 'MisPedidos',
       component: MisPedidos,
+    },
+    {
+      path: '/miscalificaciones',
+      name: 'MisCalificaciones',
+      component: MisCalificaciones,
     },
     //Para el Panel Administrativo
     {

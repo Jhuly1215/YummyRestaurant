@@ -19,6 +19,7 @@
           <div v-if="dropdownVisible" class="dropdown-content">
             <router-link to="/mispedidos">Mis Pedidos</router-link>
             <router-link to="/misreservas">Mis Reservas</router-link>
+            <router-link to="/miscalificaciones">Mis Calificaciones</router-link>
             <a @click="handleAuthAction">Cerrar Sesión</a>
           </div>
         </div>
