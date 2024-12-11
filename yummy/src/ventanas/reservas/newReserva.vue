@@ -40,110 +40,117 @@
           
         </form>
       </div>
+      <SuccessModal
+        v-if="mostrarExito"
+        :mensaje="'Reserva guardada exitosamente.'"
+        @onClose="cerrarModalExito"
+      />
     </div>
   </template>
   
-  <script>
-  import { reactive, ref } from 'vue';
-  import axios from 'axios';
+<script>
+  import { reactive, ref } from "vue";
+  import axios from "axios";
+  import SuccessModal from "@/components/SuccessModal.vue";
+
   export default {
     name: "NuevaReserva",
+    components: { SuccessModal },
     props: {
       titulo: String,
     },
-    emits: ['onClose', 'onSave'],
+    emits: ["onClose", "onSave"],
     setup(props, { emit }) {
       const error = ref(null);
       const loading = ref(false);
-      
+      const mostrarExito = ref(false); // Controla la visibilidad del modal de éxito
+
       const reservaData = reactive({
         idusuario: "", // Campo inicial para ID del usuario
         fecha: "",
         hora: "",
         idmesa: "",
       });
-  
-      // Continuar sin usuario registrado
+
       const continuarSinUsuario = () => {
         reservaData.idusuario = 1; // Usuario por defecto
       };
-  
-      // Guardar reserva
+
       const guardarReserva = async () => {
-        
         if (loading.value) return;
         loading.value = true;
-        console.log("Intentando guardar reserva");
+        try {
+          error.value = null;
 
-          try {
-              error.value = null;
+          const { idusuario, idmesa, fecha, hora } = reservaData;
 
-              const { idusuario, idmesa, fecha, hora } = reservaData;
+          // Verificar disponibilidad de la mesa
+          const response = await fetch(
+            `/api/reservas/verificar-disponibilidad?idmesa=${idmesa}&fecha=${fecha}&hora=${hora}&idreserva=${""}`
+          );
 
-              // Verificar disponibilidad de la mesa
-              const response = await fetch(
-                  `/api/reservas/verificar-disponibilidad?idmesa=${idmesa}&fecha=${fecha}&hora=${hora}&idreserva=${''}`
-              );
-
-              if (!response.ok) {
-                  const errorResponse = await response.json();
-                  error.value = errorResponse.error || "Error en la solicitud de disponibilidad.";
-                  return;
-              }
-
-              const { disponible } = await response.json();
-
-              // Verificar si el usuario está registrado
-              const responseU = await fetch(`/api/reservas/verificar-usuario?idusuario=${reservaData.idusuario}`);
-              if (!responseU.ok) {
-                  const errorResponse = await responseU.json();
-                  error.value = errorResponse.error || "Error en la verificación del usuario.";
-                  return;
-              }
-
-              const { registrado } = await responseU.json();
-
-              if (!registrado) {
-                  error.value = "El usuario no está registrado. Puede continuar sin un usuario registrado.";
-                  return;
-              }
-
-              if (!disponible) {
-                  error.value = "La mesa seleccionada ya tiene una reserva en la misma fecha y hora (o dentro de 1 hora y media).";
-                  return;
-              }
-
-              // Proceder a guardar la reserva
-              const nuevaReserva = {
-                  idusuario: idusuario || 1, 
-                  idmesa,
-                  fecha,
-                  hora,
-                  estado: 1, // Por defecto, pendiente
-              };
-
-              
-
-              emit('onSave', nuevaReserva);
-              emit('onClose');
-          } catch (err) {
-              console.error("Error al guardar la reserva:", err);
-              error.value = "Ocurrió un error al guardar la reserva.";
+          if (!response.ok) {
+            const errorResponse = await response.json();
+            error.value = errorResponse.error || "Error en la solicitud de disponibilidad.";
+            return;
           }
-          finally {
-            loading.value = false; // Restablece el estado de carga
+
+          const { disponible } = await response.json();
+
+          // Verificar si el usuario está registrado
+          const responseU = await fetch(`/api/reservas/verificar-usuario?idusuario=${reservaData.idusuario}`);
+          if (!responseU.ok) {
+            const errorResponse = await responseU.json();
+            error.value = errorResponse.error || "Error en la verificación del usuario.";
+            return;
           }
+
+          const { registrado } = await responseU.json();
+
+          if (!registrado) {
+            error.value = "El usuario no está registrado. Puede continuar sin un usuario registrado.";
+            return;
+          }
+
+          if (!disponible) {
+            error.value =
+              "La mesa seleccionada ya tiene una reserva en la misma fecha y hora (o dentro de 1 hora y media).";
+            return;
+          }
+
+          // Proceder a guardar la reserva
+          const nuevaReserva = {
+            idusuario: idusuario || 1,
+            idmesa,
+            fecha,
+            hora,
+            estado: 1, // Por defecto, pendiente
+          };
+
+          // Simular guardar la reserva (usa aquí tu llamada al backend si la tienes)
+          console.log("Reserva guardada:", nuevaReserva);
+
+          // Emitir evento y mostrar modal de éxito
+          emit("onSave", nuevaReserva);
+          mostrarExito.value = true; // Mostrar el modal de éxito
+        } catch (err) {
+          console.error("Error al guardar la reserva:", err);
+          error.value = "Ocurrió un error al guardar la reserva.";
+        } finally {
+          loading.value = false; // Restablece el estado de carga
+        }
       };
 
-  
-      const onClose = () => {
-        emit('onClose');
+      const cerrarModalExito = () => {
+        mostrarExito.value = false; // Ocultar el modal de éxito
+        emit("onClose"); // Cerrar el modal principal
       };
-  
-      return { reservaData, guardarReserva, continuarSinUsuario, error, onClose , loading};
+
+      return { reservaData, guardarReserva, continuarSinUsuario, error, onClose: cerrarModalExito, loading, mostrarExito };
     },
   };
-  </script>
+
+</script>
   
   <style scoped>
   .modal-success {
