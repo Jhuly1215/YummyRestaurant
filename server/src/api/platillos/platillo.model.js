@@ -32,6 +32,11 @@ const Platillo = sequelize.define('Platillo', {
     type: DataTypes.STRING(255), // Longitud para URLs
     allowNull: true, // Opcional si no es obligatorio
   },
+  estado: {
+    type: DataTypes.INTEGER, // Tipo entero para representar los estados
+    defaultValue: 1, // Si lo deseas, puedes asignar un valor por defecto
+    allowNull: false, // Si prefieres que siempre tenga un valor
+  },
 });
 
 module.exports = Platillo;

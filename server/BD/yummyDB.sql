@@ -24,7 +24,8 @@ CREATE TABLE mesa (
     capacidad int,
     nombre varchar(255),
     posx real,
-    posy real
+    posy real,
+    visible boolean
 );
 
 -- Table: oferta
@@ -66,7 +67,8 @@ CREATE TABLE platillo (
     descripcion varchar(200),
     precio real,
     idcategoria int,
-    imagen varchar(100)
+    imagen varchar(100),
+    estado int
 );
 
 -- Table: resenia
@@ -101,7 +103,8 @@ CREATE TABLE usuario (
     apellidos varchar(255) NOT NULL,
     correo varchar(255) NOT NULL,
     password varchar(255) NOT NULL,
-    idrol int NOT NULL
+    idrol int NOT NULL,
+    activo boolean,
 );
 
 -- foreign keys
@@ -208,3 +211,8 @@ ALTER TABLE usuario ADD CONSTRAINT usuarios_roles
     NOT DEFERRABLE 
     INITIALLY IMMEDIATE
 ;
+
+ALTER TABLE detalle_pedido ALTER COLUMN idreserva DROP NOT NULL;
+;
+ALTER TABLE pago ALTER COLUMN fecha TYPE DATE USING to_date(fecha::text, 'YYYYMMDD');
+
