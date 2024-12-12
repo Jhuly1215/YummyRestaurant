@@ -49,6 +49,33 @@ exports.registrarUsuario = async (req, res) => {
     res.status(500).json({ message: 'Error al registrar el usuario', error: error.message });
   }
 };
+
+// Actualizar solo el rol de un usuario
+exports.actualizarRolUsuario = async (req, res) => {
+  const { id } = req.params;
+  const { idRol } = req.body;
+
+  try {
+    // Ejecutar la consulta para actualizar solo el campo de rol
+    const [actualizado] = await sequelize.query(
+      `UPDATE usuario SET idrol = :idRol WHERE idUsuario = :id`,
+      {
+        replacements: { id, idRol },
+        type: sequelize.QueryTypes.UPDATE,
+      }
+    );
+
+    if (actualizado) {
+      res.json({ message: 'Rol del usuario actualizado exitosamente' });
+    } else {
+      res.status(404).json({ error: 'Usuario no encontrado' });
+    }
+  } catch (error) {
+    console.error("Error al actualizar el rol del usuario:", error);
+    res.status(500).json({ error: 'Error al actualizar el rol del usuario' });
+  }
+};
+
 // Obtener todos los usuarios
 exports.obtenerUsuarios = async (req, res) => {
   try {
@@ -62,6 +89,27 @@ exports.obtenerUsuarios = async (req, res) => {
     res.status(500).json({ error: 'Error al obtener los usuarios' });
   }
 };
+
+//Obtener todos los usuarios de un rol en especifico
+exports.obtenerUsuariosPorRol = async (req, res) => {
+  const { rol } = req.params;
+
+  try {
+    const usuarios = await sequelize.query(
+      `SELECT * FROM usuario WHERE rol = :rol`,
+      {
+        replacements: { rol },
+        type: sequelize.QueryTypes.SELECT,
+      }
+    );
+
+    res.json(usuarios);
+  } catch (error) {
+    console.error("Error al obtener usuarios por rol:", error);
+    res.status(500).json({ error: 'Error al obtener usuarios por rol' });
+  }
+};
+
 
 // Obtener un único usuario por ID
 exports.obtenerUsuarioPorId = async (req, res) => {
@@ -113,6 +161,7 @@ exports.actualizarUsuario = async (req, res) => {
     res.status(500).json({ error: 'Error al actualizar el usuario' });
   }
 };
+
 // Obtener un usuario por su correo
 exports.obtenerUsuarioPorCorreo = async (req, res) => {
   const { correo } = req.params;  // Obtener el correo de los parámetros de la URL
@@ -271,6 +320,75 @@ exports.enviarCodigo = async (req, res) => {
   } catch (error) {
     console.error("Error al enviar el código de verificación:", error);
     res.status(500).json({ success: false, message: 'Error al enviar el código de verificación', error: error.message });
+  }
+};
+
+exports.enviarConfirmacionPedido = async (req, res) => {
+  const { idUsuario, detalles, precio_total } = req.body;
+
+  try {
+    // Obtener el usuario por ID
+    const usuario = await sequelize.query(
+      `SELECT * FROM usuario WHERE idUsuario = :id`,
+      {
+        replacements: { id: idUsuario },
+        type: sequelize.QueryTypes.SELECT,
+      }
+    );
+
+    if (usuario.length === 0) {
+      return res.status(404).json({ success: false, message: 'Usuario no encontrado' });
+    }
+
+    const email = usuario[0].correo; // Extrae el email del usuario
+
+    // Generar HTML para los detalles del pedido
+    const detallesHtml = detalles
+      .map(
+        (detalle) =>
+          `<tr>
+             <td>${detalle.nombre}</td>
+             <td>${detalle.cantidad}</td>
+             <td>${detalle.precio} Bs.</td>
+             <td>${detalle.cantidad * detalle.precio} Bs.</td>
+           </tr>`
+      )
+      .join("");
+
+    const mailOptions = {
+      from: process.env.EMAIL_USER,
+      to: email,
+      subject: 'Confirmación de Pedido',
+      html: `
+        <h1>Pedido Confirmado</h1>
+        <p>Gracias por realizar tu pedido. Ya estamos trabajando en él.</p>
+        <h2>Detalles del Pedido:</h2>
+        <table border="1" style="border-collapse: collapse; width: 100%;">
+          <thead>
+            <tr>
+              <th>Platillo</th>
+              <th>Cantidad</th>
+              <th>Precio</th>
+              <th>Subtotal</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${detallesHtml}
+          </tbody>
+        </table>
+        <h3>Total: ${precio_total} Bs.</h3>
+        <p><b>Si cree que hubo un error en su pedido contactese con caja.</b></p>
+      `,
+    };
+
+    await transporter.sendMail(mailOptions);
+
+    res.json({ success: true, message: 'Correo de confirmación enviado' });
+  } catch (error) {
+    console.error("Error al enviar el correo:", error);
+    res
+      .status(500)
+      .json({ success: false, message: 'Error al enviar el correo', error: error.message });
   }
 };
 

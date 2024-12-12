@@ -11,6 +11,7 @@ router.get('/correo/:correo', usuarioController.obtenerUsuarioPorCorreo);// Ruta
 router.put('/:id', usuarioController.actualizarUsuario);
 router.delete('/:id', usuarioController.eliminarUsuario);
 router.put('/actualizar-contrasena/:id', usuarioController.actualizarContrasena);// Ruta para actualizar solo la contraseña de un usuario
+router.put('/:id/rol', usuarioController.actualizarRolUsuario);
 
 
 // Rutas para verificación de correo
@@ -18,6 +19,8 @@ router.post('/enviar-codigo', usuarioController.enviarCodigo); // Ruta para envi
 router.post('/verificar-codigo', usuarioController.verificarCodigo); // Ruta para verificar el código de verificación
 router.post('/enviar-reserva', usuarioController.enviarReserva); // Ruta para verificar el código de verificación
 
+//Rutas para envio de notificaciones
+router.post('/confirmar-pedido', usuarioController.enviarConfirmacionPedido);
 
 
 

@@ -1,3 +1,4 @@
+/* eslint-disable */
 <template>
   <div>
     <header class="offers-header">
@@ -7,6 +8,13 @@
       </h2>
       <p>Administra y crea nuevas ofertas para tus clientes</p>
     </header>
+
+    <ConfirmationModal v-if="modalVisible" :mensaje="`¿Seguro que desea eliminar la oferta ${ofertaAEliminar.titulo}?`"
+      @onCancel="cerrarModalConfirmation" @onConfirm="eliminarOferta" />
+
+    <ofertaEditComponent v-if="ModalEditar" :oferta="ofertaAEditar" @onCancel="cerrarModalEditar"
+      @onOfertaEditada="actualizarListaOfertas" />
+
     <div class="table-container">
       <table class="offers-table">
         <thead>
@@ -31,8 +39,10 @@
             <td>{{ oferta.fecha_inicio }}</td>
             <td>{{ oferta.fecha_fin }}</td>
             <td>
-              <button class="action-button edit-button"><i class="fas fa-edit"></i></button>
-              <button class="action-button delete-button"><i class="fas fa-trash"></i></button>
+              <button class="action-button edit-button" @click="mostrarModalEditar(oferta)"><i class=" fas
+                fa-edit"></i></button>
+              <button class="action-button delete-button" @click="mostrarModalEliminar(oferta)"><i
+                  class="fas fa-trash"></i></button>
             </td>
           </tr>
         </tbody>
@@ -138,7 +148,9 @@
             </div>
           </div>
         </div>
-        <button type="submit" class="submit-button">Crear Oferta</button>
+        <button type="submit" class="submit-button" :disabled="isSubmitting" @click="crearOferta()">
+          {{ isSubmitting ? "Creando oferta..." : "Crear Oferta" }}
+        </button>
       </form>
     </div>
 
@@ -149,17 +161,25 @@
 <script>
 import axios from 'axios';
 import SuccessModal from "../components/SuccessModal.vue";
+import ConfirmationModal from "../components/ConfirmationModal.vue";
+import ofertaEditComponent from "../components/ofertaEditComponent.vue"
 
 export default {
   name: "OfertasAdminComponent",
   components: {
     SuccessModal, // Registra el componente aquí
+    ConfirmationModal,
+    ofertaEditComponent
   },
   data() {
     return {
       mostrarModalExito: false,
+      ModalEditar: false,
       mensajeModal: "Oferta creada con exito!",
+      modalVisible: false,
       ofertas: [],
+      ofertaAEliminar: {},
+      ofertaAEditar: {},
       nuevaOferta: {
         titulo: "",
         requerimiento: "",
@@ -168,12 +188,13 @@ export default {
         fecha_fin: "",
         descuento: 0,
         idPlato: null,
-        src: null, // Aquí se almacenará el archivo seleccionado
+        src: null,
         srcPreview: null,
       },
-      platillos: [], // Lista completa de platillos
-      filtroPlatillo: "", // Filtro para buscar platillos por nombre
-      comboBoxAbierto: false, // Estado del combo box
+      platillos: [],
+      filtroPlatillo: "",
+      comboBoxAbierto: false,
+      isSubmitting: false,
     };
   },
   mounted() {
@@ -210,6 +231,41 @@ export default {
       this.filtroPlatillo = nombre; // Rellena la barra de búsqueda con el nombre
       this.comboBoxAbierto = false; // Cierra el combo box
     },
+    mostrarModalEditar(oferta) {
+      console.log("DATOS QUE SE ENVIAN: ", oferta)
+      this.ModalEditar = true;
+      this.ofertaAEditar = oferta;
+    },
+    async actualizarListaOfertas() {
+      await this.obtenerOfertas();
+      this.mostrarSuccessModal("Oferta editada correctamente.");
+      this.mostrarModalEditar = false;
+    },
+    cerrarModalEditar() {
+      this.ModalEditar = false;
+    },
+    mostrarSuccessModal(mensaje) {
+      this.mensajeModal = mensaje;
+      this.mostrarModalExito = true;
+    },
+    mostrarModalEliminar(oferta) {
+      this.modalVisible = true;
+      this.ofertaAEliminar = oferta;
+    },
+    cerrarModalConfirmation() {
+      this.modalVisible = false;
+    },
+    async eliminarOferta() {
+      try {
+        await axios.delete(`http://localhost:5000/api/ofertas/${this.ofertaAEliminar.idoferta}`);
+        this.ofertas = this.ofertas.filter(p => p.idoferta !== this.ofertaAEliminar.idoferta);
+        this.cerrarModalConfirmation();
+        this.mostrarSuccessModal('Oferta eliminada correctamente.');
+      } catch (error) {
+        console.error("Error al eliminar la oferta:", error);
+        this.mostrarSuccessModal('Error al eliminar la oferta');
+      }
+    },
     async obtenerOfertas() {
       try {
         const response = await axios.get('http://localhost:5000/api/ofertas');
@@ -228,6 +284,10 @@ export default {
       }
     },
     async crearOferta() {
+      console.log("PRIMERO")
+      if (this.isSubmitting) return; // Evita solicitudes múltiples
+      this.isSubmitting = true;
+      console.log("ESTADO: ", this.isSubmitting)
       try {
         if (
           !this.nuevaOferta.titulo ||
@@ -242,22 +302,15 @@ export default {
           alert("Por favor, completa todos los campos antes de enviar.");
           return;
         }
-
         const formData = new FormData();
-
         // Agrega los campos al FormData+
         for (let key in this.nuevaOferta) {
           if (key === "src") {
-            formData.append("imagen", this.nuevaOferta.src); // Asegúrate de que el archivo se envía con el nombre correcto
+            formData.append("imagen", this.nuevaOferta.src);
           } else if (key !== "srcPreview") {
             formData.append(key, this.nuevaOferta[key]);
           }
         }
-
-        // Mostrar el modal de éxito
-        this.mostrarModalExito = true;
-
-        // Reiniciar el formulario
         this.nuevaOferta = {
           titulo: "",
           requerimiento: "",
@@ -269,20 +322,24 @@ export default {
           src: null,
           srcPreview: null,
         };
-
         // Actualizar la tabla de ofertas
         this.obtenerOfertas();
-
         // Enviar datos al backend
         const response = await axios.post("http://localhost:5000/api/ofertas", formData, {
           headers: { "Content-Type": "multipart/form-data" },
         });
-
+        if (response.status === 201) {
+          this.mostrarSuccessModal("Oferta creada con éxito. Correos enviados.");
+          this.obtenerOfertas();
+        }
       } catch (error) {
         console.error("Error al crear la oferta:", error);
         alert("Ocurrió un error al crear la oferta. Por favor, inténtalo de nuevo.");
+      } finally {
+        this.isSubmitting = false;
       }
     },
+
     cerrarModal() {
       this.mostrarModalExito = false; // Oculta el modal
     },
@@ -310,12 +367,11 @@ export default {
         }
       }
     },
-
     removeImage() {
       this.nuevaOferta.src = null;
       this.nuevaOferta.srcPreview = null;
     },
-  }
+  },
 };
 </script>
 

@@ -21,6 +21,7 @@ import MapaInteractivo2 from '@/ventanas/mapaAdmin.vue';
 import OfertasAdminComponent from '../ventanas/OfertasAdminComponent.vue'
 import PlatillosAdminComponent from '@/components/PlatillosAdminComponent.vue';
 import JReservasAdminComponent from '@/ventanas/reservas/Reservas.vue';
+import UsuariosAdminComponent from '../ventanas/UsuariosAdminComponent.vue';
 import DashboardComponent from '../ventanas/dashboardComponent.vue';
 
 const router = createRouter({
@@ -61,10 +62,10 @@ const router = createRouter({
       name: 'Menu',
       component: MenuCliente,
     },
-      {
-        path: '/recupera',
-        name: 'Recupera',
-        component: Recupera,
+    {
+      path: '/recupera',
+      name: 'Recupera',
+      component: Recupera,
     },
     {
       path: '/cambioPass/:id',
@@ -123,15 +124,22 @@ const router = createRouter({
           name: 'AdminOfertas',
           component: OfertasAdminComponent,
         },
+
+        {
+          path: 'usuarios',
+          name: 'AdminUsuarios',
+          component: UsuariosAdminComponent, // Gestión de ofertas
+        },
+
         {
           path: 'platillos',
           name: 'AdminPlatillos',
-          component: PlatillosAdminComponent, 
+          component: PlatillosAdminComponent,
         },
         {
           path: 'reservas',
           name: 'AdminReservas',
-          component: JReservasAdminComponent, // Gestión de reservas
+          component: JReservasAdminComponent,
         },
         {
           path: 'mapa',
@@ -151,7 +159,7 @@ const router = createRouter({
 
 router.beforeEach((to, from, next) => {
   if (to.meta.requiresAuth) {
-    const token = localStorage.getItem('token'); 
+    const token = localStorage.getItem('token');
     if (!token) {
       next({ name: 'LogIn' });
     } else {

@@ -18,7 +18,6 @@ app.use(express.json());
 
 
 const ofertasRoutes = require('./src/api/ofertas/oferta.routes');
-const platillosRoutes = require('./src/api/platillos/platillo.routes');
 const usuarioRoutes = require('./src/api/usuario/usuario.routes');
 const authRoutes = require('./src/api/autenticacion/authRoutes');
 const actividadRoutes = require('./src/api/usuario/actividadRoutes');
@@ -29,11 +28,14 @@ const pedidosRoutes = require('./src/api/pedidos/pedido.routes');
 const detalle_pedidoRoutes = require('./src/api/detalle_pedido/detalle_pedido.routes');
 const pagosRoutes = require('./src/api/pagos/pago.routes');
 const dashboardRoutes = require('./src/api/dashboard/dashboard.routes');
+const rolRoutes = require('./src/api/rol/rol.routes');
+const platillosRoutes = require('./src/api/platillos/platillo.routes');
+
+app.use('/api/platillos', platillosRoutes);
 const calificacionRoutes = require('./src/api/calificacion/calificacion.routes');
 
-
-
 app.use('/api/ofertas', ofertasRoutes);
+app.use('/api/rol', rolRoutes);
 app.use('/api/platillos', platillosRoutes);
 app.use('/api/categorias', categoriasRoutes);
 app.use('/api/usuario', usuarioRoutes);

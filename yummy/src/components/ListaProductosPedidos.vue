@@ -31,18 +31,14 @@
                 </tr>
               </tbody>
             </table>
-                <h2><strong>Total: {{ total }} Bs. </strong></h2>                
+            <h2><strong>Total: {{ total }} Bs. </strong></h2>
           </div>
           <button class="order-button" @click="realizarPedido">Realizar pedido</button>
         </div>
       </div>
     </transition>
   </div>
-  <SuccessModal
-      v-if="successModalVisible"
-      :mensaje="successMensaje"
-      @onClose="closeSuccessModal"
-    />
+  <SuccessModal v-if="successModalVisible" :mensaje="successMensaje" @onClose="closeSuccessModal" />
 </template>
 
 <script>
@@ -122,8 +118,15 @@ export default {
       };
 
       try {
-        await axios.post("http://localhost:5000/api/pedidos", pedido);
-        this.mostrarSuccessModal("Pedido realizado con éxito");
+        const response = await axios.post("http://localhost:5000/api/pedidos", pedido);
+
+        await axios.post("http://localhost:5000/api/usuario/confirmar-pedido", {
+          idUsuario: response.data.idusuario,
+          detalles: response.data.detalles,
+          precio_total: response.data.precio_total
+        });
+
+        this.mostrarSuccessModal("Pedido realizado con éxito. Revisa tu correo electrónico.");
         this.$emit("pedidoRealizado");
         this.toggleModal();
         this.generarPDF(); // Llamada a la función para generar el PDF
@@ -132,7 +135,6 @@ export default {
         alert("Hubo un error al realizar el pedido. Por favor, inténtelo nuevamente.");
       }
     },
-
     mostrarSuccessModal(mensaje) {
       this.successMensaje = mensaje;
       this.successModalVisible = true;
@@ -254,7 +256,8 @@ export default {
   text-align: left;
 }
 
-.table th, .table td {
+.table th,
+.table td {
   border: 1px solid #ddd;
   padding: 12px;
 }
@@ -321,5 +324,4 @@ h2 {
 .close-icon:hover {
   color: #807f7f;
 }
-
 </style>

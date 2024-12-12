@@ -7,7 +7,7 @@ const upload = require("../../config/multerConfig");
 // Define las rutas
 router.post('/', upload.single("imagen"), ofertasController.crearOferta);
 router.get('/', ofertasController.obtenerOfertas);
-router.put('/:id', ofertasController.actualizarOferta);
+router.put('/:id', upload.single("imagen"), ofertasController.actualizarOferta);
 router.delete('/:id', ofertasController.eliminarOferta);
 
 module.exports = router;
