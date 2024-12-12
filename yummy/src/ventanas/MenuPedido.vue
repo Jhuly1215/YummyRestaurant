@@ -27,7 +27,7 @@
 
       </div>
     </div>
-    <FooterComponent />
+
   </div>
   <SuccessModal
       v-if="successModalVisible"
@@ -38,7 +38,6 @@
 
 <script>
 import axios from 'axios';
-import FooterComponent from '@/components/Footer.vue';
 import CarouselComponent from '@/components/CarouselComponent.vue';
 import FiltroCategorias from '@/components/FiltroCategorias.vue';
 import CardMenuPedido from '@/components/CardMenuPedido.vue';
@@ -48,7 +47,6 @@ import SuccessModal from '@/components/SuccessModal.vue';
 export default {
   name: 'MenuPedido',
   components: {
-    FooterComponent,
     CarouselComponent,
     CardMenuPedido,
     FiltroCategorias,

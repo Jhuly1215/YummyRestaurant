@@ -1,12 +1,10 @@
 <template>
   <div>
-    <header class="offers-header">
-      <h2>
-        <i class="fa fa-cutlery" aria-hidden="true"></i>
-        Platillos
-      </h2>
-      <p>Administra y crea nuevos platillos para tus clientes</p>
-    </header>
+    <HeaderAdminTitle 
+      icon="fa fa-cutlery" 
+      title="Platillos" 
+      subtitle="Visualiza los platillos que ofrese tu restaurante"
+    />
 
     <!-- Modal para eliminar -->
     <ConfirmationModal
@@ -111,6 +109,7 @@ import axios from 'axios';
 import ConfirmationModal from './ConfirmationModal.vue';
 import FormNewPlatillo from './FormNewPlatillo.vue';
 import SuccessModal from './SuccessModal.vue';
+import HeaderAdminTitle from './HeaderAdminTitle.vue';
 
 export default {
   name: "PlatillosAdminComponent",
@@ -118,6 +117,7 @@ export default {
     ConfirmationModal,
     FormNewPlatillo,
     SuccessModal,
+    HeaderAdminTitle
   },
   data() {
     return {
