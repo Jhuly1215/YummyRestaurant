@@ -8,13 +8,20 @@
       <div class="info">
         <div>
           <h3>{{ nombre }}</h3>
-          <p>{{ precio }} Bs.</p>
+          <p v-if="descuento">
+            <span class="precio-original">{{ precio }} Bs.</span>
+            <span class="precio-descuento">{{ precioConDescuento }} Bs.</span>
+          </p>
+          <p v-else>{{ precio }} Bs.</p>
+          <p v-if="descuento" class="descuento">
+            {{ descuento }}% de descuento
+          </p>
         </div>
         <div class="cantidad">
           <input
-            type="number" 
-            min="0" 
-            v-model.number="cantidadInterna" 
+            type="number"
+            min="0"
+            v-model.number="cantidadInterna"
             @input="validarCantidad"
           />
         </div>
@@ -40,8 +47,12 @@ export default {
       required: true
     },
     precio: {
-      type: String,
+      type: Number, // Cambiado a Number para cálculos
       required: true
+    },
+    descuento: { // Nueva prop para el descuento
+      type: Number,
+      default: null
     },
     id: {
       type: Number,
@@ -60,6 +71,13 @@ export default {
   watch: {
     cantidad(newCantidad) {
       this.cantidadInterna = newCantidad;
+    }
+  },
+  computed: {
+    precioConDescuento() {
+      return this.descuento
+        ? (this.precio * (1 - this.descuento / 100)).toFixed(2)
+        : this.precio;
     }
   },
   methods: {
@@ -125,6 +143,28 @@ export default {
 
 input {
   width: 50px;
+}
+
+/* Estilo para mostrar el precio original tachado */
+.precio-original {
+  text-decoration: line-through;
+  color: #888;
+  margin-right: 10px;
+}
+
+.precio-descuento {
+  color: #E53935;
+  font-weight: bold;
+}
+
+.descuento {
+  color: #FE9900;
+  font-size: 14px;
+  font-weight: bold;
+}
+
+h3 {
+  color: #322209;
 }
 
 @media (max-width: 768px) {

@@ -53,21 +53,13 @@ export default {
     }
   },
   mounted() {
-    this.obtenerPlatillos();
+    //this.obtenerPlatillos();
+    this.obtenerPlatillosOfertas();
   },
   methods: {
-    async obtenerOfertas() {
+    async obtenerPlatillosOfertas() {
       try {
-        const response = await axios.get('http://localhost:5000/api/ofertas');
-        this.ofertas = response.data;
-      } catch (error) {
-        console.error("Error al obtener las ofertas:", error);
-      }
-    },
-
-    async obtenerPlatillos() {
-      try {
-        const response = await axios.get('http://localhost:5000/api/platillos');
+        const response = await axios.get('http://localhost:5000/api/platillos/platillos-ofertas');
         this.platillos = response.data;
         await this.obtenerOfertas(); // Cargar ofertas después de los platillos
 
@@ -85,8 +77,7 @@ export default {
       } catch (error) {
         console.error("Error al obtener los platillos:", error);
       }
-    }
-
+    },
   }
 };
 </script>

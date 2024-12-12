@@ -33,8 +33,12 @@
   </template>
   
   <script>
+  import ExpCalificacion from '@/components/ExpCalificacion.vue';
   export default {
     name: "ModalPedido",
+    components: {
+      ExpCalificacion,
+    },
     props: {
       items: {
         type: Array,
@@ -53,6 +57,7 @@
         // Cierra el modal
         this.$emit('onClose');
       }
+      
     }
   };
   </script>
