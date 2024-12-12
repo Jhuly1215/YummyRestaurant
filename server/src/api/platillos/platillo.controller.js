@@ -31,43 +31,16 @@ exports.crearPlatillo = async (req, res) => {
 
 // Obtener todos los platillos
 exports.obtenerPlatillos = async (req, res) => {
-  try {
-      const platillos = await sequelize.query(
-          `
-          SELECT 
-              p.idplato AS idPlatillo,
-              p.nombre,
-              p.descripcion,
-              p.precio,
-              p.idCategoria,
-              p.imagen,
-              p.estado,
-              o.descuento AS ofertaDescuento
-          FROM 
-              platillo p
-          LEFT JOIN 
-              oferta o 
-          ON 
-              p.idplato = o.idPlato
-          WHERE 
-              p.estado != 0
-          `,
-          { type: sequelize.QueryTypes.SELECT }
-      );
-
-      // Mapeamos la respuesta para incluir "Oferta del #descuento# %" si aplica
-      const resultado = platillos.map((platillo) => ({
-          ...platillo,
-          oferta: platillo.ofertaDescuento
-              ? `Oferta del ${platillo.ofertaDescuento}%`
-              : null,
-      }));
-
-      res.json(resultado);
-  } catch (error) {
-      console.error("Error al obtener los platillos:", error);
-      res.status(500).json({ error: 'Error al obtener los platillos' });
-  }
+    try {
+        const platillos = await sequelize.query(
+            `SELECT * FROM platillo where estado != 0`,
+            { type: sequelize.QueryTypes.SELECT }
+        );
+        res.json(platillos);
+    } catch (error) {
+        console.error("Error al obtener los platillos:", error);
+        res.status(500).json({ error: 'Error al obtener los platillos' });
+    }
 };
 
 // Actualizar un platillo
@@ -187,3 +160,28 @@ exports.toggleDestacado = async (req, res) => {
   }
 };
   
+exports.obtenerPlatillosOfertas = async (req, res) => {
+  try {
+      const platillos = await sequelize.query(
+          `
+          SELECT p.idplato, p.nombre, p.descripcion, p.precio,
+          p.idCategoria, p.imagen, p.estado, o.descuento
+          FROM platillo p
+          LEFT JOIN oferta o  
+          ON p.idplato = o.idPlato 
+          WHERE p.estado != 0
+          `,
+          { type: sequelize.QueryTypes.SELECT }
+      );
+
+      // Mapeamos la respuesta para incluir "Oferta del #descuento# %" si aplica
+      const resultado = platillos.map((platillo) => ({
+          ...platillo
+      }));
+
+      res.json(resultado);
+  } catch (error) {
+      console.error("Error al obtener los platillos con ofertas:", error);
+      res.status(500).json({ error: 'Error al obtener los platillos con ofertas' });
+  }
+};

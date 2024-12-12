@@ -137,7 +137,8 @@ export default {
 }
 
 .precio-descuento {
-  color: #E53935; /* Color llamativo para el precio con descuento */
+  /*color: #35e535; */
+  color: #E53935; 
   font-weight: bold;
 }
 
@@ -145,6 +146,10 @@ export default {
   color: #FE9900;
   font-size: 14px;
   font-weight: bold;
+}
+
+h3 {
+  color: #322209;
 }
 
 @media (max-width: 768px) {
