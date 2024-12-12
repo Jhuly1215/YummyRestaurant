@@ -148,7 +148,7 @@
             </div>
           </div>
         </div>
-        <button type="submit" class="submit-button" :disabled="isSubmitting">
+        <button type="submit" class="submit-button" :disabled="isSubmitting" @click="crearOferta()">
           {{ isSubmitting ? "Creando oferta..." : "Crear Oferta" }}
         </button>
       </form>
@@ -239,6 +239,7 @@ export default {
     async actualizarListaOfertas() {
       await this.obtenerOfertas();
       this.mostrarSuccessModal("Oferta editada correctamente.");
+      this.mostrarModalEditar = false;
     },
     cerrarModalEditar() {
       this.ModalEditar = false;
@@ -283,6 +284,10 @@ export default {
       }
     },
     async crearOferta() {
+      console.log("PRIMERO")
+      if (this.isSubmitting) return; // Evita solicitudes múltiples
+      this.isSubmitting = true;
+      console.log("ESTADO: ", this.isSubmitting)
       try {
         if (
           !this.nuevaOferta.titulo ||
@@ -297,10 +302,8 @@ export default {
           alert("Por favor, completa todos los campos antes de enviar.");
           return;
         }
-
         const formData = new FormData();
-
-        // Agrega los campos al FormData
+        // Agrega los campos al FormData+
         for (let key in this.nuevaOferta) {
           if (key === "src") {
             formData.append("imagen", this.nuevaOferta.src);
@@ -308,17 +311,6 @@ export default {
             formData.append(key, this.nuevaOferta[key]);
           }
         }
-
-        // Enviar datos al backend para actualización
-        const response = await axios.put(`http://localhost:5000/api/ofertas/${this.idOfertaAEditar}`, formData, {
-          headers: { "Content-Type": "multipart/form-data" },
-        });
-
-        // Mostrar el modal de éxito
-        this.mostrarModalExito = true;
-        this.successMensaje = "Oferta actualizada exitosamente";
-
-        // Reiniciar el formulario
         this.nuevaOferta = {
           titulo: "",
           requerimiento: "",
@@ -330,14 +322,24 @@ export default {
           src: null,
           srcPreview: null,
         };
-
+        // Actualizar la tabla de ofertas
         this.obtenerOfertas();
-
+        // Enviar datos al backend
+        const response = await axios.post("http://localhost:5000/api/ofertas", formData, {
+          headers: { "Content-Type": "multipart/form-data" },
+        });
+        if (response.status === 201) {
+          this.mostrarSuccessModal("Oferta creada con éxito. Correos enviados.");
+          this.obtenerOfertas();
+        }
       } catch (error) {
-        console.error("Error al actualizar la oferta:", error);
-        alert("Ocurrió un error al actualizar la oferta. Por favor, inténtalo de nuevo.");
+        console.error("Error al crear la oferta:", error);
+        alert("Ocurrió un error al crear la oferta. Por favor, inténtalo de nuevo.");
+      } finally {
+        this.isSubmitting = false;
       }
     },
+
     cerrarModal() {
       this.mostrarModalExito = false; // Oculta el modal
     },

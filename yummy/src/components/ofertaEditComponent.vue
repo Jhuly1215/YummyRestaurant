@@ -226,7 +226,6 @@ export default {
         },
         async editarOferta() {
             try {
-                // Validar que todos los campos requeridos están completos
                 if (
                     !this.nuevaOferta.titulo ||
                     !this.nuevaOferta.requerimiento ||
@@ -242,10 +241,9 @@ export default {
 
                 const formData = new FormData();
 
-                // Agregar campos al FormData
                 for (let key in this.nuevaOferta) {
                     if (key === "src" && this.nuevaOferta.src) {
-                        formData.append("imagen", this.nuevaOferta.src); // Solo agregar si hay una imagen nueva
+                        formData.append("imagen", this.nuevaOferta.src);
                     } else if (key !== "srcPreview") {
                         formData.append(key, this.nuevaOferta[key]);
                     }
@@ -256,18 +254,14 @@ export default {
                 }
 
 
-                // Realizar la solicitud PUT para actualizar la oferta
                 await axios.put(`http://localhost:5000/api/ofertas/${this.oferta.idoferta}`, formData, {
                     headers: { "Content-Type": "multipart/form-data" },
                 });
 
-                // Emitir evento para actualizar la lista de ofertas en el componente principal
                 this.$emit("onOfertaEditada");
 
-                // Mostrar modal de éxito
                 this.mostrarSuccessModal("Oferta editada correctamente.");
 
-                // Cerrar modal de edición
                 this.onCancel();
             } catch (error) {
                 console.error("Error al editar la oferta:", error);
