@@ -33,7 +33,7 @@
             <th>Descripción</th>
             <th>Precio</th>
             <th>Categoría</th>
-            <th>Imagen</th>
+            <!--<th>Imagen</th>-->
             <th>Acciones</th>
           </tr>
         </thead>
@@ -64,7 +64,9 @@
             <td v-if="index === filaEnEdicion">
               <input v-model="platilloEditado.imagen" />
             </td>
+            <!--
             <td v-else>{{ platillo.imagen }}</td>
+            -->
             
             <td class="botones">
               <!-- Botones de edición -->

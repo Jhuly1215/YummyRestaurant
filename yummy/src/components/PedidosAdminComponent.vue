@@ -234,7 +234,7 @@ export default {
 
 /* Estilos del componente */
 .pedidos-admin {
-  max-width: 1200px;
+  max-width: 1100px;
   margin: 0 auto;
   padding: 20px;
 }
@@ -253,7 +253,7 @@ export default {
 @media (max-width: 768px) {
   .cards > * {
     flex: 1 1 100%; /* 1 tarjeta por fila en móviles */
-    max-width: 90%; /* Margen horizontal */
+    max-width: 80%; /* Margen horizontal */
   }
 }
 

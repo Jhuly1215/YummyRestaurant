@@ -23,7 +23,9 @@
               <tbody>
                 <tr v-for="platillo in platillosSeleccionados" :key="platillo.idplato">
                   <td>{{ platillo.nombre }}</td>
-                  <td>{{ platillo.precio }} Bs.</td>
+                  <td>
+                    {{ platillo.descuento ? `${platillo.precioConDescuento} Bs. (Oferta)` : `${platillo.precio} Bs.` }}
+                  </td>
                   <td>{{ platillo.cantidad }}</td>
                   <td>{{ platillo.subtotal }} Bs.</td>
                 </tr>
@@ -68,14 +70,20 @@ export default {
     platillosSeleccionados() {
       return this.platillos
         .filter((p) => this.cantidadesSeleccionadas[p.idplato] > 0)
-        .map((p) => ({
-          ...p,
-          cantidad: this.cantidadesSeleccionadas[p.idplato],
-          subtotal: this.cantidadesSeleccionadas[p.idplato] * p.precio,
-        }));
+        .map((p) => {
+          const precioConDescuento = p.descuento
+            ? p.precio - (p.precio * p.descuento) / 100
+            : p.precio;
+          return {
+            ...p,
+            precioConDescuento: precioConDescuento.toFixed(2),
+            cantidad: this.cantidadesSeleccionadas[p.idplato],
+            subtotal: (this.cantidadesSeleccionadas[p.idplato] * precioConDescuento).toFixed(2),
+          };
+        });
     },
     total() {
-      return this.platillosSeleccionados.reduce((sum, p) => sum + p.subtotal, 0);
+      return this.platillosSeleccionados.reduce((sum, p) => sum + parseFloat(p.subtotal), 0).toFixed(2);
     },
   },
   data() {
@@ -132,7 +140,6 @@ export default {
     closeSuccessModal() {
       this.successModalVisible = false;
     },
-
     generarPDF() {
       const doc = new jsPDF();
 
@@ -152,7 +159,9 @@ export default {
       // Tabla de productos
       const productos = this.platillosSeleccionados.map((platillo) => [
         platillo.nombre,
-        `${platillo.precio} Bs.`,
+        platillo.descuento
+          ? `${platillo.precioConDescuento} Bs. (Oferta)`
+          : `${platillo.precio} Bs.`,
         platillo.cantidad,
         `${platillo.subtotal} Bs.`,
       ]);
@@ -185,6 +194,7 @@ export default {
       // Descargar el PDF
       doc.save("pedido.pdf");
     },
+
   },
 };
 </script>
