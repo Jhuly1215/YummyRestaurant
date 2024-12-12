@@ -9,6 +9,6 @@ router.put("/actualizar", calificacionesController.actualizarCalificacion);
 router.delete("/:id", calificacionesController.eliminarCalificacion);
 router.get("/existe", calificacionesController.existeResenia);
 router.get('/usuario/:idusuario', calificacionesController.obtenerCalificacionesPorUsuario);
-
+router.post("/calificar-experiencia", calificacionesController.calificarExperiencia);
 
 module.exports = router;
