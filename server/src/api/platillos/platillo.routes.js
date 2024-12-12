@@ -10,5 +10,6 @@ router.delete('/:id', platilloController.eliminarPlatillo);
 
 router.put('/desactivar/:id', platilloController.cambiarDesactivado);
 router.put('/toggle-destacado/:id', platilloController.toggleDestacado);
+router.get('/platillos-ofertas', platilloController.obtenerPlatillosOfertas);
 
 module.exports = router;

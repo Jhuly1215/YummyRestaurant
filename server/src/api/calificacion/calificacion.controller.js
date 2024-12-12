@@ -141,3 +141,27 @@ exports.obtenerCalificacionesPorUsuario = async (req, res) => {
     res.status(500).json({ error: "Error al obtener las calificaciones del usuario." });
   }
 };
+// Calificar experiencia después de un pedido
+exports.calificarExperiencia = async (req, res) => {
+  const { puntuacion, idusuario, fecha } = req.body;
+  console.log('Solicitud recibida para calificar experiencia:', req.body);
+
+  try {
+    const nuevaCalificacion = await sequelize.query(
+      `INSERT INTO resenia (puntuacion, fecha, idusuario, idplato)
+       VALUES (:puntuacion, :fecha, :idusuario, NULL) RETURNING *`,
+      {
+        replacements: { puntuacion, idusuario, fecha },
+        type: sequelize.QueryTypes.INSERT,
+      }
+    );
+
+    res.status(201).json({
+      message: 'Experiencia calificada exitosamente',
+      data: nuevaCalificacion[0],
+    });
+  } catch (error) {
+    console.error('Error al calificar la experiencia:', error);
+    res.status(500).json({ error: 'Error al calificar la experiencia' });
+  }
+};

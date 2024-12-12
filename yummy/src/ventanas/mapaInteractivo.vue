@@ -3,6 +3,26 @@
 <template>
   <div class="contenedorP">
       <h1>Mapa Interactivo de Mesas</h1>
+      <!-- Filtros -->
+      <div class="filtros">
+        <div class="filtro-fecha">
+            <label>Día:</label>
+            <div class="input-group">
+            <input type="date" v-model="filtroDia" />
+            <button @click="limpiarFiltro('filtroDia')" class="limpiar-boton">✖</button>
+            </div>
+        </div>
+        <div class="filtro-hora">
+            <label>Hora:</label>
+            <div class="input-group">
+            <input type="time" v-model="filtroHora" />
+            <button @click="limpiarFiltro('filtroHora')" class="limpiar-boton">✖</button>
+            </div>
+        </div>
+        <button @click="aplicarFiltros" class="btn-aplicar">Aplicar Filtros</button>
+        </div>
+
+
       <div v-if="mostrarMesa" class="row">
         <div class="card">
             <h4>{{mesaSeleccionada.nombre}}</h4>
@@ -64,27 +84,38 @@ export default {
     },
     data() {
         return {
-            mesas: [],
-            reservas: [],
-            infoMesa: '',
-            mostrarMesa: false,
-            clickTimeout: null,
-            mostrarModal: false,
-            mostrarModalConfirmacion: false,
-            modalNuevaReservaVisible: false,
-            modoFormulario: '', // Puede ser 'añadir' o 'editar'
-            mesaSeleccionada: {},
-            mesaForm: {
-                nombre: '',
-                capacidad: 1,
-                posx: '',
-                posy: ''
-            }
+        mesas: [],
+        reservas: [],
+        reservasFiltradasTemp: [],
+        filtroDia: "",
+        filtroHora: "",
+        infoMesa: "",
+        mostrarMesa: false,
+        clickTimeout: null,
+        mostrarModal: false,
+        mostrarModalConfirmacion: false,
+        modalNuevaReservaVisible: false,
+        modoFormulario: "", // Puede ser 'añadir' o 'editar'
+        mesaSeleccionada: {},
+        mesaForm: {
+            nombre: "",
+            capacidad: 1,
+            posx: "",
+            posy: "",
+        },
         };
     },
     created() {
         this.rol = parseInt(localStorage.getItem("rol"), 10); // Asegúrate de convertir a número
     },
+    watch: {
+    filtroDia(newValue) {
+        console.log("Nuevo filtro de día:", newValue);
+    },
+    filtroHora(newValue) {
+        console.log("Nuevo filtro de hora:", newValue);
+    },
+},
     async mounted() {
         const mesaStore = useMesaStore(); // Usa el store de Pinia
         await mesaStore.obtenerMesas();
@@ -93,9 +124,52 @@ export default {
         this.reservas = mesaStore.reservas; // Asigna las mesas del store al array local
         this.crearMapa();
     },
+    
     methods: {
+        aplicarFiltros() {
+            if (!this.filtroDia || !this.filtroHora) {
+            console.log("Filtros no aplicados: día o hora están vacíos.");
+            this.reservasFiltradasTemp = [];
+            return;
+            }
+
+            const fechaSeleccionada = new Date(this.filtroDia);
+            const horaSeleccionada = new Date(`1970-01-01T${this.filtroHora}:00`);
+
+            if (isNaN(fechaSeleccionada) || isNaN(horaSeleccionada)) {
+            console.log("Error al interpretar los filtros como fechas u horas.");
+            this.reservasFiltradasTemp = [];
+            return;
+            }
+
+            this.reservasFiltradasTemp = this.reservas.filter((reserva) => {
+            const fechaReserva = new Date(reserva.fecha);
+            const horaReserva = new Date(`1970-01-01T${reserva.hora}`);
+
+            const mismaFecha = fechaReserva.toDateString() === fechaSeleccionada.toDateString();
+            const diferenciaMinutos = Math.abs(horaReserva - horaSeleccionada) / (1000 * 60);
+            const intervaloHora = diferenciaMinutos <= 60;
+
+            return mismaFecha && intervaloHora;
+            });
+
+            console.log("Reservas filtradas manualmente:", this.reservasFiltradasTemp);
+            this.actualizarColoresMesas();
+        },
+        actualizarColoresMesas() {
+            const svg = d3.select(this.$refs.mapa);
+
+            svg.selectAll(".mesa").style("fill", (d) => {
+            const reservaFiltrada = this.reservasFiltradasTemp.find((r) => r.idmesa === d.idmesa);
+            return reservaFiltrada ? "#724A0E" : "#FFFEDC";
+            });
+        },
         cerrarModalNuevaReserva() {
         this.modalNuevaReservaVisible = false;
+        },
+        limpiarFiltro(campo) {
+            this[campo] = "";
+            console.log(`Filtro ${campo} limpiado, valor actual:`, this[campo]);
         },
         crearMapa() {
             const svg = d3.select(this.$refs.mapa);
@@ -126,7 +200,7 @@ export default {
             // Obtener la hora actual
             const ahora = new Date();
 
-            // Crear los círculos para las mesas
+                        // Crear los círculos para las mesas
             svg.selectAll(".mesa")
                 .data(this.mesas)
                 .enter()
@@ -135,30 +209,40 @@ export default {
                 .attr("r", 35)
                 .attr("cx", d => d.posx)
                 .attr("cy", d => d.posy)
-                .style("fill", d => {
-                    // Verificar si la mesa está reservada dentro del intervalo de tiempo
-                    const reserva = this.reservas.find(r => r.idmesa === d.idmesa);
-                    console.log("reserva",reserva)
-                    console.log("d:",d)
-                    if (reserva) {
-                        const horaReserva = new Date(`${reserva.fecha}T${reserva.hora}`);
-                        console.log("hora reserva", horaReserva)
-                        const diferencia = Math.abs(ahora - horaReserva) / (1000 * 60); // Diferencia en minutos
-                        if (diferencia <= 60) {
-                            return "blue"; // Mesa ocupada
-                        }
-                    }
-                    return "#FFFEDC"; // Mesa disponible
+                .style("fill", (d) => {
+                    const reservaFiltrada = this.reservasFiltradasTemp.find((r) => r.idmesa === d.idmesa);
+                    return reservaFiltrada ? "#724A0E" : "#FFFEDC";
                 })
                 .style("stroke", "#000")
-                .style("cursor", this.rol !== 1 ? "pointer" : "pointer")
+                .style("cursor", (d) => {
+                    const reservaFiltrada = this.reservasFiltradasTemp.find((r) => r.idmesa === d.idmesa);
+                    return reservaFiltrada ? "not-allowed" : "pointer";
+                })
                 .call(this.rol == 2 ? drag : () => {})
                 .on("click", (event, d) => {
-                    clearTimeout(this.clickTimeout);
-                    this.clickTimeout = setTimeout(() => {
-                        this.rol === 1 ? this.abrirModalNuevaReserva(d) : this.mostrarFormulario('editar', d);
-                    }, 200);
-                });
+                // Verificar si la mesa está reservada
+                const reservaFiltrada = this.reservasFiltradasTemp.find((r) => r.idmesa === d.idmesa);
+                if (reservaFiltrada) {
+                    // Mesa reservada, no permitir clic
+                    return;
+                }
+
+                clearTimeout(this.clickTimeout);
+                this.clickTimeout = setTimeout(() => {
+                    // Cambiar el color de la mesa (círculo)
+                    svg.selectAll(".mesa")
+                        .filter(m => m.idmesa === d.idmesa)
+                        .style("fill", "#322209");  // Usa .style("fill") en lugar de .attr("fill")
+
+                    // Cambiar el color del texto
+                    svg.selectAll(".mesa-label")
+                        .filter(m => m.idmesa === d.idmesa)
+                        .attr("fill", "white");
+
+                    // Proceder según el rol del usuario
+                    this.rol === 1 ? this.abrirModalNuevaReserva(d) : this.mostrarFormulario('editar', d);
+                }, 200);
+            });
 
             // Crear las etiquetas (nombres) de las mesas
             svg.selectAll(".mesa-label")
@@ -173,6 +257,7 @@ export default {
                 .attr("font-weight", "bold")
                 .attr("fill", "#322209")
                 .text(d => d.nombre);
+
 
             // Crear otros elementos del mapa
             svg.append("rect")
@@ -312,6 +397,99 @@ export default {
 
 
 <style scoped>
+/* Estilo de la sección de filtros */
+.filtros {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin: 0 auto;
+  padding: 0;
+  margin-bottom: 2rem;
+  margin-left: 40%;
+  margin-top: 2rem;
+
+}
+
+.input-group {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+input {
+  padding: 0.5rem;
+  font-size: 1rem;
+  border-color: #F5F3F3;
+  border-radius: 2vh;
+}
+
+.limpiar-boton {
+  background: #ffab5e;
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 25px;
+  height: 25px;
+  cursor: pointer;
+}
+
+.limpiar-boton:hover {
+  background: #a16f23;
+}
+
+.reservas-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2.5rem;
+  margin: 0 auto;
+  padding: 0;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+
+}
+
+.titulo {
+  display: block;
+  padding-top: 1vh;
+  font-size: 2.5rem;
+  font-weight: bold;
+  color: #a16f23;
+  margin-bottom: 1rem;
+  text-align: left;
+}
+.reservas-container {
+  padding: 5%;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Reorganización responsiva */
+@media (max-width: 768px) {
+  .filtros {
+    grid-template-columns: repeat(2, 1fr); /* 2 columnas en pantallas pequeñas */
+  }
+}
+
+@media (max-width: 480px) {
+  .filtros {
+    grid-template-columns: 1fr; /* Una sola columna en pantallas muy pequeñas */
+    gap: 1rem; /* Aumentar espaciado vertical */
+  }
+
+  .filtro-fecha,
+  .filtro-hora {
+    flex-direction: row; /* Coloca el label y el input en una fila */
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .input-group {
+    width: 100%; /* Ocupa todo el ancho disponible */
+  }
+
+  input {
+    flex: 1; /* Deja que el input ocupe el espacio restante */
+  }
+}
 .mesa {
     transition: fill 0.2s;
 }
@@ -393,6 +571,29 @@ body {
 .contenedorP{
     margin-bottom: 50px;
 }
+.btn-aplicar {
+    background-color: #f3b976;  /* Color de fondo */
+    color: white;               /* Color del texto */
+    height: 50px;
+    margin-top: 20px;
+    font-size: 16px;            /* Tamaño de la fuente */
+    padding: 10px 20px;         /* Espaciado interior (arriba/abajo, izquierda/derecha) */
+    border: none;               /* Eliminar borde */
+    border-radius: 5px;         /* Bordes redondeados */
+    cursor: pointer;            /* Cursor tipo mano */
+    transition: background-color 0.3s ease, transform 0.3s ease; /* Efecto suave */
+}
+
+.btn-aplicar:hover {
+    background-color: #a07545;  /* Cambiar color de fondo cuando el cursor está sobre el botón */
+    transform: scale(1.05);      /* Efecto de escala al pasar el ratón */
+}
+
+.btn-aplicar:active {
+    background-color: #a07545;  /* Cambiar color de fondo cuando se hace clic */
+    transform: scale(1);        /* Vuelve al tamaño original */
+}
+
 .card {
   border-radius: 10px;
   filter: drop-shadow(0 5px 10px 0 #ffffff);

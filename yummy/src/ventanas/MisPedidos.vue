@@ -17,7 +17,7 @@
           <h3>{{ getEstadoTexto(pedido.estado) }}</h3>
           <p>Fecha: {{ formatFecha(pedido.fecha) }}</p>
           <p>Hora: {{ pedido.hora }}</p>
-          <p>Precio Total: ${{ pedido.precio_total.toFixed(2) }}</p>
+          <p>Precio Total: Bs. {{ pedido.precio_total.toFixed(2) }}</p>
           <div class="acciones">
             <!-- Botón para ver detalles del pedido -->
             <button @click="verDetallesPedido(pedido.idpedido, pedido.estado)" class="detalle-btn">Ver Detalles</button>
@@ -49,7 +49,14 @@
   
               <!-- Botón para calificar si el pedido está entregado -->
               <button
-                v-if="estadoPedido === 1"
+                v-if="estadoPedido === 1 "
+                class="calificar-btn"
+                @click="abrirCalificacionModal(detalle.platillo, detalle.idplato)"
+              >
+                Calificar
+              </button>
+              <button
+                v-if="estadoPedido === 3 "
                 class="calificar-btn"
                 @click="abrirCalificacionModal(detalle.platillo, detalle.idplato)"
               >
