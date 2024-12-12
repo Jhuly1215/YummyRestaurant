@@ -1,12 +1,10 @@
 <template>
   <div>
-    <header class="offers-header">
-      <h2>
-        <i class="fa fa-cutlery" aria-hidden="true"></i>
-        Platillos
-      </h2>
-      <p>Administra y crea nuevos platillos para tus clientes</p>
-    </header>
+    <HeaderAdminTitle 
+      icon="fa fa-cutlery" 
+      title="Platillos" 
+      subtitle="Visualiza los platillos que ofrese tu restaurante"
+    />
 
     <!-- Modal para eliminar -->
     <ConfirmationModal
@@ -33,7 +31,7 @@
             <th>Descripción</th>
             <th>Precio</th>
             <th>Categoría</th>
-            <th>Imagen</th>
+            <!--<th>Imagen</th>-->
             <th>Acciones</th>
           </tr>
         </thead>
@@ -64,7 +62,9 @@
             <td v-if="index === filaEnEdicion">
               <input v-model="platilloEditado.imagen" />
             </td>
+            <!--
             <td v-else>{{ platillo.imagen }}</td>
+            -->
             
             <td class="botones">
               <!-- Botones de edición -->
@@ -109,6 +109,7 @@ import axios from 'axios';
 import ConfirmationModal from './ConfirmationModal.vue';
 import FormNewPlatillo from './FormNewPlatillo.vue';
 import SuccessModal from './SuccessModal.vue';
+import HeaderAdminTitle from './HeaderAdminTitle.vue';
 
 export default {
   name: "PlatillosAdminComponent",
@@ -116,6 +117,7 @@ export default {
     ConfirmationModal,
     FormNewPlatillo,
     SuccessModal,
+    HeaderAdminTitle
   },
   data() {
     return {

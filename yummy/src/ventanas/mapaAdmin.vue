@@ -87,100 +87,105 @@ export default {
         this.modalNuevaReservaVisible = false;
         },
         crearMapa() {
-    const svg = d3.select(this.$refs.mapa);
+            const svg = d3.select(this.$refs.mapa);
 
-    // Crear un fondo de color
-    svg.append("rect")
-        .attr("class", "fondo")
-        .attr("width", "100%")
-        .attr("height", "100%")
-        .attr("fill", "#A16F23");
+            // Crear un fondo de color
+            svg.append("rect")
+                .attr("class", "fondo")
+                .attr("width", "100%")
+                .attr("height", "100%")
+                .attr("fill", "#A16F23");
 
-    const drag = d3.drag()
-        .on("start", function (event, d) {
-            d3.select(this).raise().classed("active", true);
-        })
-        .on("drag", (event, d) => {
-            // Usamos d3.select para asegurar que estamos trabajando con el elemento SVG correcto
-            d.x = event.x;
-            d.y = event.y;
+                const drag = d3.drag()
+                .on("start", (event, d) => {
+                    // Ocultar todos los labels al comenzar a arrastrar
+                    svg.selectAll(".mesa-label").remove();
+                })
+                .on("drag", (event, d) => {
+                    d.posx = event.x;
+                    d.posy = event.y;
 
-            // Actualiza el círculo de la mesa
-            d3.select(event.sourceEvent.target)  // Usar el evento fuente para el target (el círculo)
-                .attr("cx", d.x)
-                .attr("cy", d.y);
+                    svg.selectAll(".mesa")
+                        .filter(m => m.idmesa === d.idmesa)
+                        .attr("cx", d.posx)
+                        .attr("cy", d.posy);
 
-            // Actualiza la posición del texto de la mesa
-            d3.select(event.sourceEvent.target.parentNode)
-                .select(".mesa-label")
-                .attr("x", d.x)
-                .attr("y", d.y + 5);
+                    this.actualizarMesaCor(d);
+                })
+                .on("end", (event, d) => {
+                    // Recrear los labels al terminar de arrastrar
+                    svg.selectAll(".mesa-label")
+                        .data(this.mesas)
+                        .enter()
+                        .append("text")
+                        .attr("class", "mesa-label")
+                        .attr("x", d => d.posx)
+                        .attr("y", d => d.posy + 5)
+                        .attr("text-anchor", "middle")
+                        .attr("font-size", "16px")
+                        .attr("font-weight", "bold")
+                        .attr("fill", "#322209")
+                        .text(d => d.nombre);
+                });
 
-            // Actualizar el array de mesas a actualizar
-            this.actualizarMesaCor(d);
-        })
-        .on("end", function () {
-            d3.select(this).classed("active", false);
-        });
+            // Crear las mesas
+            svg.selectAll(".mesa")
+                .data(this.mesas)
+                .enter()
+                .append("circle")
+                .attr("class", "mesa")
+                .attr("r", 35)
+                .attr("cx", d => d.posx)
+                .attr("cy", d => d.posy)
+                .style("fill", "#FFFEDC")
+                .style("stroke", "#000")
+                .style("cursor", this.rol !== 1 ? "pointer" : "pointer")
+                .call(this.rol == 2 ? drag : () => {})
+                .on("click", (event, d) => {
+                    clearTimeout(this.clickTimeout);
+                    this.clickTimeout = setTimeout(() => {
+                        this.rol === 1 ? this.abrirModalNuevaReserva(d) : this.mostrarFormulario('editar', d);
+                    }, 200);
+                });
 
-    // Crear las mesas
-    svg.selectAll(".mesa")
-        .data(this.mesas)
-        .enter()
-        .append("circle")
-        .attr("class", "mesa")
-        .attr("r", 35)
-        .attr("cx", d => d.posx)
-        .attr("cy", d => d.posy)
-        .style("fill", "#FFFEDC")
-        .style("stroke", "#000")
-        .style("cursor", this.rol !== 1 ? "pointer" : "pointer")
-        .call(this.rol == 2 ? drag : () => {})
-        .on("click", (event, d) => {
-            clearTimeout(this.clickTimeout);
-            this.clickTimeout = setTimeout(() => {
-                this.rol === 1 ? this.abrirModalNuevaReserva(d) : this.mostrarFormulario('editar', d);
-            }, 200);
-        });
+            // Crear las etiquetas de las mesas
+            svg.selectAll(".mesa-label")
+                .data(this.mesas)
+                .enter()
+                .append("text")
+                .attr("class", "mesa-label")
+                .attr("x", d => d.posx)
+                .attr("y", d => d.posy + 5)
+                .attr("text-anchor", "middle")
+                .attr("font-size", "16px")
+                .attr("font-weight", "bold")
+                .attr("fill", "#322209")
+                .text(d => d.nombre);
+                svg.append("rect")
+                            .attr("x", 50)  // Posición horizontal del rectángulo
+                            .attr("y", 350)  // Posición vertical del rectángulo
+                            .attr("width", 100)  // Ancho del rectángulo
+                            .attr("height", 40)  // Alto del rectángulo
+                            .attr("fill", "#724A0E")  // Color de fondo del rectángulo
+                            .attr("stroke", "#000")  // Color del borde
 
-    // Crear las etiquetas de las mesas
-    svg.selectAll(".mesa-label")
-        .data(this.mesas)
-        .enter()
-        .append("text")
-        .attr("class", "mesa-label")
-        .attr("x", d => d.posx)
-        .attr("y", d => d.posy + 5)
-        .attr("text-anchor", "middle")
-        .attr("font-size", "16px")
-        .attr("font-weight", "bold")
-        .attr("fill", "#322209")
-        .text(d => d.nombre);
-        svg.append("rect")
-                    .attr("x", 50)  // Posición horizontal del rectángulo
-                    .attr("y", 350)  // Posición vertical del rectángulo
-                    .attr("width", 100)  // Ancho del rectángulo
-                    .attr("height", 40)  // Alto del rectángulo
-                    .attr("fill", "#724A0E")  // Color de fondo del rectángulo
-                    .attr("stroke", "#000")  // Color del borde
+                        // Crear el texto "Entrada" dentro del rectángulo
+                        svg.append("text")
+                            .attr("x", 100)  // Centrado horizontalmente dentro del rectángulo
+                            .attr("y", 375)   // Centrado verticalmente dentro del rectángulo
+                            .attr("text-anchor", "middle")  // Centrado del texto
+                            .attr("font-size", "16px")
+                            .attr("fill", "#ffffff")  // Color del texto
+                            .text("Entrada");  // El texto que aparecerá dentro del rectángulo
 
-                // Crear el texto "Entrada" dentro del rectángulo
-                svg.append("text")
-                    .attr("x", 100)  // Centrado horizontalmente dentro del rectángulo
-                    .attr("y", 375)   // Centrado verticalmente dentro del rectángulo
-                    .attr("text-anchor", "middle")  // Centrado del texto
-                    .attr("font-size", "16px")
-                    .attr("fill", "#ffffff")  // Color del texto
-                    .text("Entrada");  // El texto que aparecerá dentro del rectángulo
-
-                    svg.append("rect")
-                    .attr("x", 540)  // Posición horizontal del rectángulo
-                    .attr("y", 80)  // Posición vertical del rectángulo
-                    .attr("width", 2)  // Ancho del rectángulo
-                    .attr("height", 250)  // Alto del rectángulo
-                    .attr("fill", "#ffffff")  // Color de fondo del rectángulo
-                    .attr("stroke", "#fff")  // Color del borde
-},
+                            svg.append("rect")
+                            .attr("x", 540)  // Posición horizontal del rectángulo
+                            .attr("y", 80)  // Posición vertical del rectángulo
+                            .attr("width", 2)  // Ancho del rectángulo
+                            .attr("height", 250)  // Alto del rectángulo
+                            .attr("fill", "#ffffff")  // Color de fondo del rectángulo
+                            .attr("stroke", "#fff")  // Color del borde
+        },
 
     // Actualiza las coordenadas de la mesa en el array 'actualizarMesas'
     actualizarMesaCor(mesa) {

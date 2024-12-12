@@ -1,11 +1,9 @@
 <template>
-  <header class="offers-header">
-    <h2>
-      <i class="fas fa-clipboard-list"></i>
-      Pedidos
-    </h2>
-    <p>Administra los pedidos realizados</p>
-  </header>
+  <HeaderAdminTitle 
+      icon="fas fa-clipboard-list" 
+      title="Pedidos" 
+      subtitle="Administra los pedidos realizados"
+  />
   <FiltroEstadoPedido :estadoInicial="estadoActual" @cambioEstado="actualizarFiltro" />
   <div class="pedidos-admin">
     <div v-if="cargando">Cargando pedidos...</div>
@@ -44,6 +42,7 @@ import CardPedido from '@/components/CardPedido.vue';
 import ConfirmationModal from '@/components/ConfirmationModal.vue';
 import SuccessModal from '@/components/SuccessModal.vue';
 import FiltroEstadoPedido from "@/components/FiltroEstadoPedido.vue";
+import HeaderAdminTitle from './HeaderAdminTitle.vue';
 
 export default {
   name: 'PedidosAdmin',
@@ -52,6 +51,7 @@ export default {
     ConfirmationModal,
     SuccessModal,
     FiltroEstadoPedido,
+    HeaderAdminTitle,
   },
   data() {
     return {
@@ -180,51 +180,6 @@ export default {
 </script>
 
 <style scoped>
-/* Encabezado principal */
-.offers-header {
-  text-align: center;
-  background: linear-gradient(180deg, #ff9900, #ffcc00);
-  color: white;
-  padding: 20px 10px;
-  border-radius: 0 0 15px 15px;
-  /* Redondeo en las esquinas inferiores */
-  box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.2);
-  /* Sombra para dar profundidad */
-  margin-bottom: 20px;
-}
-
-/* Título principal */
-.offers-header h2 {
-  font-size: 2.5em;
-  font-weight: bold;
-  margin: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
-  /* Espacio entre el texto y el icono */
-  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
-  /* Sombra del texto */
-}
-
-/* Icono decorativo */
-.offers-header h2 i {
-  font-size: 0.8em;
-  color: #ffd700;
-  /* Color dorado para el icono */
-  animation: bounce 1s infinite;
-  /* Animación de rebote */
-}
-
-/* Subtítulo */
-.offers-header p {
-  font-size: 1.2em;
-  margin-top: 10px;
-  color: #fff8e7;
-  /* Color claro para contraste */
-  font-style: italic;
-}
-
 /* Contenedor de la tabla */
 .table-container {
   overflow-x: auto;
@@ -234,7 +189,7 @@ export default {
 
 /* Estilos del componente */
 .pedidos-admin {
-  max-width: 1200px;
+  max-width: 1100px;
   margin: 0 auto;
   padding: 20px;
 }
@@ -253,7 +208,7 @@ export default {
 @media (max-width: 768px) {
   .cards > * {
     flex: 1 1 100%; /* 1 tarjeta por fila en móviles */
-    max-width: 90%; /* Margen horizontal */
+    max-width: 80%; /* Margen horizontal */
   }
 }
 
