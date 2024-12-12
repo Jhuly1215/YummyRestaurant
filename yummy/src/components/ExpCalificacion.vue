@@ -20,51 +20,56 @@
       </div>
     </div>
 </template>
-  
 <script>
-  import axios from "axios";
-  
-  export default {
-    name: "StarRatingModal",
-    props: {
-      show: {
-        type: Boolean,
-        required: true, 
-      },
+import axios from 'axios';
+export default {
+  name: "ExpCalificacion",
+  props: {
+    show: {
+      type: Boolean,
+      required: true,
     },
-    emits: ["close", "submitted"],
-    data() {
-      return {
-        rating: 0,
-      };
+  },
+  emits: ["close", "submitted"],
+  data() {
+    return {
+      rating: 0,
+    };
+  },
+  methods: {
+    setRating(star) {
+      this.rating = star;
     },
-    methods: {
-      setRating(star) {
-        this.rating = star;
-      },
-      async submitRating() {
-        try {
-          const idusuario = 1; 
-          await axios.post("/api/calificaciones", {
-            puntuacion: this.rating,
-            idusuario: idusuario,
-            idplato: null,
-          });
-  
-          alert("¡Gracias por tu calificación!");
-          this.$emit("submitted", this.rating);
-          this.close(); 
-        } catch (error) {
-          console.error("Error al enviar la calificación:", error);
-          alert("Hubo un problema al guardar tu calificación.");
+    async submitRating() {
+      try {
+        const idusuario = localStorage.getItem("id"); // Usuario logueado
+        if (!idusuario) {
+          alert("No se encontró un usuario logueado.");
+          return;
         }
-      },
-      close() {
-        this.$emit("close");
-      },
+
+        const fecha = new Date().toISOString().split("T")[0]; // Fecha actual
+
+        await axios.post("/api/calificaciones/calificar-experiencia", {
+          puntuacion: this.rating,
+          idusuario: parseInt(idusuario, 10),
+          fecha: fecha,
+        });
+
+        this.$emit("submitted", this.rating);
+        this.close();
+      } catch (error) {
+        console.error("Error al enviar la calificación:", error);
+        alert("Hubo un problema al guardar tu calificación.");
+      }
     },
-  };
+    close() {
+      this.$emit("close");
+    },
+  },
+};
 </script>
+
   
 <style scoped>
   .modal-overlay {

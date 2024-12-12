@@ -4,7 +4,7 @@
     <ListaProductosPedidos
       :cantidadesSeleccionadas="cantidadesSeleccionadas"
       :platillos="platillos"
-      @pedidoRealizado="reiniciarCantidades"
+      @pedidoRealizado="mostrarSuccessModal"
       @reiniciarCantidades="cantidadesSeleccionadas = {}"
     />
 
@@ -26,25 +26,35 @@
       </div>
     </div>
     <FooterComponent />
-  </div>
-  <SuccessModal
+
+    <!-- Modal de éxito -->
+    <SuccessModal
       v-if="successModalVisible"
       :mensaje="successMensaje"
       @onClose="closeSuccessModal"
     />
+
+    <!-- Modal de calificación -->
+    <ExpCalificacion
+      :show="isModalOpen"
+      @close="closeModal"
+      @submitted="handleSubmitted"
+    />
+  </div>
 </template>
 
 <script>
-import axios from 'axios';
-import FooterComponent from '@/components/Footer.vue';
-import CarouselComponent from '@/components/CarouselComponent.vue';
-import FiltroCategorias from '@/components/FiltroCategorias.vue';
-import CardMenuPedido from '@/components/CardMenuPedido.vue';
-import ListaProductosPedidos from '@/components/ListaProductosPedidos.vue';
-import SuccessModal from '@/components/SuccessModal.vue';
+import axios from "axios";
+import FooterComponent from "@/components/Footer.vue";
+import CarouselComponent from "@/components/CarouselComponent.vue";
+import FiltroCategorias from "@/components/FiltroCategorias.vue";
+import CardMenuPedido from "@/components/CardMenuPedido.vue";
+import ListaProductosPedidos from "@/components/ListaProductosPedidos.vue";
+import SuccessModal from "@/components/SuccessModal.vue";
+import ExpCalificacion from "@/components/ExpCalificacion.vue";
 
 export default {
-  name: 'MenuPedido',
+  name: "MenuPedido",
   components: {
     FooterComponent,
     CarouselComponent,
@@ -52,6 +62,7 @@ export default {
     FiltroCategorias,
     ListaProductosPedidos,
     SuccessModal,
+    ExpCalificacion,
   },
   data() {
     return {
@@ -61,13 +72,14 @@ export default {
       error: null,
       cantidadesSeleccionadas: {}, // Almacena las cantidades seleccionadas por ID de platillo
       successModalVisible: false,
-      successMensaje: '',
+      successMensaje: "",
+      isModalOpen: false, // Controla la visibilidad del modal de calificación
     };
   },
   computed: {
     platillosFiltrados() {
       return this.categoriaSeleccionada
-        ? this.platillos.filter(p => p.idcategoria === this.categoriaSeleccionada)
+        ? this.platillos.filter((p) => p.idcategoria === this.categoriaSeleccionada)
         : this.platillos;
     },
   },
@@ -97,6 +109,25 @@ export default {
     },
     reiniciarCantidades() {
       this.cantidadesSeleccionadas = {};
+    },
+    mostrarSuccessModal() {
+      this.successModalVisible = true;
+      this.successMensaje = "¡Pedido realizado exitosamente!";
+    },
+    closeSuccessModal() {
+      this.successModalVisible = false;
+      this.openModal(); // Abrir modal de calificación al cerrar el modal de éxito
+    },
+    openModal() {
+      this.isModalOpen = true;
+    },
+    closeModal() {
+      this.isModalOpen = false;
+    },
+    handleSubmitted(rating) {
+      console.log("Calificación enviada:", rating);
+      this.closeModal();
+      alert(`¡Gracias por calificar con ${rating} estrellas!`);
     },
   },
 };
