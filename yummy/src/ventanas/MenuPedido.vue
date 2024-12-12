@@ -19,10 +19,12 @@
           :nombre="platillo.nombre"
           :descripcion="platillo.descripcion"
           :precio="platillo.precio"
+          :descuento="platillo.descuento" 
           :id="platillo.idplato"
           :cantidad="cantidadesSeleccionadas[platillo.idplato] || 0"
           @actualizarCantidad="actualizarCantidad"
         />
+
       </div>
     </div>
     <FooterComponent />
@@ -72,20 +74,28 @@ export default {
     },
   },
   mounted() {
-    this.obtenerPlatillos();
+    this.obtenerPlatillosOfertas();
   },
   methods: {
-    async obtenerPlatillos() {
-      this.cargando = true;
-      this.error = null;
+    async obtenerPlatillosOfertas() {
       try {
-        const response = await axios.get('http://localhost:5000/api/platillos');
+        const response = await axios.get('http://localhost:5000/api/platillos/platillos-ofertas');
         this.platillos = response.data;
+        await this.obtenerOfertas(); // Cargar ofertas después de los platillos
+
+        // Relaciona ofertas con platillos
+        this.platillos = this.platillos.map(platillo => {
+          const oferta = this.ofertas.find(of => of.idPlato === platillo.idplato);
+          if (oferta) {
+            platillo.descuento = oferta.descuento; // Asegúrate de que se asigne el descuento
+          } else {
+            platillo.descuento = null;
+          }
+          return platillo;
+        });
+        console.log('Platillos con descuentos:', this.platillos); // Verifica los platillos
       } catch (error) {
         console.error("Error al obtener los platillos:", error);
-        this.error = "No se pudieron cargar los platillos. Por favor, intenta más tarde.";
-      } finally {
-        this.cargando = false;
       }
     },
     actualizarCantidad(idplato, cantidad) {
