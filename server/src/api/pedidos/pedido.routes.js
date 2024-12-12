@@ -13,4 +13,6 @@ router.put('/entregar/:id', pedidoController.entregarPedido); // Ruta para entre
 router.put('/cancelar/:id', pedidoController.cancelarPedido); // Ruta para cancelar un pedido
 router.put('/pagar/:id', pedidoController.registrarPagoPedido); // ruta para registrar pago
 
+
+router.get('/usuario/:idUsuario', pedidoController.obtenerPedidosPorUsuario); 
 module.exports = router;

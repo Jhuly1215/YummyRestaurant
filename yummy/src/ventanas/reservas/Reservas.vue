@@ -100,19 +100,17 @@ export default {
   computed: {
     reservasFiltradas() {
       return this.reservas.filter((reserva) => {
-        // Filtrar por fecha desde/hasta
+
         const cumpleFechaDesde =
           !this.filtroFechaDesde || reserva.fecha >= this.filtroFechaDesde;
         const cumpleFechaHasta =
           !this.filtroFechaHasta || reserva.fecha <= this.filtroFechaHasta;
 
-        // Filtrar por hora desde/hasta
         const cumpleHoraDesde =
           !this.filtroHoraDesde || reserva.hora >= this.filtroHoraDesde;
         const cumpleHoraHasta =
           !this.filtroHoraHasta || reserva.hora <= this.filtroHoraHasta;
 
-        // Retorna true si cumple con todas las condiciones activas
         return cumpleFechaDesde && cumpleFechaHasta && cumpleHoraDesde && cumpleHoraHasta;
       });
     },
@@ -146,7 +144,7 @@ export default {
         const mesasResponse = await axios.get("/api/mesas");
         this.mesas = mesasResponse.data;
 
-        // Solo combinar datos si las reservas ya han sido cargadas
+       
         if (this.reservas.length > 0) {
           this.asociarReservasConMesas();
         }
@@ -222,16 +220,15 @@ export default {
     //anadir reserva
     async guardarNuevaReserva(nuevaReserva) {
       try {
-        // Llamar al backend para guardar la nueva reserva
+    
         const response = await axios.post("/api/reservas", nuevaReserva);
 
         // Agregar la nueva reserva a la lista localmente
         this.reservas.push(response.data);
 
-        // Volver a asociar las reservas con las mesas
+
         this.asociarReservasConMesas();
 
-        alert("Reserva creada exitosamente.");
 
         this.cerrarModalNuevaReserva();
       } catch (error) {

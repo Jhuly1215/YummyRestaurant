@@ -88,3 +88,31 @@ exports.eliminarDetallePedido = async (req, res) => {
         res.status(500).json({ error: 'Error al eliminar el detalle del pedido' });
     }
 };
+
+exports.obtenerDetallesPedidoPorPedido = async (req, res) => {
+    const { pedido } = req.query; // Leer el idPedido de los parámetros de consulta
+
+    if (!pedido) {
+        return res.status(400).json({ error: 'El parámetro "pedido" es obligatorio.' });
+    }
+
+    try {
+        const detalles = await sequelize.query(
+            `SELECT dp.iddetalle, dp.cantidad, dp.idplato, dp.idpedido, dp.idreserva, 
+                    pl.nombre AS platillo, r.fecha AS reserva_fecha
+             FROM detalle_pedido dp
+             JOIN platillo pl ON dp.idplato = pl.idplato
+             LEFT JOIN reserva r ON dp.idreserva = r.idreserva
+             WHERE dp.idpedido = :pedido`, // Filtrar por idPedido
+            { 
+                replacements: { pedido }, // Reemplazar el valor en la consulta
+                type: sequelize.QueryTypes.SELECT 
+            }
+        );
+
+        res.json(detalles);
+    } catch (error) {
+        console.error("Error al obtener los detalles del pedido:", error);
+        res.status(500).json({ error: 'Error al obtener los detalles del pedido' });
+    }
+};

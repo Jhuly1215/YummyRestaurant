@@ -7,17 +7,16 @@ import PanelAdministrativo from '@/ventanas/panelAdministrativo.vue';
 import Recupera from '@/ventanas/recupera.vue';
 import CambioPass from '@/ventanas/cambioPassword.vue';
 import Ofertas from '@/ventanas/ofertasPage.vue';
-
 import MenuPedido from '@/ventanas/MenuPedido.vue';
-import PedidosAdmin from '@/ventanas/PedidosAdmin.vue';
-
+import PedidosAdmin from '@/components/PedidosAdminComponent.vue';
 import MapaInteractivo1 from '@/ventanas/mapaInteractivo.vue';
-
 import MenuCliente from '@/ventanas/MenuCliente.vue'
 import TemporalCalificacion from '@/ventanas/temporalCalificacion.vue'
+import MisReservas from '@/ventanas/reservas/MisReservas.vue';
+import MisPedidos from '@/ventanas/MisPedidos.vue';
+import MisCalificaciones from '@/ventanas/MisCalificaciones.vue';
 
 //para el administrador
-
 import MapaInteractivo2 from '@/ventanas/mapaAdmin.vue';
 import OfertasAdminComponent from '../ventanas/OfertasAdminComponent.vue'
 import PlatillosAdminComponent from '@/components/PlatillosAdminComponent.vue';
@@ -62,10 +61,10 @@ const router = createRouter({
       name: 'Menu',
       component: MenuCliente,
     },
-    {
-      path: '/recupera',
-      name: 'Recupera',
-      component: Recupera,
+      {
+        path: '/recupera',
+        name: 'Recupera',
+        component: Recupera,
     },
     {
       path: '/cambioPass/:id',
@@ -87,65 +86,79 @@ const router = createRouter({
       name: 'MenuPedido',
       component: MenuPedido,
     },
-    
     {
       path: '/temporal',
       name: 'Calificaciones',
       component: TemporalCalificacion,
     },
-
-   {
-    path: '/panelAdministrativo',
-    name: 'PanelAdministrativo',
-    component: PanelAdministrativo,
-    children: [
-      {
-        path: 'section1',
-        name: 'Dashboard',
-        component: DashboardComponent,
-      },
-      {
-        path: 'ofertas',
-        name: 'AdminOfertas',
-        component: OfertasAdminComponent,
-      },
-      {
-        path: 'platillos',
-        name: 'AdminPlatillos',
-        component: PlatillosAdminComponent,
-      },
-      {
-        path: 'reservas',
-        name: 'AdminReservas',
-        component: JReservasAdminComponent,
-      },
-      {
-        path: 'mapa',
-        name: 'MapaAdmin',
-        component: MapaInteractivo2,
-      },
-      {
-        path: 'pedidosadmin',
-        name: 'PedidosAdmin',
-        component: PedidosAdmin,
-      },
-    ],
-  },
+    {
+      path: '/misreservas',
+      name: 'MisReservas',
+      component: MisReservas,
+    },
+    {
+      path: '/mispedidos',
+      name: 'MisPedidos',
+      component: MisPedidos,
+    },
+    {
+      path: '/miscalificaciones',
+      name: 'MisCalificaciones',
+      component: MisCalificaciones,
+    },
+    //Para el Panel Administrativo
+    {
+      path: '/panelAdministrativo',
+      name: 'PanelAdministrativo',
+      component: PanelAdministrativo,
+      //meta: { requiresAuth: true }, // Requiere autenticación
+      children: [
+        {
+          path: 'section1',
+          name: 'Dashboard',
+          component: DashboardComponent,
+        },
+        {
+          path: 'ofertas',
+          name: 'AdminOfertas',
+          component: OfertasAdminComponent,
+        },
+        {
+          path: 'platillos',
+          name: 'AdminPlatillos',
+          component: PlatillosAdminComponent, 
+        },
+        {
+          path: 'reservas',
+          name: 'AdminReservas',
+          component: JReservasAdminComponent, // Gestión de reservas
+        },
+        {
+          path: 'mapa',
+          name: 'MapaAdmin',
+          component: MapaInteractivo2,
+        },
+        {
+          path: 'pedidosadmin',
+          name: 'PedidosAdmin',
+          component: PedidosAdmin,
+        },
+      ],
+    },
   ],
 });
-router.beforeEach((to, from, next) => {
-  const token = localStorage.getItem('token');
-  const rol = parseInt(localStorage.getItem('rol'), 10);
 
-  if (to.name === 'PanelAdministrativo' && (!token || rol !== 2)) {
-    next('/iniciarsesion'); // Redirige al inicio de sesión si no es admin
-  } else if (to.name === 'Reservas' && !token) {
-    next('/iniciarsesion'); // Redirige al inicio de sesión si no está logueado
-  } else if (to.name === 'MapaAdmin' && (!token || rol !== 2)) {
-    next('/iniciarsesion'); // Protege el mapa del admin
+
+router.beforeEach((to, from, next) => {
+  if (to.meta.requiresAuth) {
+    const token = localStorage.getItem('token'); 
+    if (!token) {
+      next({ name: 'LogIn' });
+    } else {
+      next();
+    }
   } else {
     next();
   }
 });
-
 export default router;

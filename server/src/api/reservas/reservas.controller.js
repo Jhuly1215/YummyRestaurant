@@ -272,3 +272,26 @@ exports.enviarRecordatorios = async () => {
 };
 
 
+exports.obtenerReservasPorUsuario = async (req, res) => {
+    const { idUsuario } = req.params;
+    if (!idUsuario) {
+        return res.status(400).json({ error: 'El idUsuario es obligatorio.' });
+    }
+
+    try {
+        const reservas = await sequelize.query(
+            `SELECT * FROM reserva WHERE idusuario = :idUsuario`,
+            {
+                replacements: { idUsuario },
+                type: sequelize.QueryTypes.SELECT,
+            }
+        );
+        res.json(reservas);
+    } catch (error) {
+        console.error('Error al obtener reservas por usuario:', error);
+        res.status(500).json({ error: 'Error al obtener reservas.' });
+    }
+};
+
+
+
