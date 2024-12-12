@@ -94,8 +94,8 @@
         console.error("Error al cancelar reserva:", err);
         error.value = "Ocurrió un error al cancelar la reserva.";
       } finally {
-        mostrarModalConfirmacion.value = false; // Cerrar el modal de confirmación
-        reservaSeleccionada.value = null; // Limpiar la reserva seleccionada
+        mostrarModalConfirmacion.value = false; 
+        reservaSeleccionada.value = null;
       }
     };
 
