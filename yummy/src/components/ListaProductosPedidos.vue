@@ -6,6 +6,9 @@
     <transition name="fade">
       <div v-if="isModalOpen" class="modal-overlay" @click.self="toggleModal">
         <div class="modal-content">
+          <button class="close-icon" @click="toggleModal">
+            <i class="fa-solid fa-x"></i>
+          </button>
           <h2>Tu Pedido</h2>
           <div class="table-container">
             <table class="table">
@@ -28,8 +31,7 @@
             </table>
             <h2><strong>Total: {{ total }} Bs. </strong></h2>
           </div>
-          <button class="close-button" @click="realizarPedido">Realizar pedido</button>
-          <button class="close-button" @click="toggleModal">Cerrar</button>
+          <button class="order-button" @click="realizarPedido">Realizar pedido</button>
         </div>
       </div>
     </transition>
@@ -38,13 +40,15 @@
 </template>
 
 <script>
+import { jsPDF } from "jspdf";
+import "jspdf-autotable";
 import axios from "axios";
 import SuccessModal from "./SuccessModal.vue";
 
 export default {
   name: "ListaProductosPedidos",
   components: {
-    SuccessModal
+    SuccessModal,
   },
   props: {
     cantidadesSeleccionadas: {
@@ -74,7 +78,7 @@ export default {
     return {
       isModalOpen: false,
       successModalVisible: false,
-      successMensaje: '',
+      successMensaje: "",
     };
   },
   methods: {
@@ -87,26 +91,37 @@ export default {
         return;
       }
 
+      const idUsuario = localStorage.getItem("id");
+      if (!idUsuario) {
+        alert("Debe iniciar sesión antes de realizar un pedido.");
+        return;
+      }
+
       const pedido = {
-        fecha: new Date().toISOString().slice(0, 10), // Fecha actual en formato YYYY-MM-DD
-        hora: new Date().toTimeString().slice(0, 8), // Hora actual en formato HH:mm:ss
-        estado: 0, // Pedido en espera
-        idUsuario: localStorage.getItem('id'), // Obtén el ID del usuario logueado
-        precio_total: this.total, // Total calculado
+        fecha: new Date().toISOString().slice(0, 10),
+        hora: new Date().toTimeString().slice(0, 8),
+        estado: 0,
+        idusuario: parseInt(idUsuario, 10),
+        precio_total: this.total,
         detalles: this.platillosSeleccionados.map((p) => ({
           idplato: p.idplato,
           cantidad: p.cantidad,
-          nombre: p.nombre, // Incluye el nombre del platillo
-          precio: p.precio, // Incluye el precio del platillo
-        })), // Detalles del pedido
+        })),
       };
 
       try {
-        // Realizar el pedido y enviar el correo
-        const response = await axios.post('http://localhost:5000/api/pedidos', pedido);
-        this.mostrarSuccessModal('Pedido realizado con éxito. Revisa tu correo electrónico.');
-        this.$emit("pedidoRealizado"); // Notifica al componente padre para reiniciar el estado
-        this.toggleModal(); // Cierra el modal
+        const response = await axios.post("http://localhost:5000/api/pedidos", pedido);
+
+        await axios.post("http://localhost:5000/api/usuario/confirmar-pedido", {
+          idUsuario: response.data.idusuario,
+          detalles: response.data.detalles,
+          precio_total: response.data.precio_total
+        });
+
+        this.mostrarSuccessModal("Pedido realizado con éxito. Revisa tu correo electrónico.");
+        this.$emit("pedidoRealizado");
+        this.toggleModal();
+        this.generarPDF(); // Llamada a la función para generar el PDF
       } catch (error) {
         console.error("Error al realizar el pedido:", error);
         alert("Hubo un error al realizar el pedido. Por favor, inténtelo nuevamente.");
@@ -120,6 +135,58 @@ export default {
       this.successModalVisible = false;
     },
 
+    generarPDF() {
+      const doc = new jsPDF();
+
+      // Título
+      doc.setFontSize(18);
+      doc.setFont("helvetica", "bold");
+      doc.text("DETALLE DEL PEDIDO", 10, 20);
+
+      // Fecha y Hora
+      const fecha = new Date().toISOString().slice(0, 10);
+      const hora = new Date().toTimeString().slice(0, 8);
+      doc.setFontSize(12);
+      doc.setFont("helvetica", "normal");
+      doc.text(`Fecha: ${fecha}`, 10, 30);
+      doc.text(`Hora: ${hora}`, 10, 36);
+
+      // Tabla de productos
+      const productos = this.platillosSeleccionados.map((platillo) => [
+        platillo.nombre,
+        `${platillo.precio} Bs.`,
+        platillo.cantidad,
+        `${platillo.subtotal} Bs.`,
+      ]);
+
+      doc.autoTable({
+        startY: 50,
+        head: [["Platillo", "Precio", "Cantidad", "Subtotal"]],
+        body: productos,
+        theme: "grid",
+        styles: {
+          font: "helvetica",
+          fontSize: 12,
+          halign: "center",
+        },
+        headStyles: {
+          fillColor: [255, 223, 102],
+          textColor: [50, 34, 9],
+        },
+        bodyStyles: {
+          textColor: [50, 34, 9],
+        },
+      });
+
+      // Total
+      const finalY = doc.lastAutoTable.finalY + 10;
+      doc.setFontSize(16);
+      doc.setFont("helvetica", "bold");
+      doc.text(`Total: ${this.total} Bs.`, 10, finalY);
+
+      // Descargar el PDF
+      doc.save("pedido.pdf");
+    },
   },
 };
 </script>
@@ -210,9 +277,9 @@ h2 {
 
 }
 
-.close-button {
+.order-button {
   background-color: #322209;
-  color: #FFFDA4;
+  color: #FFFEDC;
   border: none;
   padding: 10px;
   width: 40%;
@@ -223,7 +290,28 @@ h2 {
   align-self: center;
 }
 
-.close-button:hover {
+.order-button:hover {
   background-color: #807f7f;
+}
+
+.close-icon {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: none;
+  border: none;
+  background-color: #322209;
+  color: #FFFEDC;
+  font-size: 24px;
+  cursor: pointer;
+  z-index: 1001;
+  border-radius: 50px;
+  padding: 5px;
+  padding-left: 15px;
+  padding-right: 15px;
+}
+
+.close-icon:hover {
+  color: #807f7f;
 }
 </style>

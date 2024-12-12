@@ -104,7 +104,7 @@ CREATE TABLE usuario (
     correo varchar(255) NOT NULL,
     password varchar(255) NOT NULL,
     idrol int NOT NULL,
-    activo boolean,
+    activo boolean
 );
 
 -- foreign keys

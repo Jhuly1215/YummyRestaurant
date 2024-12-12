@@ -9,6 +9,7 @@ exports.crearPedido = async (req, res) => {
   }
 
   try {
+    // Insertar pedido
     const [result] = await sequelize.query(
       `INSERT INTO pedido (fecha, hora, estado, idusuario, precio_total)
        VALUES (:fecha, :hora, :estado, :idusuario, :precio_total) RETURNING idpedido`,
@@ -23,6 +24,9 @@ exports.crearPedido = async (req, res) => {
       throw new Error("No se pudo obtener el ID del pedido generado.");
     }
 
+    // Array para guardar los detalles completos del pedido
+    const detallesCompletos = [];
+
     for (const detalle of detalles) {
       const { idplato, cantidad } = detalle;
 
@@ -30,6 +34,16 @@ exports.crearPedido = async (req, res) => {
         throw new Error("Los detalles del pedido deben incluir idplato y cantidad.");
       }
 
+      // Obtener información completa del platillo
+      const [platilloInfo] = await sequelize.query(
+        `SELECT nombre, precio FROM platillo WHERE idplato = :idplato`,
+        {
+          replacements: { idplato },
+          type: sequelize.QueryTypes.SELECT,
+        }
+      );
+
+      // Insertar detalle del pedido
       await sequelize.query(
         `INSERT INTO detalle_pedido (idplato, cantidad, idpedido, idreserva)
          VALUES (:idplato, :cantidad, :idpedido, NULL)`,
@@ -38,9 +52,23 @@ exports.crearPedido = async (req, res) => {
           type: sequelize.QueryTypes.INSERT,
         }
       );
+
+      // Agregar información completa al array de detalles
+      detallesCompletos.push({
+        nombre: platilloInfo.nombre,
+        cantidad: cantidad,
+        precio: platilloInfo.precio
+      });
     }
 
-    res.status(201).json({ message: "Pedido creado exitosamente", idpedido });
+    // Enviar respuesta con información del pedido y detalles
+    res.status(201).json({
+      message: "Pedido creado exitosamente",
+      idpedido,
+      idusuario,
+      precio_total,
+      detalles: detallesCompletos
+    });
   } catch (error) {
     console.error("Error al crear el pedido:", error);
     res.status(500).json({ error: "Error al crear el pedido." });
@@ -185,5 +213,30 @@ exports.registrarPagoPedido = async (req, res) => {
   } catch (error) {
     console.error("Error al pagar el pedido:", error);
     res.status(500).json({ error: 'Error al pagar el pedido' });
+  }
+};
+
+exports.obtenerPedidosPorUsuario = async (req, res) => {
+  const { idUsuario } = req.params;
+
+  if (!idUsuario) {
+    return res.status(400).json({ error: 'El idUsuario es obligatorio.' });
+  }
+
+  try {
+    const pedidos = await sequelize.query(
+      `SELECT p.idpedido, p.fecha, p.hora, p.estado, p.precio_total
+       FROM pedido p
+       WHERE p.idusuario = :idUsuario`,
+      {
+        replacements: { idUsuario },
+        type: sequelize.QueryTypes.SELECT,
+      }
+    );
+
+    res.json(pedidos);
+  } catch (error) {
+    console.error('Error al obtener los pedidos por usuario:', error);
+    res.status(500).json({ error: 'Error al obtener los pedidos.' });
   }
 };

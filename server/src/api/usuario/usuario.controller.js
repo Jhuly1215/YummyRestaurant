@@ -377,6 +377,7 @@ exports.enviarConfirmacionPedido = async (req, res) => {
           </tbody>
         </table>
         <h3>Total: ${precio_total} Bs.</h3>
+        <p><b>Si cree que hubo un error en su pedido contactese con caja.</b></p>
       `,
     };
 
@@ -409,3 +410,47 @@ exports.verificarCodigo = async (req, res) => {
     res.status(500).json({ success: false, message: 'Error al verificar el código', error: error.message });
   }
 };
+
+exports.enviarReserva = async (req, res) => {
+  const { email, nombre, fecha, hora, mesa } = req.body;
+
+  try {
+    const htmlContent = `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #ccc; border-radius: 10px;">
+        <h2 style="text-align: center; color: #4CAF50;">Reserva Confirmada</h2>
+        <p style="font-size: 16px;">Hola <strong>${nombre}</strong>,</p>
+        <p style="font-size: 16px;">Gracias por elegirnos. Tu reserva ha sido confirmada con éxito. Aquí están los detalles de tu reserva:</p>
+        <ul style="list-style: none; padding: 0;">
+          <li><strong>Fecha:</strong> ${fecha}</li>
+          <li><strong>Hora:</strong> ${hora}</li>
+          <li><strong>Mesa:</strong> ${mesa}</li>
+        </ul>
+        <p style="font-size: 16px;">¡Esperamos verte pronto!</p>
+        <p style="font-size: 14px; color: #888;">Si tienes alguna pregunta, no dudes en contactarnos.</p>
+        <div style="text-align: center; margin-top: 20px;">
+          <a href="https://tu-sitio-web.com" style="text-decoration: none; color: white; background-color: #4CAF50; padding: 10px 20px; border-radius: 5px;">Visítanos</a>
+        </div>
+        <footer style="margin-top: 20px; text-align: center; font-size: 12px; color: #aaa;">
+          © 2024 Tu Restaurante. Todos los derechos reservados.
+        </footer>
+      </div>
+    `;
+
+    const mailOptions = {
+      from: process.env.EMAIL_USER,
+      to: email,
+      subject: 'Confirmación de Reserva',
+      html: htmlContent,
+    };
+
+    await transporter.sendMail(mailOptions);
+
+    res.json({ success: true, message: 'Correo de confirmación enviado' });
+  } catch (error) {
+    console.error("Error al enviar la confirmación de reserva:", error);
+    res.status(500).json({ success: false, message: 'Error al enviar la confirmación de reserva', error: error.message });
+  }
+};
+
+
+

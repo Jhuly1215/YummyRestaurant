@@ -3,7 +3,7 @@
         <div class="modal-content">
             <div class="form-container">
                 <h2>Editar Oferta</h2>
-                <form @submit.prevent="crearOferta" class="modern-form">
+                <form @submit.prevent="editarOferta" class="modern-form">
                     <div class="form-row">
                         <!-- Título -->
                         <div class="form-group">
@@ -178,7 +178,6 @@ export default {
     },
     mounted() {
         this.obtenerPlatillos();
-        this.obtenerOfertas();
     },
     computed: {
         platillosFiltrados() {
@@ -225,8 +224,9 @@ export default {
         cerrarModal() {
             this.mostrarModalExito = false; // Oculta el modal
         },
-        async crearOferta() {
+        async editarOferta() {
             try {
+                // Validar que todos los campos requeridos están completos
                 if (
                     !this.nuevaOferta.titulo ||
                     !this.nuevaOferta.requerimiento ||
@@ -234,8 +234,7 @@ export default {
                     !this.nuevaOferta.fecha_inicio ||
                     !this.nuevaOferta.fecha_fin ||
                     !this.nuevaOferta.descuento ||
-                    !this.nuevaOferta.idPlato ||
-                    !this.nuevaOferta.src
+                    !this.nuevaOferta.idPlato
                 ) {
                     alert("Por favor, completa todos los campos antes de enviar.");
                     return;
@@ -243,58 +242,36 @@ export default {
 
                 const formData = new FormData();
 
-                // Agrega los campos al FormData+
+                // Agregar campos al FormData
                 for (let key in this.nuevaOferta) {
-                    if (key === "src") {
-                        formData.append("imagen", this.nuevaOferta.src); // Asegúrate de que el archivo se envía con el nombre correcto
+                    if (key === "src" && this.nuevaOferta.src) {
+                        formData.append("imagen", this.nuevaOferta.src); // Solo agregar si hay una imagen nueva
                     } else if (key !== "srcPreview") {
                         formData.append(key, this.nuevaOferta[key]);
                     }
                 }
 
-                // Mostrar el modal de éxito
-                this.mostrarModalExito = true;
+                for (let pair of formData.entries()) {
+                    console.log(pair[0], pair[1]);
+                }
 
-                // Reiniciar el formulario
-                this.nuevaOferta = {
-                    titulo: "",
-                    requerimiento: "",
-                    descripcion: "",
-                    fecha_inicio: "",
-                    fecha_fin: "",
-                    descuento: 0,
-                    idPlato: null,
-                    src: null,
-                    srcPreview: null,
-                };
 
-                this.obtenerOfertas();
-
-                // Enviar datos al backend
-                const response = await axios.post("http://localhost:5000/api/ofertas", formData, {
+                // Realizar la solicitud PUT para actualizar la oferta
+                await axios.put(`http://localhost:5000/api/ofertas/${this.oferta.idoferta}`, formData, {
                     headers: { "Content-Type": "multipart/form-data" },
                 });
 
-            } catch (error) {
-                console.error("Error al crear la oferta:", error);
-                alert("Ocurrió un error al crear la oferta. Por favor, inténtalo de nuevo.");
-            }
-        },
-        async obtenerOfertas() {
-            try {
-                const response = await axios.get('http://localhost:5000/api/ofertas');
-                const data = response.data;
+                // Emitir evento para actualizar la lista de ofertas en el componente principal
+                this.$emit("onOfertaEditada");
 
-                this.ofertas = Array.isArray(data) ? data : [data];
+                // Mostrar modal de éxito
+                this.mostrarSuccessModal("Oferta editada correctamente.");
+
+                // Cerrar modal de edición
+                this.onCancel();
             } catch (error) {
-                console.error("Error al obtener las ofertas:", error);
-                if (error.response) {
-                    console.error("Error en la respuesta:", error.response);
-                } else if (error.request) {
-                    console.error("No se recibió respuesta del servidor:", error.request);
-                } else {
-                    console.error("Error al configurar la solicitud:", error.message);
-                }
+                console.error("Error al editar la oferta:", error);
+                alert("Ocurrió un error al editar la oferta. Por favor, inténtalo de nuevo.");
             }
         },
         handleFileChange(event) {

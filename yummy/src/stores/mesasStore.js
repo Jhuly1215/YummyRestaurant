@@ -5,6 +5,7 @@ import { defineStore } from 'pinia';
 export const useMesaStore = defineStore('mesaStore', {
   state: () => ({
     mesas: [],
+    reservas: [],
     mesa: null,
     error: null,
   }),
@@ -18,6 +19,16 @@ export const useMesaStore = defineStore('mesaStore', {
       } catch (error) {
         console.error('Error al obtener las mesas:', error);
         this.error = 'Error al obtener las mesas';
+      }
+    },
+    async obtenerReservas() {
+      try {
+        const response = await axios.get(`${RutaApi.baseURL}reservas/`);
+        this.reservas = response.data;
+        console.log("reservas obtenidas del backend: ", this.reservas)
+      } catch (error) {
+        console.error('Error al obtener las reservas:', error);
+        this.error = 'Error al obtener las reservas';
       }
     },
 
