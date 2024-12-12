@@ -1,5 +1,15 @@
 const sequelize = require('../../config/db');
 
+const nodemailer = require('nodemailer');
+
+const transporter = nodemailer.createTransport({
+    service: 'Gmail',
+    auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS,
+    },
+});
+
 // Crear una nueva oferta
 exports.crearOferta = async (req, res) => {
     try {
@@ -20,13 +30,43 @@ exports.crearOferta = async (req, res) => {
                 type: sequelize.QueryTypes.INSERT,
             }
         );
+
+        // Obtener todos los usuarios con rol 1
+        const usuarios = await sequelize.query(
+            `SELECT correo FROM usuario WHERE idRol = 1`,
+            { type: sequelize.QueryTypes.SELECT }
+        );
+        const emailPromises = usuarios.map(usuario => {
+            const mailOptions = {
+                from: process.env.EMAIL_USER,
+                to: usuario.correo,
+                subject: 'Nueva Oferta Disponible',
+                html: `
+                    <h1>¡Nueva Oferta Disponible!</h1>
+                    <p>¡No te pierdas esta oportunidad! Hemos lanzado una nueva oferta:</p>
+                    <ul>
+                        <li><strong>Título:</strong> ${titulo}</li>
+                        <li><strong>Requisito:</strong> ${requerimiento}</li>
+                        <li><strong>Descripción:</strong> ${descripcion}</li>
+                        <li><strong>Descuento:</strong> ${descuento}%</li>
+                        <li><strong>Fecha de Inicio:</strong> ${fecha_inicio}</li>
+                        <li><strong>Fecha de Expiración:</strong> ${fecha_fin}</li>
+                    </ul>
+                    <p>¡Aprovecha antes de que expire!</p>
+                `,
+            };
+            return transporter.sendMail(mailOptions);
+        });
+
+        // Esperar que todos los correos sean enviados
+        await Promise.all(emailPromises);
+
+        res.status(201).json({ message: "Oferta creada y correos enviados a los usuarios con rol 1." });
     } catch (error) {
-        console.error("Error al crear la oferta mensaje backend:", error);
-        res.status(500).json({ error: "Error al crear la oferta backend", details: error.message });
+        console.error("Error al crear la oferta o enviar correos:", error);
+        res.status(500).json({ error: "Error al crear la oferta o enviar correos", details: error.message });
     }
 };
-
-
 
 // Obtener todas las ofertas
 exports.obtenerOfertas = async (req, res) => {

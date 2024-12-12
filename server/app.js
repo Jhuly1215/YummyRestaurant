@@ -28,12 +28,11 @@ const pedidosRoutes = require('./src/api/pedidos/pedido.routes');
 const detalle_pedidoRoutes = require('./src/api/detalle_pedido/detalle_pedido.routes');
 const pagosRoutes = require('./src/api/pagos/pago.routes');
 const dashboardRoutes = require('./src/api/dashboard/dashboard.routes');
-const rolRoutes = require('./src/api/rol/rol.routes')
+const rolRoutes = require('./src/api/rol/rol.routes');
+const platillosRoutes = require('./src/api/platillos/platillo.routes');
 
 app.use('/api/platillos', platillosRoutes);
 const calificacionRoutes = require('./src/api/calificacion/calificacion.routes');
-
-
 
 app.use('/api/ofertas', ofertasRoutes);
 app.use('/api/rol', rolRoutes);
