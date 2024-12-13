@@ -165,7 +165,12 @@ exports.obtenerPlatillosOfertas = async (req, res) => {
       const platillos = await sequelize.query(
           `
           SELECT p.idplato, p.nombre, p.descripcion, p.precio,
-          p.idCategoria, p.imagen, p.estado, o.descuento
+          p.idCategoria, p.imagen, p.estado,
+          CASE 
+            WHEN CURRENT_DATE BETWEEN o.fecha_inicio AND o.fecha_fin 
+            THEN o.descuento 
+            ELSE NULL 
+          END AS descuento
           FROM platillo p
           LEFT JOIN oferta o  
           ON p.idplato = o.idPlato 
