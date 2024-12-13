@@ -41,7 +41,7 @@
             <td>{{ platillo.nombre }}</td>
             <td>{{ platillo.descripcion }}</td>
             <td>{{ platillo.precio }} Bs.</td>
-            <td>{{ platillo.idcategoria }}</td>
+            <td>{{ platillo.tipo }}</td>
             <!-- <td>{{ platillo.imagen }}</td> -->
 
             <td class="botones">
@@ -65,19 +65,15 @@
           </tr>
         </tbody>
       </table>
-
-      <FormEditPlatillo
-        v-if="modalEditarVisible"
-        :platillo="platilloSeleccionado"
-        @onClose="cerrarModalEditar"
-        @onSave="guardarCambiosPlatillo"
-      />
-
       <FormNewPlatillo />
     </div>
 
-    <FormEditPlatillo v-if="ModalEditar" :platillo="platilloAEditar" @onCancel="cerrarModalEditar"
-      @onPlatilloEditada="actualizarListaPlatillos" />
+    <FormEditPlatillo 
+      v-if="ModalEditar" 
+      :platillo="platilloAEditar" 
+      @onCancel="cerrarModalEditar"
+      @onPlatilloEditada="actualizarListaPlatillos" 
+    />
 
     <SuccessModal
       v-if="successModalVisible"
@@ -137,19 +133,24 @@ export default {
     },
 
     mostrarModalEditar(platillo) {
-      console.log("DATOS QUE SE ENVIAN: ", platillo)
+      console.log("Platillo enviado: ", platillo)
       this.ModalEditar = true;
       this.platilloAEditar = platillo;
     },
     async actualizarListaPlatillos() {
-      await this.obtenerPlatillos();
-      this.mostrarSuccessModal("Platillo editado correctamente");
-      this.mostrarModalEditar = false;
+      try {
+        await this.obtenerPlatillos(); // Refresca la lista de platillos
+        this.mostrarSuccessModal("Platillo editado correctamente");
+        this.cerrarModalEditar();
+      } catch (error) {
+        console.error("Error al actualizar la lista de platillos:", error);
+        this.mostrarSuccessModal("Error al actualizar la lista de platillos.");
+      }
     },
     cerrarModalEditar() {
       this.ModalEditar = false;
+      this.platilloAEditar = {}; // Limpia los datos del platillo seleccionado
     },
-
     async eliminarPlatillo() {
       try {
         await axios.put(`http://localhost:5000/api/platillos/desactivar/${this.platilloAEliminar.idplato}`);
@@ -201,12 +202,19 @@ export default {
         this.cerrarModalDestacar();
       }
     },
+    mostrarModalEliminar(platillo) {
+      this.platilloAEliminar = platillo;
+      this.modalVisible = true;
+    },
     mostrarSuccessModal(mensaje) {
       this.successMensaje = mensaje;
       this.successModalVisible = true;
     },
     closeSuccessModal() {
       this.successModalVisible = false;
+    },
+    cerrarModal() {
+      this.modalVisible = false;
     },
   },
 };
