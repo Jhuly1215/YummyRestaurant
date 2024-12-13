@@ -15,6 +15,7 @@ import TemporalCalificacion from '@/ventanas/temporalCalificacion.vue'
 import MisReservas from '@/ventanas/reservas/MisReservas.vue';
 import MisPedidos from '@/ventanas/MisPedidos.vue';
 import MisCalificaciones from '@/ventanas/MisCalificaciones.vue';
+import MenuPedidoMesero from '@/ventanas/MenuPedidoMesero.vue';
 
 //para el administrador
 import MapaInteractivo2 from '@/ventanas/mapaAdmin.vue';
@@ -106,6 +107,11 @@ const router = createRouter({
       path: '/miscalificaciones',
       name: 'MisCalificaciones',
       component: MisCalificaciones,
+    },
+    {
+      path: '/menumesero',
+      name: 'MenuMesero',
+      component: MenuPedidoMesero,
     },
     //Para el Panel Administrativo
     {

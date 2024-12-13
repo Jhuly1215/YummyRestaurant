@@ -59,10 +59,11 @@
             </td>
             <td v-else>{{ platillo.idcategoria }}</td>
 
+            <!--
             <td v-if="index === filaEnEdicion">
               <input v-model="platilloEditado.imagen" />
             </td>
-            <!--
+            
             <td v-else>{{ platillo.imagen }}</td>
             -->
             
@@ -399,5 +400,3 @@ export default {
   background: #bbb;
 }
 </style>
-
-

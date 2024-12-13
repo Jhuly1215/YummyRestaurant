@@ -2,7 +2,12 @@
 
 <template>
   <div>
-      <h1>Mapa Interactivo de Mesas</h1>
+    <HeaderAdminTitle 
+        icon="fa fa-map-marker-alt" 
+        title="Mapa de Mesas" 
+        subtitle="Visualiza y gestiona la distribución de las mesas en tu restaurante"
+    />
+
       <button v-if="rol == 2" @click="mostrarFormulario('añadir')">Añadir Mesa</button>
 
       <button v-if="rol == 2" @click="guardarCoordenadas()">Guardar Mesas</button>
@@ -29,8 +34,6 @@
             
         </form>
 
-        
-
       </div>
       <NuevaReserva
             v-if="modalNuevaReservaVisible"
@@ -47,11 +50,13 @@ import * as d3 from 'd3';
 import { useMesaStore } from '@/stores/mesasStore'; // Importa tu store
 import NuevaReserva from "@/ventanas/reservas/reservaMapa.vue";
 import Swal from 'sweetalert2';
+import HeaderAdminTitle from '@/components/HeaderAdminTitle.vue';
 
 export default {
     name: "ReservasPage",
     components: {
-        NuevaReserva
+        NuevaReserva,
+        HeaderAdminTitle,
     },
     data() {
         return {

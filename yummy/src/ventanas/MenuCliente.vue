@@ -61,7 +61,7 @@ export default {
       try {
         const response = await axios.get('http://localhost:5000/api/platillos/platillos-ofertas');
         this.platillos = response.data;
-        await this.obtenerOfertas(); // Cargar ofertas después de los platillos
+        await this.obtenerOfertas(); // Cargar ofertas después de los platillos NO BORRAR
 
         // Relaciona ofertas con platillos
         this.platillos = this.platillos.map(platillo => {
@@ -78,6 +78,7 @@ export default {
         console.error("Error al obtener los platillos:", error);
       }
     },
+    
   }
 };
 </script>
