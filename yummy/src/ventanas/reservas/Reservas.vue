@@ -1,6 +1,10 @@
 <template>
+  <HeaderAdminTitle 
+    icon="fa fa-calendar-check" 
+    title="Reservas" 
+    subtitle="Gestiona las reservas realizadas por tus clientes"
+  />
   <div class="reservas-container">
-    <h2 class="titulo">Reservas:</h2>
     <button @click="abrirModalNuevaReserva" class="nuevo-button">Nueva Reserva</button>
         <!-- Modal de nueva reserva -->
         <NuevaReserva
@@ -74,6 +78,7 @@ import axios from "axios";
 import ReservaCard from "@/components/ReservaCard.vue";
 import ModalEditReserva from "@/ventanas/reservas/editarReserva.vue";
 import NuevaReserva from "@/ventanas/reservas/newReserva.vue";
+import HeaderAdminTitle from "@/components/HeaderAdminTitle.vue";
 
 export default {
   name: "ReservasView",
@@ -81,6 +86,7 @@ export default {
     ReservaCard,
     ModalEditReserva,
     NuevaReserva,
+    HeaderAdminTitle,
   },
   data() {
     return {
