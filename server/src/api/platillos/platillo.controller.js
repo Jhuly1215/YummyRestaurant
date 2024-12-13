@@ -33,14 +33,7 @@ exports.crearPlatillo = async (req, res) => {
 exports.obtenerPlatillos = async (req, res) => {
     try {
         const platillos = await sequelize.query(
-            `
-            SELECT p.idplato, p.nombre, p.descripcion,
-            p.precio, c.tipo, p.imagen, p.estado
-            FROM platillo p, categoria c 
-            WHERE p.estado != 0
-            AND c.idcategoria = p.idcategoria
-            ORDER BY p.idplato
-            `,
+            `SELECT * FROM platillo where estado != 0`,
             { type: sequelize.QueryTypes.SELECT }
         );
         res.json(platillos);
@@ -52,31 +45,29 @@ exports.obtenerPlatillos = async (req, res) => {
 
 // Actualizar un platillo
 exports.actualizarPlatillo = async (req, res) => {
-  const { id } = req.params;
-  const { nombre, descripcion, precio, idCategoria, imagen } = req.body;
-  console.log("Datos recibidos en el body:", req.body);
-  console.log("ID recibido en params:", req.params.id);
+    const { id } = req.params;
+    const { nombre, descripcion, precio, idCategoria, imagen } = req.body;
 
-  try {
-    const [actualizado] = await sequelize.query(
-        `UPDATE platillo SET nombre = :nombre, descripcion = :descripcion, 
-          precio = :precio, idcategoria = :idCategoria, imagen = :imagen
-          WHERE idplato = :id`,
-        {
-            replacements: { id, nombre, descripcion, precio, idCategoria, imagen },
-            type: sequelize.QueryTypes.UPDATE,
+    try {
+        const [actualizado] = await sequelize.query(
+            `UPDATE platillo SET nombre = :nombre, descripcion = :descripcion, 
+             precio = :precio, idcategoria = :idCategoria, imagen = :imagen
+             WHERE idplato = :id`,
+            {
+                replacements: { id, nombre, descripcion, precio, idCategoria, imagen },
+                type: sequelize.QueryTypes.UPDATE,
+            }
+        );
+
+        if (actualizado) {
+            res.json({ message: 'Platillo actualizado exitosamente' });
+        } else {
+            res.status(404).json({ error: 'Platillo no encontrado' });
         }
-    );
-
-    if (actualizado) {
-        res.json({ message: 'Platillo actualizado exitosamente' });
-    } else {
-        res.status(404).json({ error: 'Platillo no encontrado' });
+    } catch (error) {
+        console.error("Error al actualizar el platillo:", error);
+        res.status(500).json({ error: 'Error al actualizar el platillo', details: error.message });
     }
-  } catch (error) {
-    console.error("Error al actualizar el platillo:", error);
-    res.status(500).json({ error: 'Error al actualizar el platillo', details: error.message });
-  }
 };
 
 // Eliminar un platillo
@@ -174,12 +165,7 @@ exports.obtenerPlatillosOfertas = async (req, res) => {
       const platillos = await sequelize.query(
           `
           SELECT p.idplato, p.nombre, p.descripcion, p.precio,
-          p.idCategoria, p.imagen, p.estado,
-          CASE 
-            WHEN CURRENT_DATE BETWEEN o.fecha_inicio AND o.fecha_fin 
-            THEN o.descuento 
-            ELSE NULL 
-          END AS descuento
+          p.idCategoria, p.imagen, p.estado, o.descuento
           FROM platillo p
           LEFT JOIN oferta o  
           ON p.idplato = o.idPlato 
