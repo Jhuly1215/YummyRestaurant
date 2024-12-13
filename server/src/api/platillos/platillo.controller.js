@@ -35,7 +35,7 @@ exports.obtenerPlatillos = async (req, res) => {
         const platillos = await sequelize.query(
             `
             SELECT p.idplato, p.nombre, p.descripcion,
-            p.precio, c.tipo, p.imagen, p.estado
+            p.precio, c.idcategoria, p.imagen, p.estado
             FROM platillo p, categoria c 
             WHERE p.estado != 0
             AND c.idcategoria = p.idcategoria
@@ -54,8 +54,6 @@ exports.obtenerPlatillos = async (req, res) => {
 exports.actualizarPlatillo = async (req, res) => {
   const { id } = req.params;
   const { nombre, descripcion, precio, idCategoria, imagen } = req.body;
-  console.log("Datos recibidos en el body:", req.body);
-  console.log("ID recibido en params:", req.params.id);
 
   try {
     const [actualizado] = await sequelize.query(

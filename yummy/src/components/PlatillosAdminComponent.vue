@@ -38,20 +38,48 @@
         <tbody>
           <tr v-for="(platillo, index) in platillos" :key="index">
             <td>{{ platillo.idplato }}</td>
-            <td>{{ platillo.nombre }}</td>
-            <td>{{ platillo.descripcion }}</td>
-            <td>{{ platillo.precio }} Bs.</td>
-            <td>{{ platillo.tipo }}</td>
-            <!-- <td>{{ platillo.imagen }}</td> -->
+            
+            <td v-if="index === filaEnEdicion">
+              <input v-model="platilloEditado.nombre" />
+            </td>
+            <td v-else>{{ platillo.nombre }}</td>
+            
+            <td v-if="index === filaEnEdicion">
+              <input v-model="platilloEditado.descripcion" />
+            </td>
+            <td v-else>{{ platillo.descripcion }}</td>
+            
+            <td v-if="index === filaEnEdicion">
+              <input type="number" v-model="platilloEditado.precio" />
+            </td>
+            <td v-else>{{ platillo.precio }} Bs.</td>
+            
+            <td v-if="index === filaEnEdicion">
+              <input type="number" v-model="platilloEditado.idcategoria" />
+            </td>
+            <td v-else>{{ platillo.idcategoria }}</td>
 
+            <!--
+            <td v-if="index === filaEnEdicion">
+              <input v-model="platilloEditado.imagen" />
+            </td>
+            
+            <td v-else>{{ platillo.imagen }}</td>
+            -->
+            
             <td class="botones">
-              <!-- Botón de edición -->
-              <button class="action-button edit-button" @click="mostrarModalEditar(platillo)">
-                <i class=" fas fa-edit"></i>
+              <!-- Botones de edición -->
+              <button v-if="index !== filaEnEdicion" class="action-button edit-button" @click="seleccionarPlatilloParaEditar(index, platillo)">
+                <i class="fas fa-edit"></i>
               </button>
-              <!-- Botón de eliminación -->
-              <button class="action-button delete-button" @click="mostrarModalEliminar(platillo)">
+              <button v-if="index !== filaEnEdicion" class="action-button delete-button" @click="mostrarModalEliminar(platillo)">
                 <i class="fas fa-trash"></i>
+              </button>
+              <button v-if="index === filaEnEdicion" class="action-button button-save" @click="guardarCambios">
+                <i class="fa-solid fa-floppy-disk"></i>
+              </button>
+              <button v-if="index === filaEnEdicion" class="action-button button-cancel" @click="cancelarCambios">
+                <i class="fa-solid fa-xmark"></i>
               </button>
 
               <!-- Botón para destacar -->
@@ -65,15 +93,9 @@
           </tr>
         </tbody>
       </table>
+
       <FormNewPlatillo />
     </div>
-
-    <FormEditPlatillo 
-      v-if="ModalEditar" 
-      :platillo="platilloAEditar" 
-      @onCancel="cerrarModalEditar"
-      @onPlatilloEditada="actualizarListaPlatillos" 
-    />
 
     <SuccessModal
       v-if="successModalVisible"
@@ -89,7 +111,6 @@ import ConfirmationModal from './ConfirmationModal.vue';
 import FormNewPlatillo from './FormNewPlatillo.vue';
 import SuccessModal from './SuccessModal.vue';
 import HeaderAdminTitle from './HeaderAdminTitle.vue';
-import FormEditPlatillo from './FormEditPlatillo.vue';
 
 export default {
   name: "PlatillosAdminComponent",
@@ -97,14 +118,13 @@ export default {
     ConfirmationModal,
     FormNewPlatillo,
     SuccessModal,
-    HeaderAdminTitle, 
-    FormEditPlatillo,
+    HeaderAdminTitle
   },
   data() {
     return {
       platillos: [],
       filaEnEdicion: null,
-      platilloAEditar: {},
+      platilloEditado: {},
       platilloAEliminar: {}, // Platillo que se desea eliminar
       platilloADestacar: {}, // Platillo que se desea destacar
       modalVisible: false, // Modal para eliminar
@@ -112,8 +132,6 @@ export default {
       successModalVisible: false,
       modalMensaje: '', // Mensaje del modal para destacar/desdestacar
       successMensaje: '',
-      ModalEditar: false,
-      platilloSeleccionado: null,
     };
   },
   mounted() {
@@ -131,25 +149,39 @@ export default {
         console.error("Error al obtener los platillos:", error);
       }
     },
-
-    mostrarModalEditar(platillo) {
-      console.log("Platillo enviado: ", platillo)
-      this.ModalEditar = true;
-      this.platilloAEditar = platillo;
+    seleccionarPlatilloParaEditar(index, platillo) {
+      this.filaEnEdicion = index;
+      this.platilloEditado = { ...platillo }; // Copia el platillo a editar
     },
-    async actualizarListaPlatillos() {
+    async guardarCambios() {
       try {
-        await this.obtenerPlatillos(); // Refresca la lista de platillos
-        this.mostrarSuccessModal("Platillo editado correctamente");
-        this.cerrarModalEditar();
+        const payload = {
+          nombre: this.platilloEditado.nombre,
+          descripcion: this.platilloEditado.descripcion,
+          precio: this.platilloEditado.precio,
+          idCategoria: this.platilloEditado.idcategoria,
+          imagen: this.platilloEditado.imagen || null,
+        };
+
+        await axios.put(`http://localhost:5000/api/platillos/${this.platilloEditado.idplato}`, payload);
+        this.platillos.splice(this.filaEnEdicion, 1, { ...this.platilloEditado }); // Actualiza localmente
+        this.filaEnEdicion = null;
+        this.mostrarSuccessModal('Platillo actualizado correctamente');
       } catch (error) {
-        console.error("Error al actualizar la lista de platillos:", error);
-        this.mostrarSuccessModal("Error al actualizar la lista de platillos.");
+        console.error("Error al guardar cambios:", error);
+        this.mostrarSuccessModal('Error al actualizar el platillo');
       }
     },
-    cerrarModalEditar() {
-      this.ModalEditar = false;
-      this.platilloAEditar = {}; // Limpia los datos del platillo seleccionado
+    cancelarCambios() {
+      this.filaEnEdicion = null;
+      this.platilloEditado = {};
+    },
+    mostrarModalEliminar(platillo) {
+      this.platilloAEliminar = platillo;
+      this.modalVisible = true;
+    },
+    cerrarModal() {
+      this.modalVisible = false;
     },
     async eliminarPlatillo() {
       try {
@@ -171,50 +203,49 @@ export default {
       this.modalParaDestacarVisible = false;
     },
     async toggleDestacadoConfirmado() {
-      try {
-        // Realiza la solicitud para cambiar el estado
-        const response = await axios.put(
-          `http://localhost:5000/api/platillos/toggle-destacado/${this.platilloADestacar.idplato}`
+  try {
+    // Realiza la solicitud para cambiar el estado
+    const response = await axios.put(
+      `http://localhost:5000/api/platillos/toggle-destacado/${this.platilloADestacar.idplato}`
+    );
+
+    // Verifica si la respuesta tiene un nuevo estado válido
+    if (response.data && typeof response.data.nuevoEstado === 'number') {
+      // Encuentra el índice del platillo en el array local
+      const index = this.platillos.findIndex(
+        (p) => p.idplato === this.platilloADestacar.idplato
+      );
+
+      if (index !== -1) {
+        // Actualiza el estado del platillo en el array local
+        this.platillos[index].estado = response.data.nuevoEstado;
+        this.$forceUpdate(); // Forzar renderizado si es necesario
+
+        // Opcional: Muestra un mensaje de éxito
+        this.mostrarSuccessModal(
+          `El platillo "${this.platilloADestacar.nombre}" ahora está ${
+            response.data.nuevoEstado === 2 ? 'destacado' : 'no destacado'
+          }.`
         );
-
-        // Verifica si la respuesta tiene un nuevo estado válido
-        if (response.data && typeof response.data.nuevoEstado === 'number') {
-          // Encuentra el índice del platillo en el array local
-          const index = this.platillos.findIndex(
-            (p) => p.idplato === this.platilloADestacar.idplato
-          );
-
-          if (index !== -1) {
-            // Actualiza el estado del platillo en el array local
-            this.platillos[index].estado = response.data.nuevoEstado;
-            this.$forceUpdate(); 
-            // Opcional: Muestra un mensaje de éxito
-            this.mostrarSuccessModal(`El platillo "${this.platilloADestacar.nombre}" ahora está ${response.data.nuevoEstado === 2 ? 'destacado' : 'no destacado'}.`);
-          }
-        } else {
-          this.mostrarSuccessModal('Error en la respuesta del servidor.');
-        }
-      } catch (error) {
-        console.error('Error al cambiar el estado del platillo:', error);
-        this.mostrarSuccessModal('Error al cambiar el estado del platillo.');
-      } finally {
-        // Cierra el modal para destacar
-        this.cerrarModalDestacar();
       }
-    },
-    mostrarModalEliminar(platillo) {
-      this.platilloAEliminar = platillo;
-      this.modalVisible = true;
-    },
+    } else {
+      this.mostrarSuccessModal('Error en la respuesta del servidor.');
+    }
+  } catch (error) {
+    console.error('Error al cambiar el estado del platillo:', error);
+    this.mostrarSuccessModal('Error al cambiar el estado del platillo.');
+  } finally {
+    // Cierra el modal para destacar
+    this.cerrarModalDestacar();
+  }
+},
+
     mostrarSuccessModal(mensaje) {
       this.successMensaje = mensaje;
       this.successModalVisible = true;
     },
     closeSuccessModal() {
       this.successModalVisible = false;
-    },
-    cerrarModal() {
-      this.modalVisible = false;
     },
   },
 };
@@ -323,6 +354,14 @@ export default {
 }
 
 .delete-button {
+  color: #f44336;
+}
+
+.button-save {
+  color: #2f0cf5;
+}
+
+.button-cancel {
   color: #f44336;
 }
 

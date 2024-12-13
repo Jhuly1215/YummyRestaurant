@@ -101,7 +101,7 @@ export default {
         immediate: true,
         handler(nuevoPlatillo) {
           console.log("Platillo recibido:", nuevoPlatillo);
-          this.nuevoPlatillo = { ...nuevoPlatillo, src: null, srcPreview: null };
+          this.nuevoPlatillo = { ...nuevoPlatillo, imagen: null, srcPreview: null };
         },
     },
   },
@@ -112,7 +112,7 @@ export default {
         descripcion: "",
         precio: "",
         idCategoria: null,
-        src: null,
+        imagen: null,
         srcPreview: null,
       },
       categorias: [],
@@ -160,10 +160,22 @@ export default {
     handleFileChange(event) {
       const file = event.target.files[0];
       if (file && (file.type === "image/jpeg" || file.type === "image/png")) {
-        this.nuevoPlatillo.src = file;
+        this.nuevoPlatillo.imagen = file;
         this.nuevoPlatillo.srcPreview = URL.createObjectURL(file);
       } else {
         alert("Solo se permiten archivos JPEG y PNG.");
+      }
+    },
+    handleFileDrop(event) {
+      const file = event.dataTransfer.files[0];
+      if (file) {
+        if (file.type === "image/jpeg" || file.type === "image/png") {
+            this.nuevoPlatillo.imagen = file;
+            this.nuevoPlatillo.srcPreview = URL.createObjectURL(file); // Generar enlace temporal
+            console.log("Imagen cargada (drag & drop): ", this.nuevaOferta.srcPreview); // Debug
+        } else {
+            alert("Solo se permiten archivos JPEG y PNG.");
+        }
       }
     },
     async editarPlatillo() {
@@ -173,16 +185,20 @@ export default {
         }
 
         const formData = new FormData();
+
+        
         formData.append("nombre", this.nuevoPlatillo.nombre);
         formData.append("descripcion", this.nuevoPlatillo.descripcion);
         formData.append("precio", this.nuevoPlatillo.precio);
         formData.append("idCategoria", this.nuevoPlatillo.idCategoria);
 
-        if (this.nuevoPlatillo.src) {
-            formData.append("imagen", this.nuevoPlatillo.src);
+        if (this.nuevoPlatillo.imagen) {
+            formData.append("imagen", this.nuevoPlatillo.imagen);
         }
+        
 
         try {
+            console.log(formData);
             const response = await axios.put(`http://localhost:5000/api/platillos/${this.nuevoPlatillo.idplato}`, formData);
 
             // Notifica al padre que el platillo fue editado
@@ -194,9 +210,9 @@ export default {
             console.error("Error al editar el platillo:", error);
             alert("Ocurrió un error al editar el platillo.");
         }
-        },
+    },
     removeImage() {
-      this.nuevoPlatillo.src = null;
+      this.nuevoPlatillo.imagen = null;
       this.nuevoPlatillo.srcPreview = null;
     },
     mostrarSuccessModal(mensaje) {
