@@ -1,25 +1,54 @@
 # Sistema Web de Gestión de Pedidos, Reservas, Menú y Promociones para el Restaurante Yummy
 
 ## Descripción
-Este proyecto es un sistema web diseñado para mejorar la gestión operativa del restaurante Yummy. Incluye funcionalidades como la reserva de mesas, pedidos en línea, manejo del menú y la creación de promociones, todo desde una interfaz web interactiva y fácil de usar. El sistema busca automatizar procesos internos del restaurante, mejorar la experiencia del cliente y optimizar el uso de los recursos del restaurante mediante estadísticas y visualización de datos en tiempo real.
+Sistema web para mejorar la operación del restaurante **Yummy**, centralizando procesos clave: **reservas**, **pedidos**, **gestión de menú** y **promociones**. Incluye una interfaz web interactiva para uso operativo y administración.
 
-## Integrantes
-| Nombre                        | Rol/Función                    |
-| ----------------------------- | ------------------------------ |
-| Jhulianna Tarqui               | Coach / Programadora Back End   |
-| Dominic Escalante              | Programador Front End           |
-| Alejandro Chiri                | Programador Front End           |
-| Gabriela Barrios               | Analista de Calidad de Software |
+## Equipo de desarrollo
+| Nombre              | Rol |
+|---------------------|-----|
+| Jhulianna Tarqui    | Tech Lead / Backend Developer |
+| Dominic Escalante   | Frontend Developer |
+| Alejandro Chiri     | Frontend Developer |
+| Gabriela Barrios    | QA / Software Quality Analyst |
 
-## Herramientas de Desarrollo
-- **JavaScript**: Se utiliza para añadir interactividad a la interfaz web, permitiendo acciones como validación de formularios, actualización de contenido dinámico y manejo de eventos.
-- **HTML**: Estructura el contenido de la página, definiendo los elementos que el usuario verá y cómo se organizarán en el navegador.
-- **CSS**: Aplica estilos y define el diseño visual del sistema, asegurando que la interfaz sea atractiva y adaptable a diferentes dispositivos.
-- **Vue.js**: Framework de JavaScript utilizado para construir la interfaz de usuario, facilitando la creación de componentes reutilizables y la gestión eficiente del DOM.
+---
 
-## Gestor de Base de Datos
-- **PostgreSQL**: Es el sistema de gestión de bases de datos relacional que se utilizará para almacenar y organizar la información del restaurante. Permite realizar consultas complejas y manejar transacciones con alto rendimiento, asegurando la integridad y consistencia de los datos, como reservas, pedidos, menús y promociones.
+## ✨ Features
+- **Reservas:** registro y administración de reservas de mesas.
+- **Pedidos:** creación y gestión de pedidos (flujo operativo).
+- **Menú:** administración de productos/categorías (CRUD).
+- **Promociones:** creación y gestión de promociones (vigencia/reglas básicas).
+- **Dashboard / métricas:** visualización de información operativa *(según implementación del proyecto)*.
 
-## Diagrama de la Base de Datos
+---
+
+## 🧱 Tech Stack
+**Frontend**
+- Vue.js
+- HTML, CSS, JavaScript
+
+**Backend**
+- Node.js
+- Express.js (REST API)
+
+**Database**
+- PostgreSQL
 ![Diagrama de la Base de Datos](basededatos.jpeg)
+---
 
+## 🏗️ Architecture / Repo Structure
+- `server/` → Backend API (Node.js + Express)
+- `yummy/` → Frontend (Vue.js)
+---
+
+## 🚀 Getting Started
+
+### Prerequisites
+- Node.js (LTS recomendado)
+- PostgreSQL
+- npm
+
+### 1) Clone
+```bash
+git clone https://github.com/Jhuly1215/YummyRestaurant.git
+cd YummyRestaurant
